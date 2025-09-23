@@ -1,0 +1,3 @@
+# nixos
+
+Initial repository setup.
