@@ -14,12 +14,12 @@
   boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
 
   fileSystems."/" = {
-    device = "/dev/disk/by-label/NIXOS_ROOT";
+    device = "/dev/disk/by-label/nixos";
     fsType = "ext4";
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-label/NIXOS_BOOT";
+    device = "/dev/disk/by-label/EFI";
     fsType = "vfat";
     options = [ "fmask=0077" "dmask=0077" ];
   };
