@@ -5,4 +5,19 @@
   timezone = "UTC";
   # Replace with your SSH public key before first deploy.
   sshAuthorizedKey = null;
+
+  # Disk mapping used by hardware-configuration.nix. Update the device paths
+  # (or labels/UUIDs) to match the target machine. To skip mounting /boot, set
+  # boot.device = null.
+  root = {
+    device = "/dev/disk/by-label/nixos";
+    fsType = "ext4";
+    options = [ ];
+  };
+
+  boot = {
+    device = "/dev/disk/by-label/EFI";
+    fsType = "vfat";
+    options = [ "fmask=0077" "dmask=0077" ];
+  };
 }

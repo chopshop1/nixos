@@ -12,6 +12,7 @@ Terminal-only, reproducible NixOS environment preloaded with development tooling
 
 2. **Configure host specifics**
    - Edit `hosts/devbox/user-settings.nix` to set your hostname, username, timezone, and **SSH public key**. Providing a key disables password login; if left `null`, the user password defaults to `changeme` and is forced to reset on first login.
+   - Update the `root`/`boot` blocks in the same file with the device paths, labels, or UUIDs for your disks. Leave `boot.device = null` if you do not mount a separate EFI partition.
    - Optionally adjust modules or add overlays under `modules/` for custom needs.
 
 3. **Install using flakes**

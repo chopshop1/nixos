@@ -1,6 +1,25 @@
-{ config, lib, pkgs, modulesPath, ... }: {
-  # Base hardware profile targeting the Gigabyte X570 AORUS Elite + Ryzen 5 5600X.
-  # Adjust filesystem labels/UUIDs to match the actual install before deployment.
+{ config, lib, modulesPath, userSettings, ... }:
+let
+  get = path: default: lib.attrByPath path default userSettings;
+  rootDevice = get [ "root" "device" ] "/dev/disk/by-label/nixos";
+  rootFsType = get [ "root" "fsType" ] "ext4";
+  rootOptions = get [ "root" "options" ] [ ];
+  bootDevice = get [ "boot" "device" ] null;
+  bootFsType = get [ "boot" "fsType" ] "vfat";
+  bootOptions = get [ "boot" "options" ] [ "fmask=0077" "dmask=0077" ];
+  swapConfig = get [ "swap" ] [ ];
+  rootFs = {
+    device = rootDevice;
+    fsType = rootFsType;
+  } // lib.optionalAttrs (rootOptions != [ ]) { options = rootOptions; };
+  bootFs = lib.optionalAttrs (bootDevice != null) {
+    "/boot" = {
+      device = bootDevice;
+      fsType = bootFsType;
+    } // lib.optionalAttrs (bootOptions != [ ]) { options = bootOptions; };
+  };
+in {
+  # Hardware defaults; override devices in hosts/devbox/user-settings.nix.
 
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
@@ -13,26 +32,14 @@
   boot.loader.systemd-boot.enable = lib.mkDefault true;
   boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
 
-  fileSystems."/" = {
-    device = "/dev/disk/by-label/nixos";
-    fsType = "ext4";
-  };
+  fileSystems = { "/" = rootFs; } // bootFs;
 
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-label/EFI";
-    fsType = "vfat";
-    options = [ "fmask=0077" "dmask=0077" ];
-  };
-
-  swapDevices = [ ];
+  swapDevices = swapConfig;
 
   powerManagement.cpuFreqGovernor = lib.mkDefault "schedutil";
 
-  hardware.cpu.amd = {
-    updateMicrocode =
-      lib.mkDefault config.hardware.enableRedistributableFirmware;
-  };
-
+  hardware.cpu.amd.updateMicrocode =
+    lib.mkDefault config.hardware.enableRedistributableFirmware;
   hardware.enableRedistributableFirmware = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
