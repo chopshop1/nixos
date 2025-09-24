@@ -26,7 +26,7 @@
 
   bootLoader = {
     type = "grub";
-    device = "/dev/sda"; # Change to your target disk (not partition).
+    device = "/dev/nvme0n1"; # Change to your target disk (not partition).
     efiSupport = false;
     useOSProber = false;
   };
