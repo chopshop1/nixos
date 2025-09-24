@@ -31,4 +31,9 @@
     efiSupport = false;
     useOSProber = false;
   };
+
+  virtualization = {
+    enableKVM =
+      false; # Set true to load kvm-amd module when SVM is enabled in BIOS.
+  };
 }

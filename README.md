@@ -14,6 +14,7 @@ Terminal-only, reproducible NixOS environment preloaded with development tooling
    - Edit `hosts/devbox/user-settings.nix` to set your hostname, username, timezone, and **SSH public key**. Providing a key disables password login; if left `null`, the user password defaults to `changeme` and is forced to reset on first login.
    - Update the `root`/`boot` blocks in the same file with the device paths, labels, or UUIDs for your disks. Leave `boot.device = null` when you do not mount a separate EFI system partition.
    - Adjust the `bootLoader` block: leave `type = null` to supply your own bootloader, set `type = "systemd-boot"` when you mount an EFI partition, or set `type = "grub"` and `device` to the target disk (e.g. `/dev/nvme0n1`) for BIOS installs.
+   - Flip `virtualization.enableKVM` to `true` only if SVM/virtualization is enabled in firmware; otherwise leave it `false` to avoid loading `kvm-amd`.
    - Optionally adjust modules or add overlays under `modules/` for custom needs.
 
 3. **Install using flakes**
