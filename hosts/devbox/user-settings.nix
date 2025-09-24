@@ -25,8 +25,9 @@
   swap = [ ];
 
   bootLoader = {
-    type = "grub";
-    device = "/dev/nvme0n1"; # Change to your target disk (not partition).
+    type = null; # Set to "systemd-boot" or "grub" for your setup.
+    device =
+      null; # Required when type = "grub" (e.g. /dev/sda or /dev/nvme0n1).
     efiSupport = false;
     useOSProber = false;
   };

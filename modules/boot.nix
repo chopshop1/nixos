@@ -1,18 +1,15 @@
 # Boot loader configuration driven by user settings.
-{ lib, userSettings, ... }:
+{ lib, config, userSettings, ... }:
 let
   bootLoader = userSettings.bootLoader or { };
-  loaderType = bootLoader.type or "grub";
-  grubDevice = bootLoader.device or "/dev/sda";
+  hasBootFs = config.fileSystems ? "/boot";
+  defaultType = if hasBootFs then "systemd-boot" else null;
+  loaderType = bootLoader.type or defaultType;
+  grubDevice = bootLoader.device or null;
   grubUseEFI = bootLoader.efiSupport or false;
   grubUseOSProber = bootLoader.useOSProber or false;
   grubEnableCryptodisk = bootLoader.enableCryptodisk or false;
   grubSplashImage = bootLoader.splashImage or null;
-  base = {
-    boot.loader.systemd-boot.enable = lib.mkDefault false;
-    boot.loader.efi.canTouchEfiVariables = lib.mkDefault false;
-    boot.loader.grub.enable = lib.mkDefault false;
-  };
   systemdBootCfg = lib.mkIf (loaderType == "systemd-boot") {
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables =
@@ -20,6 +17,8 @@ let
     boot.loader.grub.enable = lib.mkForce false;
   };
   grubCfg = lib.mkIf (loaderType == "grub") {
+    boot.loader.systemd-boot.enable = lib.mkForce false;
+    boot.loader.efi.canTouchEfiVariables = lib.mkForce grubUseEFI;
     boot.loader.grub = {
       enable = true;
       device = grubDevice;
@@ -29,13 +28,17 @@ let
     } // lib.optionalAttrs (grubSplashImage != null) {
       splashImage = grubSplashImage;
     };
-
-    boot.loader.systemd-boot.enable = lib.mkForce false;
-    boot.loader.efi.canTouchEfiVariables = lib.mkForce grubUseEFI;
   };
-  noneCfg = lib.mkIf (loaderType == "none") {
-    boot.loader.grub.enable = lib.mkForce false;
+  noneCfg = lib.mkIf (loaderType == "none" || loaderType == null) {
     boot.loader.systemd-boot.enable = lib.mkForce false;
     boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
+    boot.loader.grub.enable = lib.mkForce false;
   };
-in lib.mkMerge [ base systemdBootCfg grubCfg noneCfg ]
+  assertionCfg = lib.mkIf (loaderType == "grub" && grubDevice == null) {
+    assertions = [{
+      assertion = false;
+      message =
+        ''Set `bootLoader.device` (disk path) when bootLoader.type = "grub".'';
+    }];
+  };
+in lib.mkMerge [ assertionCfg noneCfg systemdBootCfg grubCfg ]
