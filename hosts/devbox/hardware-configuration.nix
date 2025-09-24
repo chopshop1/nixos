@@ -31,7 +31,6 @@
   hardware.cpu.amd = {
     updateMicrocode =
       lib.mkDefault config.hardware.enableRedistributableFirmware;
-    smt = lib.mkDefault true;
   };
 
   hardware.enableRedistributableFirmware = lib.mkDefault true;
