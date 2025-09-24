@@ -10,6 +10,7 @@ in {
     ../../modules/ssh.nix
     ../../modules/docker.nix
     ../../modules/editor.nix
+    ../../modules/boot.nix
   ];
 
   # Ensure Home Manager uses the same package set for consistency.

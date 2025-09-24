@@ -16,8 +16,18 @@
   };
 
   boot = {
-    device = "/dev/disk/by-label/EFI";
+    device =
+      null; # Set to e.g. /dev/disk/by-label/EFI when using a separate EFI partition.
     fsType = "vfat";
     options = [ "fmask=0077" "dmask=0077" ];
+  };
+
+  swap = [ ];
+
+  bootLoader = {
+    type = "grub";
+    device = "/dev/sda"; # Change to your target disk (not partition).
+    efiSupport = false;
+    useOSProber = false;
   };
 }

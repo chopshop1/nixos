@@ -12,7 +12,8 @@ Terminal-only, reproducible NixOS environment preloaded with development tooling
 
 2. **Configure host specifics**
    - Edit `hosts/devbox/user-settings.nix` to set your hostname, username, timezone, and **SSH public key**. Providing a key disables password login; if left `null`, the user password defaults to `changeme` and is forced to reset on first login.
-   - Update the `root`/`boot` blocks in the same file with the device paths, labels, or UUIDs for your disks. Leave `boot.device = null` if you do not mount a separate EFI partition.
+   - Update the `root`/`boot` blocks in the same file with the device paths, labels, or UUIDs for your disks. Leave `boot.device = null` when you do not mount a separate EFI system partition.
+   - Adjust the `bootLoader` block: defaults target legacy/BIOS installs via GRUB on `/dev/sda`. For systemd-boot, set `type = "systemd-boot"` and provide an EFI partition via the `boot` block.
    - Optionally adjust modules or add overlays under `modules/` for custom needs.
 
 3. **Install using flakes**
@@ -50,6 +51,7 @@ If flakes are unavailable, copy `legacy/configuration.nix` and its companion mod
 
 - `flake.nix / flake.lock` – primary NixOS entrypoint.
 - `modules/*.nix` – composable NixOS modules (base tooling, SSH, Docker, users, networking, editor, security).
+- `modules/hardware-*.nix` – hardware defaults (storage mapping, AMD tuning) referenced by host definitions.
 - `hosts/devbox/` – host configuration, hardware stub, and overridable user settings.
 - `scripts/` – operational helpers (AI CLI provisioning, NvChad fallback installer, updates, verification).
 - `legacy/` – single-file configuration fallback plus hardware stub.
