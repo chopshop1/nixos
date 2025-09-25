@@ -1,5 +1,8 @@
 # Core language runtimes and terminal tooling shared by all hosts.
 { pkgs, lib, ... }: {
+  # Allow unfree packages globally (e.g., NVIDIA proprietary driver)
+  nixpkgs.config.allowUnfree = true;
+
   environment.systemPackages = with pkgs; [
     nodejs_22
     bun
