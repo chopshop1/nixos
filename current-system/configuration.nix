@@ -136,15 +136,16 @@ environment.sessionVariables = {
   NIXOS_OZONE_WL = "1";
 };
 
-# Enable Oh My Zsh system-wide
+# Enable zsh system-wide
 programs.zsh = {
   enable = true;
   ohMyZsh = {
     enable = true;
-    plugins = [ "git" "docker" "zsh-autosuggestions" ];
+    plugins = [ "git" "docker" "npm" "node" ];
     theme = "robbyrussell";
   };
   autosuggestions.enable = true;
+  syntaxHighlighting.enable = true;
   enableCompletion = true;
 };
 
