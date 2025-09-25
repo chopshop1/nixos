@@ -1,16 +1,13 @@
 { config, pkgs, lib, ... }:
 {
-  # Drop-in adapter so you can paste a working /etc/nixos configuration.
-  # Replace the two imports below with your copies from the test bench:
-  # - ./hardware-configuration.nix
-  # - ./reference-configuration.nix
+  # Paste your working /etc/nixos/configuration.nix into
+  #   ./reference-configuration.nix
+  # Keep its imports as-is (including ./hardware-configuration.nix).
+  # This avoids duplicate imports and keeps behavior identical to the host.
 
-  imports = [
-    ./hardware-configuration.nix
-    ./reference-configuration.nix
-  ];
+  imports = [ ./reference-configuration.nix ];
 
-  # Keep a sane stateVersion; adjust if your reference requires older semantics
+  # Keep a sane stateVersion; reference config may override if it sets one.
   system.stateVersion = lib.mkDefault "24.05";
 }
 
