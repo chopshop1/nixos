@@ -5,6 +5,11 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  # Allow insecure packages that some dependencies might need
+  nixpkgs.config.permittedInsecurePackages = [
+    "openssl-1.1.1w"
+  ];
+
   environment.systemPackages = with pkgs; [
     curl
     file

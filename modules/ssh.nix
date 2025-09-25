@@ -27,7 +27,8 @@
     ];
   };
 
-  programs.ssh.startAgent = true;
+  # Disabled because GnuPG agent is handling SSH support
+  # programs.ssh.startAgent = true;
 
   environment.systemPackages = with pkgs; [
     openssh
