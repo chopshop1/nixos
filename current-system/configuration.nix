@@ -48,8 +48,10 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
+  # Enable SDDM Display Manager
+  services.displayManager.sddm.enable = true;
+
+  # Enable GNOME as fallback desktop
   services.xserver.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
@@ -62,7 +64,7 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  services.pulseaudio.enable = false;
+  hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -77,6 +79,12 @@
     #media-session.enable = true;
   };
 
+  # Enable polkit for authentication
+  security.polkit.enable = true;
+
+  # Enable dbus for desktop integration
+  services.dbus.enable = true;
+
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
@@ -84,7 +92,8 @@
   users.users.dev = {
     isNormalUser = true;
     description = "dev";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    shell = pkgs.zsh;
     packages = with pkgs; [
     #  thunderbird
     firefox
@@ -109,14 +118,45 @@
   flatpak
   _1password
   _1password-gui
+
+  # Terminal and shell tools
+  kitty           # Terminal emulator
+  zsh             # Shell
+  oh-my-zsh       # Zsh framework
+  docker          # Container platform
   ];
 
 # Add Bun's binary path to environment variables (adjust path if necessary)
 environment.variables.PATH = [
-  "/root/.bun/bin"
+  "/home/dev/.bun/bin"
 ];
 
+# Environment variables
+environment.sessionVariables = {
+  NIXOS_OZONE_WL = "1";
+};
+
+# Enable Oh My Zsh system-wide
+programs.zsh = {
+  enable = true;
+  ohMyZsh = {
+    enable = true;
+    plugins = [ "git" "docker" "zsh-autosuggestions" ];
+    theme = "robbyrussell";
+  };
+  autosuggestions.enable = true;
+  enableCompletion = true;
+};
+
 programs._1password-gui.enable = true;
+
+# XDG Desktop Portal configuration
+xdg.portal = {
+  enable = true;
+  extraPortals = with pkgs; [
+    xdg-desktop-portal-gtk
+  ];
+};
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -129,7 +169,13 @@ programs._1password-gui.enable = true;
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
+  services.openssh.enable = true;
+
+  # Enable Docker service
+  virtualisation.docker.enable = true;
+
+  # Enable Tailscale
+  services.tailscale.enable = true;
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
