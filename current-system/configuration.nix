@@ -123,6 +123,7 @@
   kitty           # Terminal emulator
   zsh             # Shell
   oh-my-zsh       # Zsh framework
+  tmux            # Terminal multiplexer
   docker          # Container platform
   ];
 
@@ -141,12 +142,58 @@ programs.zsh = {
   enable = true;
   ohMyZsh = {
     enable = true;
-    plugins = [ "git" "docker" "npm" "node" ];
+    plugins = [
+      "git"
+      "docker"
+      "npm"
+      "node"
+      "tmux"
+      "history-substring-search"
+    ];
     theme = "robbyrussell";
   };
   autosuggestions.enable = true;
   syntaxHighlighting.enable = true;
   enableCompletion = true;
+
+  # Enhanced history configuration
+  histSize = 10000;
+  histFile = "$HOME/.zsh_history";
+
+  # Shell initialization with better history search
+  interactiveShellInit = ''
+    # History configuration
+    setopt HIST_IGNORE_DUPS
+    setopt HIST_IGNORE_ALL_DUPS
+    setopt HIST_IGNORE_SPACE
+    setopt HIST_SAVE_NO_DUPS
+    setopt SHARE_HISTORY
+    setopt APPEND_HISTORY
+    setopt INC_APPEND_HISTORY
+    setopt HIST_REDUCE_BLANKS
+    setopt HIST_VERIFY
+
+    # Better history search with up/down arrows
+    autoload -U up-line-or-beginning-search
+    autoload -U down-line-or-beginning-search
+    zle -N up-line-or-beginning-search
+    zle -N down-line-or-beginning-search
+    bindkey "^[[A" up-line-or-beginning-search
+    bindkey "^[[B" down-line-or-beginning-search
+
+    # Additional useful key bindings
+    bindkey "^[[1;5C" forward-word    # Ctrl+Right
+    bindkey "^[[1;5D" backward-word   # Ctrl+Left
+    bindkey "^[[3~" delete-char       # Delete key
+    bindkey "^[[H" beginning-of-line  # Home key
+    bindkey "^[[F" end-of-line        # End key
+
+    # Tmux aliases and functions
+    alias tm='tmux'
+    alias tma='tmux attach'
+    alias tms='tmux list-sessions'
+    alias tmn='tmux new-session'
+  '';
 };
 
 programs._1password-gui.enable = true;
