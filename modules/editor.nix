@@ -33,6 +33,7 @@
           nvim-colorizer-lua
           plenary-nvim
           nvim-web-devicons
+          telescope-ui-select-nvim
         ];
       };
     };
@@ -44,7 +45,7 @@
     lua-language-server
     nil  # Nix LSP
     nodePackages.typescript-language-server
-    nodePackages.pyright
+    pyright
     rust-analyzer
     gopls
 

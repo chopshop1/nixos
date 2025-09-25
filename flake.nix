@@ -34,7 +34,6 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.dev = import ./current-system/home.nix;
           }
         ];
         specialArgs = { inherit inputs; };
