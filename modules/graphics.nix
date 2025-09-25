@@ -1,4 +1,4 @@
-{ lib, userSettings, ... }:
+{ lib, userSettings, config, ... }:
 let
   gfx = userSettings.graphics or { };
   enableOpenGL = gfx.enableOpenGL or true;
@@ -12,6 +12,11 @@ let
   amd = gfx.amd or { };
   dcDisable = amd.dcDisable or false; # amdgpu.dc=0 can help some displays
   dpmDisable = amd.dpmDisable or false; # amdgpu.dpm=0 for troubleshooting
+  # NVIDIA controls
+  isNvidia = (driver == "nvidia");
+  nvidia = gfx.nvidia or { };
+  nvidiaModeset = nvidia.modeset or true;
+  nvidiaOpen = nvidia.open or false; # 1080 Ti uses proprietary, so default false
 in {
   # OpenGL/DRI are broadly useful; allow users to opt-out via settings
   hardware.opengl.enable = enableOpenGL;
@@ -28,8 +33,10 @@ in {
 
   # Optionally blacklist legacy radeon driver to avoid conflicts
   boot.blacklistedKernelModules = lib.mkIf blacklistRadeon (lib.mkAfter [ "radeon" ]);
+  # When using NVIDIA proprietary driver, ensure nouveau is not loaded
+  boot.blacklistedKernelModules = lib.mkIf isNvidia (lib.mkAfter [ "nouveau" ]);
 
-  # Collect optional AMD kernel params into a single assignment to avoid conflicts
+  # Collect optional GPU-related kernel params into a single assignment to avoid conflicts
   boot.kernelParams = lib.mkAfter (
     (lib.optionals forceAmdgpu [
       "amdgpu.si_support=1"
@@ -39,7 +46,15 @@ in {
     ])
     ++ (lib.optionals dcDisable [ "amdgpu.dc=0" ])
     ++ (lib.optionals dpmDisable [ "amdgpu.dpm=0" ])
+    ++ (lib.optionals isNvidia [ "nvidia_drm.modeset=1" ])
   );
+
+  # Enable NVIDIA proprietary driver integration when selected
+  hardware.nvidia = lib.mkIf isNvidia {
+    modesetting.enable = nvidiaModeset;
+    open = nvidiaOpen;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
+  };
 }
 
 

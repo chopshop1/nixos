@@ -59,25 +59,20 @@
       vendor = "amd";
     };
     disableEfifb = false;
-    disableVesafb = true; # often avoids early fb conflicts
-    pcieAspmOff = true;   # some boards hang without this
+    disableVesafb = false; # keep generic fb for console with NVIDIA
+    pcieAspmOff = true;    # some boards hang without this
     pciNoAER = true;      # silence AER storms that can look like stalls
   };
 
   # Graphics configuration; keep conservative defaults to avoid black screens
   graphics = {
     enableOpenGL = true;
-    driver = "amdgpu"; # pin driver for AMD
-    plymouthEnable = false; # enable if you want a splash screen
-    initrd = {
-      amdgpu = true; # enable early KMS for AMD (helps avoid blank screen)
-    };
-    # Additional AMD safety toggles
-    # blacklistRadeon = true; # uncomment to ensure radeon is not loaded
-    # oldAmd.forceAmdgpu = true; # uncomment for SI/CIK-era GPUs
-    amd = {
-      dcDisable = false;  # set true if blank screen remains
-      dpmDisable = false; # set true if power mgmt causes stalls
+    driver = "nvidia"; # 1080 Ti test bench
+    plymouthEnable = false; # keep splash disabled
+    # NVIDIA tuning
+    nvidia = {
+      modeset = false; # start without DRM KMS to avoid early console freeze
+      open = false;    # Pascal uses proprietary driver
     };
   };
 }
