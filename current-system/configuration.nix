@@ -196,6 +196,47 @@ programs.zsh = {
   '';
 };
 
+# Configure tmux to use zsh
+programs.tmux = {
+  enable = true;
+  shell = "${pkgs.zsh}/bin/zsh";
+  baseIndex = 1;
+  escapeTime = 0;
+  keyMode = "vi";
+  mouse = true;
+  terminal = "screen-256color";
+
+  extraConfig = ''
+    # Use zsh as default shell
+    set-option -g default-shell ${pkgs.zsh}/bin/zsh
+
+    # Better key bindings
+    bind-key v split-window -h
+    bind-key s split-window -v
+    bind-key h select-pane -L
+    bind-key j select-pane -D
+    bind-key k select-pane -U
+    bind-key l select-pane -R
+
+    # Resize panes
+    bind-key H resize-pane -L 5
+    bind-key J resize-pane -D 5
+    bind-key K resize-pane -U 5
+    bind-key L resize-pane -R 5
+
+    # Status bar
+    set -g status-bg black
+    set -g status-fg white
+    set -g status-left-length 40
+    set -g status-left "#[fg=green]Session: #S #[fg=yellow]#I #[fg=cyan]#P"
+    set -g status-right "#[fg=cyan]%d %b %R"
+    set -g status-justify centre
+
+    # Highlight active window
+    setw -g window-status-current-style fg=white,bg=red,bright
+  '';
+};
+
 programs._1password-gui.enable = true;
 
 # XDG Desktop Portal configuration
