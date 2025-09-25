@@ -1,44 +1,27 @@
-# Boot loader configuration driven by user settings.
-{ lib, config, userSettings, ... }:
-let
-  bootLoader = userSettings.bootLoader or { };
-  hasBootFs = config.fileSystems ? "/boot";
-  defaultType = if hasBootFs then "systemd-boot" else null;
-  loaderType = bootLoader.type or defaultType;
-  grubDevice = bootLoader.device or null;
-  grubUseEFI = bootLoader.efiSupport or false;
-  grubUseOSProber = bootLoader.useOSProber or false;
-  grubEnableCryptodisk = bootLoader.enableCryptodisk or false;
-  grubSplashImage = bootLoader.splashImage or null;
-  systemdBootCfg = lib.mkIf (loaderType == "systemd-boot") {
-    boot.loader.systemd-boot.enable = true;
-    boot.loader.efi.canTouchEfiVariables =
-      bootLoader.efiCanTouchEfiVariables or true;
-    boot.loader.grub.enable = lib.mkForce false;
+{ config, lib, pkgs, ... }:
+
+{
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  boot.initrd.kernelModules = [ "amdgpu" ];
+  
+  boot.kernelParams = [
+    "quiet"
+    "splash"
+    "vga=current"
+    "rd.systemd.show_status=false"
+    "rd.udev.log_level=3"
+    "udev.log_priority=3"
+  ];
+
+  boot.consoleLogLevel = 0;
+  boot.initrd.verbose = false;
+
+  boot.plymouth = {
+    enable = true;
+    theme = "breeze";
   };
-  grubCfg = lib.mkIf (loaderType == "grub") {
-    boot.loader.systemd-boot.enable = lib.mkForce false;
-    boot.loader.efi.canTouchEfiVariables = lib.mkForce grubUseEFI;
-    boot.loader.grub = {
-      enable = true;
-      device = grubDevice;
-      efiSupport = grubUseEFI;
-      useOSProber = grubUseOSProber;
-      enableCryptodisk = grubEnableCryptodisk;
-    } // lib.optionalAttrs (grubSplashImage != null) {
-      splashImage = grubSplashImage;
-    };
-  };
-  noneCfg = lib.mkIf (loaderType == "none" || loaderType == null) {
-    boot.loader.systemd-boot.enable = lib.mkForce false;
-    boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
-    boot.loader.grub.enable = lib.mkForce false;
-  };
-  assertionCfg = lib.mkIf (loaderType == "grub" && grubDevice == null) {
-    assertions = [{
-      assertion = false;
-      message =
-        ''Set `bootLoader.device` (disk path) when bootLoader.type = "grub".'';
-    }];
-  };
-in lib.mkMerge [ assertionCfg noneCfg systemdBootCfg grubCfg ]
+
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+}

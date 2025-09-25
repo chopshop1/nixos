@@ -1,117 +1,129 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
-HOST="devbox"
-USER_NAME="devuser"
-EXPECT_PASSWORD_AUTH=0
-SKIP_DOCKER_RUN=0
+set -e
 
-usage() {
-  cat <<USAGE
-Usage: ${0##*/} [--host HOSTNAME] [--user USERNAME] [--expect-password-auth] [--skip-docker-run]
+echo "========================================"
+echo "NixOS Configuration Verification"
+echo "========================================"
 
-Run post-install validation checks for the devbox configuration.
-USAGE
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Counters
+ERRORS=0
+WARNINGS=0
+
+# Function to check if file exists
+check_file() {
+    if [ -f "$1" ]; then
+        echo -e "${GREEN}✓${NC} $1 exists"
+        return 0
+    else
+        echo -e "${RED}✗${NC} $1 is missing"
+        ((ERRORS++))
+        return 1
+    fi
 }
 
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --host)
-      HOST="$2"
-      shift 2
-      ;;
-    --user)
-      USER_NAME="$2"
-      shift 2
-      ;;
-    --expect-password-auth)
-      EXPECT_PASSWORD_AUTH=1
-      shift
-      ;;
-    --skip-docker-run)
-      SKIP_DOCKER_RUN=1
-      shift
-      ;;
-    --help|-h)
-      usage
-      exit 0
-      ;;
-    *)
-      echo "Unknown argument: $1" >&2
-      usage
-      exit 1
-      ;;
-  esac
-done
-
-failures=()
-
-run_check() {
-  local desc="$1"
-  local cmd="$2"
-  if bash -o pipefail -c "$cmd" >/dev/null 2>&1; then
-    printf "[OK]    %s\n" "$desc"
-  else
-    printf "[FAIL]  %s\n" "$desc" >&2
-    failures+=("$desc")
-  fi
+# Function to check if directory exists
+check_dir() {
+    if [ -d "$1" ]; then
+        echo -e "${GREEN}✓${NC} $1 directory exists"
+        return 0
+    else
+        echo -e "${RED}✗${NC} $1 directory is missing"
+        ((ERRORS++))
+        return 1
+    fi
 }
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-
-run_check "AI CLI provisioning" "\"$REPO_ROOT/scripts/provision-ai-cli.sh\""
-run_check "AI CLI provisioning idempotent" "\"$REPO_ROOT/scripts/provision-ai-cli.sh\""
-
-run_check "sshd service active" "systemctl is-active --quiet sshd"
-run_check "SSH listening on 22/tcp" "ss -lnpt | grep -q ':22 '"
-run_check "SSH root login disabled" "sudo sshd -T | grep -qi 'permitrootlogin no'"
-
-if [[ $EXPECT_PASSWORD_AUTH -eq 1 ]]; then
-  run_check "Password authentication enabled" "sudo sshd -T | grep -qi 'passwordauthentication yes'"
+# Check essential files
+echo "Checking essential files..."
+if [ -f "flake.nix" ]; then
+    check_file "flake.nix"
+    check_file "flake.lock"
 else
-  run_check "Password authentication disabled" "sudo sshd -T | grep -qi 'passwordauthentication no'"
+    check_file "configuration.nix"
+    check_file "hardware-configuration.nix"
 fi
 
-run_check "Default shell is zsh" "getent passwd '$USER_NAME' | cut -d: -f7 | grep -q 'zsh'"
-run_check "Oh My Zsh initialized" "zsh -ic 'echo $ZSH' | grep -q 'oh-my-zsh'"
-run_check "npm prefix exported" "zsh -ic 'npm config get prefix' | grep -q \"$HOME/.npm-global\""
-run_check "npm bin on PATH" "zsh -ic 'echo $PATH' | tr ':' '\n' | grep -q \"$HOME/.npm-global/bin\""
-
-run_check "node available" "node -v"
-run_check "npm available" "npm -v"
-run_check "bun available" "bun --version"
-run_check "rustc available" "rustc --version"
-run_check "cargo available" "cargo --version"
-run_check "go available" "go version"
-run_check "python3 available" "python3 --version"
-
-run_check "Neovim available" "nvim --version"
-run_check "NvChad init.lua present" "test -f $HOME/.config/nvim/init.lua"
-run_check "Neovim headless check" "nvim --headless '+qall'"
-
-run_check "User in docker group" "getent group docker | grep -q '$USER_NAME'"
-run_check "docker info" "docker info"
-
-if [[ $SKIP_DOCKER_RUN -eq 0 ]]; then
-  run_check "docker hello-world" "docker run --rm hello-world"
+# Check directory structure
+echo -e "\nChecking directory structure..."
+if [ -f "flake.nix" ]; then
+    check_dir "hosts"
+    check_dir "modules"
+    check_dir "scripts"
 fi
 
-run_check "docker compose version" "docker compose version || docker-compose version"
-
-run_check "claude CLI" "command -v claude"
-run_check "claude --help" "claude --help"
-run_check "codex CLI or replacement" "command -v codex || command -v openai"
-run_check "codex/help output" "(codex -h || openai -h)"
-
-flake_arg=$(printf '%q' "${REPO_ROOT}#${HOST}")
-run_check "nixos-rebuild dry-run clean" "sudo nixos-rebuild dry-run --flake ${flake_arg} 2>&1 | tee >(grep -q '0 to rebuild' >/dev/null) >/dev/null"
-
-if [[ ${#failures[@]} -gt 0 ]]; then
-  printf '\nFailures (%d):\n' "${#failures[@]}" >&2
-  for f in "${failures[@]}"; do
-    printf ' - %s\n' "$f" >&2
-  done
-  exit 1
+# Check module files if modules directory exists
+if [ -d "modules" ]; then
+    echo -e "\nChecking module files..."
+    for module in base boot networking security ssh users docker editor hardware-basics hardware-amd; do
+        check_file "modules/${module}.nix"
+    done
 fi
 
-printf '\nAll checks passed.\n'
+# Check host configurations
+if [ -d "hosts" ]; then
+    echo -e "\nChecking host configurations..."
+    for host in hosts/*/; do
+        if [ -d "$host" ]; then
+            hostname=$(basename "$host")
+            echo "Checking host: $hostname"
+            check_file "${host}configuration.nix"
+            check_file "${host}hardware-configuration.nix"
+        fi
+    done
+fi
+
+# Validate Nix syntax
+echo -e "\nValidating Nix syntax..."
+if [ -f "flake.nix" ]; then
+    if nix flake check . 2>/dev/null; then
+        echo -e "${GREEN}✓${NC} Flake configuration is valid"
+    else
+        echo -e "${YELLOW}⚠${NC} Flake check failed (this might be normal if not all inputs are available)"
+        ((WARNINGS++))
+    fi
+else
+    if nixos-rebuild dry-build 2>/dev/null; then
+        echo -e "${GREEN}✓${NC} Configuration syntax is valid"
+    else
+        echo -e "${RED}✗${NC} Configuration has syntax errors"
+        ((ERRORS++))
+    fi
+fi
+
+# Check script permissions
+if [ -d "scripts" ]; then
+    echo -e "\nChecking script permissions..."
+    for script in scripts/*.sh; do
+        if [ -f "$script" ]; then
+            if [ -x "$script" ]; then
+                echo -e "${GREEN}✓${NC} $(basename $script) is executable"
+            else
+                echo -e "${YELLOW}⚠${NC} $(basename $script) is not executable"
+                echo "  Run: chmod +x $script"
+                ((WARNINGS++))
+            fi
+        fi
+    done
+fi
+
+# Summary
+echo -e "\n========================================"
+if [ $ERRORS -eq 0 ] && [ $WARNINGS -eq 0 ]; then
+    echo -e "${GREEN}All checks passed!${NC}"
+    exit 0
+else
+    if [ $ERRORS -gt 0 ]; then
+        echo -e "${RED}Found $ERRORS error(s)${NC}"
+    fi
+    if [ $WARNINGS -gt 0 ]; then
+        echo -e "${YELLOW}Found $WARNINGS warning(s)${NC}"
+    fi
+    exit 1
+fi

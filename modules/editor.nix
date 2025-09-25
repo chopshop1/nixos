@@ -1,18 +1,34 @@
-# Neovim configured with NvChad via Home Manager.
-{ lib, userSettings, nvchadSrc, ... }:
-let username = userSettings.username or "devuser";
-in {
-  home-manager.users.${username} = { pkgs, ... }: {
-    home.stateVersion = lib.mkDefault "24.05";
+{ config, lib, pkgs, ... }:
 
-    home.sessionVariables.EDITOR = "nvim";
-
-    xdg.enable = true;
-    xdg.configFile."nvim" = {
-      source = nvchadSrc;
-      recursive = true;
+{
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+    configure = {
+      customRC = ''
+        set number
+        set relativenumber
+        set autoindent
+        set tabstop=2
+        set shiftwidth=2
+        set smarttab
+        set softtabstop=2
+        set expandtab
+        set mouse=a
+        set clipboard=unnamedplus
+        set cursorline
+        set ttyfast
+        set encoding=UTF-8
+      '';
     };
-
-    programs.home-manager.enable = true;
   };
+
+  environment.systemPackages = with pkgs; [
+    vscode
+    sublime4
+    emacs
+    helix
+  ];
 }

@@ -1,13 +1,20 @@
-# Docker daemon, Docker Compose v2, and user access configuration.
-{ pkgs, userSettings, ... }:
-let username = userSettings.username or "devuser";
-in {
+{ config, lib, pkgs, ... }:
+
+{
   virtualisation.docker = {
     enable = true;
     enableOnBoot = true;
+    autoPrune = {
+      enable = true;
+      dates = "weekly";
+    };
   };
 
-  users.groups.docker.members = [ username ];
+  environment.systemPackages = with pkgs; [
+    docker-compose
+    docker-buildx
+    lazydocker
+  ];
 
-  environment.systemPackages = [ pkgs.docker-compose ];
+  users.extraGroups.docker.members = [ "dev" ];
 }

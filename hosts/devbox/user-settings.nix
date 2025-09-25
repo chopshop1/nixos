@@ -1,34 +1,38 @@
+{ config, lib, pkgs, ... }:
+
 {
-  # Override these defaults as needed for your environment.
-  hostname = "devbox";
-  username = "devuser";
-  timezone = "UTC";
-  # Replace with your SSH public key before first deploy.
-  sshAuthorizedKey = null;
-
-  # Disk mapping used by hardware-configuration.nix. Update the device paths
-  # (or labels/UUIDs) to match the target machine. To skip mounting /boot, set
-  # boot.device = null.
-  root = {
-    device = "/dev/disk/by-label/nixos";
-    fsType = "ext4";
-    options = [ ];
+  users.users.dev = {
+    isNormalUser = true;
+    description = "Development User";
+    extraGroups = [ "networkmanager" "wheel" "docker" "audio" "video" ];
+    shell = pkgs.bash;
+    packages = with pkgs; [
+      thunderbird
+      vscode
+      docker-compose
+      nodejs
+      bun
+      python3
+      rustc
+      cargo
+      go
+      _1password
+      _1password-gui
+    ];
   };
 
-  boot = {
-    device =
-      null; # Set to e.g. /dev/disk/by-label/EFI when using a separate EFI partition.
-    fsType = "vfat";
-    options = [ "fmask=0077" "dmask=0077" ];
+  programs.bash.enableCompletion = true;
+
+  environment.variables = {
+    EDITOR = "vim";
+    VISUAL = "vim";
   };
 
-  swap = [ ];
+  services.flatpak.enable = true;
 
-  bootLoader = {
-    type = null; # Set to "systemd-boot" or "grub" for your setup.
-    device =
-      null; # Required when type = "grub" (e.g. /dev/sda or /dev/nvme0n1).
-    efiSupport = false;
-    useOSProber = false;
+  programs.steam = {
+    enable = false;
+    remotePlay.openFirewall = false;
+    dedicatedServer.openFirewall = false;
   };
 }

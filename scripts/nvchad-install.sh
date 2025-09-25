@@ -1,22 +1,29 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
-REPO="https://github.com/NvChad/NvChad.git"
-BRANCH="main"
-TARGET="${HOME}/.config/nvim"
+set -e
 
-if [[ -d "$TARGET" && ! -d "$TARGET/.git" ]]; then
-  echo "Target $TARGET exists but is not a git repository. Refusing to overwrite." >&2
-  exit 1
+echo "Installing NvChad for Neovim..."
+
+# Backup existing nvim config if it exists
+if [ -d "$HOME/.config/nvim" ]; then
+    echo "Backing up existing nvim config..."
+    mv "$HOME/.config/nvim" "$HOME/.config/nvim.backup.$(date +%Y%m%d_%H%M%S)"
 fi
 
-if [[ ! -d "$TARGET" ]]; then
-  echo "Cloning NvChad into $TARGET..."
-  git clone --depth=1 --branch "$BRANCH" "$REPO" "$TARGET"
-else
-  echo "Updating existing NvChad repository in $TARGET..."
-  git -C "$TARGET" fetch origin "$BRANCH"
-  git -C "$TARGET" reset --hard "origin/$BRANCH"
+if [ -d "$HOME/.local/share/nvim" ]; then
+    echo "Backing up existing nvim data..."
+    mv "$HOME/.local/share/nvim" "$HOME/.local/share/nvim.backup.$(date +%Y%m%d_%H%M%S)"
 fi
 
-echo "NvChad installed. Launch nvim to trigger plugin sync if needed."
+if [ -d "$HOME/.cache/nvim" ]; then
+    echo "Cleaning nvim cache..."
+    rm -rf "$HOME/.cache/nvim"
+fi
+
+# Clone NvChad
+echo "Cloning NvChad repository..."
+git clone https://github.com/NvChad/NvChad "$HOME/.config/nvim" --depth 1
+
+echo "NvChad installation complete!"
+echo "Run 'nvim' to start Neovim with NvChad."
+echo "On first run, NvChad will install necessary plugins automatically."

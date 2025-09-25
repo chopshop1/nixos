@@ -1,16 +1,25 @@
-# AMD-specific kernel defaults and microcode.
-{ config, lib, modulesPath, ... }: {
-  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
+{ config, lib, pkgs, ... }:
 
-  boot.initrd.availableKernelModules =
-    [ "xhci_pci" "ahci" "nvme" "usb_storage" "usbhid" "sd_mod" ];
-  boot.initrd.kernelModules = [ ];
+{
+  hardware.cpu.amd.updateMicrocode = true;
+  
   boot.kernelModules = [ "kvm-amd" ];
-  boot.extraModulePackages = [ ];
+  
+  hardware.opengl = {
+    enable = true;
+    driSupport = true;
+    driSupport32Bit = true;
+    extraPackages = with pkgs; [
+      amdvlk
+      rocm-opencl-icd
+      rocm-opencl-runtime
+    ];
+    extraPackages32 = with pkgs; [
+      driversi686Linux.amdvlk
+    ];
+  };
 
-  powerManagement.cpuFreqGovernor = lib.mkDefault "schedutil";
+  environment.variables.AMD_VULKAN_ICD = "RADV";
 
-  hardware.cpu.amd.updateMicrocode =
-    lib.mkDefault config.hardware.enableRedistributableFirmware;
-  hardware.enableRedistributableFirmware = lib.mkDefault true;
+  services.xserver.videoDrivers = [ "amdgpu" ];
 }

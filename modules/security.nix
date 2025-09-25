@@ -1,15 +1,37 @@
-# Minimal security hardening and sudo policy.
-{ lib, userSettings, ... }:
-let
-  sshKey = userSettings.sshAuthorizedKey or null;
-  hasKey = sshKey != null && sshKey != "";
-in {
-  security.sudo = {
+{ config, lib, pkgs, ... }:
+
+{
+  security.sudo.enable = true;
+  security.sudo.wheelNeedsPassword = true;
+
+  security.polkit.enable = true;
+
+  security.apparmor.enable = true;
+
+  services.fail2ban = {
     enable = true;
-    wheelNeedsPassword = true;
+    maxretry = 5;
+    ignoreIP = [
+      "127.0.0.1"
+      "192.168.0.0/16"
+      "10.0.0.0/8"
+    ];
   };
 
-  users.mutableUsers = lib.mkDefault (!hasKey);
+  services.clamav = {
+    daemon.enable = true;
+    updater.enable = true;
+  };
 
-  services.openssh.settings.MaxAuthTries = 3;
+  security.pam.services = {
+    login.enableGnomeKeyring = true;
+    gdm.enableGnomeKeyring = true;
+  };
+
+  programs.firejail.enable = true;
+
+  boot.kernel.sysctl = {
+    "kernel.unprivileged_userns_clone" = 1;
+    "net.ipv4.ip_forward" = 1;
+  };
 }
