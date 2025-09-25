@@ -6,6 +6,8 @@ let
   defaultType = if hasBootFs then "systemd-boot" else null;
   loaderType = bootLoader.type or defaultType;
   grubDevice = bootLoader.device or null;
+  grubDevices = bootLoader.devices or null; # list of disks for GRUB install
+  grubMirroredBoots = bootLoader.mirroredBoots or [ ];
   grubUseEFI = bootLoader.efiSupport or false;
   grubUseOSProber = bootLoader.useOSProber or false;
   grubEnableCryptodisk = bootLoader.enableCryptodisk or false;
@@ -24,7 +26,11 @@ let
     boot.loader.efi.canTouchEfiVariables = lib.mkForce grubUseEFI;
     boot.loader.grub = {
       enable = true;
-      device = grubDevice;
+      # device is used for single-disk installs; "nodev" for UEFI-only
+      # devices is the newer multi-disk interface; mirroredBoots for complex setups
+      device = lib.mkIf (grubDevice != null) grubDevice;
+      devices = lib.mkIf (grubDevices != null) grubDevices;
+      mirroredBoots = lib.mkIf (grubMirroredBoots != [ ]) grubMirroredBoots;
       efiSupport = grubUseEFI;
       useOSProber = grubUseOSProber;
       enableCryptodisk = grubEnableCryptodisk;
@@ -37,11 +43,11 @@ let
     boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
     boot.loader.grub.enable = lib.mkForce false;
   };
-  assertionCfg = lib.mkIf (loaderType == "grub" && grubDevice == null) {
+  assertionCfg = lib.mkIf (loaderType == "grub" && grubDevice == null && grubDevices == null && grubMirroredBoots == [ ]) {
     assertions = [{
       assertion = false;
       message =
-        ''Set `bootLoader.device` (disk path) when bootLoader.type = "grub".'';
+        ''Set one of `bootLoader.device` (e.g. "/dev/nvme0n1" or "nodev" for UEFI-only), `bootLoader.devices` (list of disks), or `bootLoader.mirroredBoots` when bootLoader.type = "grub".'';
     }];
   };
 in lib.mkMerge [ assertionCfg noneCfg systemdBootCfg grubCfg ]
