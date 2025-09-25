@@ -30,6 +30,9 @@
       null; # Required when type = "grub" (e.g. /dev/sda or /dev/nvme0n1).
     efiSupport = false;
     useOSProber = false;
+    # Optionally set systemd-boot console mode: "keep", "0", "1", ...
+    # Helps when firmware sets an unsupported graphics mode
+    # systemdConsoleMode = "keep";
   };
 
   virtualization = {
@@ -41,18 +44,24 @@
   # Optional kernel tuning and visibility during boot
   kernel = {
     params = [ ]; # e.g. "amd_pstate=active" "pci=nomsi"
-    consoleLogLevel = 4; # 4=warning, 7=debug
-    initrdVerbose = false;
-    forceTextMode = false; # adds nomodeset
+    consoleLogLevel = 7; # start verbose while diagnosing black screen
+    initrdVerbose = true;
+    forceTextMode = false; # set true only as last resort
+    showStatus = true;
+    console = "tty0"; # also try "ttyS0,115200n8" for serial logs
+    # useLatest = true; # enable for newest kernel when GPU support is needed
   };
 
   # Graphics configuration; keep conservative defaults to avoid black screens
   graphics = {
     enableOpenGL = true;
-    driver = null; # set to "amdgpu" for AMD, or leave null for auto
+    driver = "amdgpu"; # pin driver for AMD
     plymouthEnable = false; # enable if you want a splash screen
     initrd = {
-      amdgpu = false; # set true if using early KMS or encrypted root
+      amdgpu = true; # enable early KMS for AMD (helps avoid blank screen)
     };
+    # Additional AMD safety toggles
+    # blacklistRadeon = true; # uncomment to ensure radeon is not loaded
+    # oldAmd.forceAmdgpu = true; # uncomment for SI/CIK-era GPUs
   };
 }

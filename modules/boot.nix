@@ -10,11 +10,14 @@ let
   grubUseOSProber = bootLoader.useOSProber or false;
   grubEnableCryptodisk = bootLoader.enableCryptodisk or false;
   grubSplashImage = bootLoader.splashImage or null;
+  sysdConsoleMode = bootLoader.systemdConsoleMode or null; # e.g. "keep", "0", "1"
   systemdBootCfg = lib.mkIf (loaderType == "systemd-boot") {
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables =
       bootLoader.efiCanTouchEfiVariables or true;
     boot.loader.grub.enable = lib.mkForce false;
+    # Configure consoleMode when provided, useful for blank/overscanned screens
+    boot.loader.systemd-boot.consoleMode = lib.mkIf (sysdConsoleMode != null) sysdConsoleMode;
   };
   grubCfg = lib.mkIf (loaderType == "grub") {
     boot.loader.systemd-boot.enable = lib.mkForce false;
