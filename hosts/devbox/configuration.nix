@@ -11,6 +11,8 @@ in {
     ../../modules/docker.nix
     ../../modules/editor.nix
     ../../modules/boot.nix
+    ../../modules/kernel.nix
+    ../../modules/graphics.nix
   ];
 
   # Ensure Home Manager uses the same package set for consistency.

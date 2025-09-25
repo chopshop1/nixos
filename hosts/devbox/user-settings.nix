@@ -33,7 +33,26 @@
   };
 
   virtualization = {
-    enableKVM =
-      false; # Set true to load kvm-amd module when SVM is enabled in BIOS.
+    enableKVM = false; # Set true to load KVM when virtualization is enabled.
+    # Optionally pin vendor for correct KVM module: "amd" or "intel".
+    kvmVendor = "amd";
+  };
+
+  # Optional kernel tuning and visibility during boot
+  kernel = {
+    params = [ ]; # e.g. "amd_pstate=active" "pci=nomsi"
+    consoleLogLevel = 4; # 4=warning, 7=debug
+    initrdVerbose = false;
+    forceTextMode = false; # adds nomodeset
+  };
+
+  # Graphics configuration; keep conservative defaults to avoid black screens
+  graphics = {
+    enableOpenGL = true;
+    driver = null; # set to "amdgpu" for AMD, or leave null for auto
+    plymouthEnable = false; # enable if you want a splash screen
+    initrd = {
+      amdgpu = false; # set true if using early KMS or encrypted root
+    };
   };
 }

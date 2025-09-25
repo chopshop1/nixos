@@ -56,11 +56,18 @@
           hostPath = ./hosts/devbox/configuration.nix;
           userSettingsPath = ./hosts/devbox/user-settings.nix;
         };
+
+        devbox-container = makeSystem {
+          system = "x86_64-linux";
+          hostPath = ./hosts/container/configuration.nix;
+          userSettingsPath = ./hosts/container/user-settings.nix;
+        };
       };
 
       formatter = {
         x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt;
         aarch64-linux = nixpkgs.legacyPackages.aarch64-linux.nixfmt;
       };
+
     };
 }

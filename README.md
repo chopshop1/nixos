@@ -92,6 +92,49 @@ Neovim is installed system-wide via Nix. NvChad is deployed declaratively throug
 - **Docker hello-world pull failures** – re-run with network access or `./scripts/verify.sh --skip-docker-run` if offline (other checks still run).
 - **NvChad sync issues** – run `nvim --headless "+Lazy sync" +qa` or `scripts/nvchad-install.sh` to force an update.
 - **AI CLI auth errors** – ensure `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` are exported in your shell or managed via a secrets store.
+- **Virtualisation disabled in firmware** – leave `virtualization.enableKVM = false`; enabling it without SVM/AMD-V causes the kernel to log repeated `kvm_amd: SVM not supported` messages.
+
+### Hardware/graphics configuration (hardware-agnostic defaults and AMD black screen)
+
+- The config now separates hardware concerns:
+  - `modules/hardware-cpu.nix` – generic firmware and microcode for both AMD/Intel; optional KVM module based on `virtualization.kvmVendor`.
+  - `modules/kernel.nix` – kernel params, console log level, text-mode fallback.
+  - `modules/graphics.nix` – OpenGL, optional video driver pinning, optional `amdgpu` in initrd, and Plymouth toggle.
+
+- If you see a black screen with a blinking cursor on an AMD GPU after install:
+  1. In `hosts/devbox/user-settings.nix`, set a minimal AMD-oriented graphics stanza:
+     ```nix
+     graphics = {
+       enableOpenGL = true;
+       driver = "amdgpu";        # Pin driver
+       plymouthEnable = false;    # Keep splash disabled initially
+       initrd = { amdgpu = true; }; # Enable early KMS if using encrypted root or if blank screen persists
+     };
+     ```
+  2. Optionally add kernel params for visibility while debugging:
+     ```nix
+     kernel = {
+       consoleLogLevel = 7;       # verbose boot
+       initrdVerbose = true;
+       params = [ "amd_pstate=active" ];
+       # As a last resort only:
+       # forceTextMode = true;    # adds nomodeset (disables KMS)
+     };
+     ```
+  3. Rebuild and reboot:
+     ```bash
+     sudo nixos-rebuild switch --flake .#devbox
+     sudo reboot
+     ```
+  4. Once stable, you can relax `consoleLogLevel` back to `4` and disable `initrdVerbose`.
+
+- For virtualization on AMD, enable KVM only if SVM is enabled in firmware:
+  ```nix
+  virtualization = {
+    enableKVM = true;
+    kvmVendor = "amd"; # or "intel" on Intel machines
+  };
+  ```
 
 ## Development & contributions
 
@@ -112,6 +155,18 @@ $ ./scripts/verify.sh --host devbox
 
 All checks passed.
 ```
+
+## Docker smoke test
+
+Build and load a privileged Docker image (for quick userland checks only):
+
+```bash
+./scripts/build-docker-image.sh
+docker run --rm -it --privileged \
+  -v /sys/fs/cgroup:/sys/fs/cgroup:ro devbox:latest
+```
+
+The script builds the `devbox-container` flake target via `nixos-generators`. The container runs systemd; SSH and Docker daemon are disabled, but language runtimes, zsh/Oh My Zsh, and NvChad match the bare-metal configuration. Run the container with `--privileged` so systemd can boot.
 
 ## Release notes
 
