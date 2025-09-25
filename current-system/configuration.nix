@@ -193,22 +193,25 @@ programs.zsh = {
     alias tma='tmux attach'
     alias tms='tmux list-sessions'
     alias tmn='tmux new-session'
+    alias tmz='tmux new-session -s main -c $HOME'  # New session with zsh
   '';
 };
 
 # Configure tmux to use zsh
 programs.tmux = {
   enable = true;
-  shell = "${pkgs.zsh}/bin/zsh";
   baseIndex = 1;
   escapeTime = 0;
   keyMode = "vi";
-  mouse = true;
   terminal = "screen-256color";
 
   extraConfig = ''
-    # Use zsh as default shell
-    set-option -g default-shell ${pkgs.zsh}/bin/zsh
+    # Use zsh as default shell (both settings for compatibility)
+    set-option -g default-shell /run/current-system/sw/bin/zsh
+    set-option -g default-command /run/current-system/sw/bin/zsh
+
+    # Enable mouse support
+    set -g mouse on
 
     # Better key bindings
     bind-key v split-window -h
