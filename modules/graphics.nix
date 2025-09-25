@@ -29,19 +29,17 @@ in {
   # Optionally blacklist legacy radeon driver to avoid conflicts
   boot.blacklistedKernelModules = lib.mkIf blacklistRadeon (lib.mkAfter [ "radeon" ]);
 
-  # Toggle to force amdgpu on older Southern/Sea Islands generations
-  boot.kernelParams = lib.mkIf forceAmdgpu (
-    lib.mkAfter [
+  # Collect optional AMD kernel params into a single assignment to avoid conflicts
+  boot.kernelParams = lib.mkAfter (
+    (lib.optionals forceAmdgpu [
       "amdgpu.si_support=1"
       "amdgpu.cik_support=1"
       "radeon.si_support=0"
       "radeon.cik_support=0"
-    ]
+    ])
+    ++ (lib.optionals dcDisable [ "amdgpu.dc=0" ])
+    ++ (lib.optionals dpmDisable [ "amdgpu.dpm=0" ])
   );
-
-  # AMD troubleshooting switches
-  boot.kernelParams = lib.mkIf dcDisable (lib.mkAfter [ "amdgpu.dc=0" ]);
-  boot.kernelParams = lib.mkIf dpmDisable (lib.mkAfter [ "amdgpu.dpm=0" ]);
 }
 
 
