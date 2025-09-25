@@ -62,6 +62,14 @@
           hostPath = ./hosts/container/configuration.nix;
           userSettingsPath = ./hosts/container/user-settings.nix;
         };
+
+        # Reference host for importing a known-good /etc/nixos configuration
+        bench = makeSystem {
+          system = "x86_64-linux";
+          hostPath = ./hosts/bench/configuration.nix;
+          # This host intentionally ignores userSettings; drop in raw config
+          userSettingsPath = null;
+        };
       };
 
       formatter = {
