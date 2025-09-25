@@ -31,10 +31,11 @@ in {
   # Some AMD setups need amdgpu in initrd (e.g., luks on root with early kms)
   boot.initrd.kernelModules = lib.mkIf preloadAmdgpu (lib.mkAfter [ "amdgpu" ]);
 
-  # Optionally blacklist legacy radeon driver to avoid conflicts
-  boot.blacklistedKernelModules = lib.mkIf blacklistRadeon (lib.mkAfter [ "radeon" ]);
-  # When using NVIDIA proprietary driver, ensure nouveau is not loaded
-  boot.blacklistedKernelModules = lib.mkIf isNvidia (lib.mkAfter [ "nouveau" ]);
+  # Consolidate blacklist entries to avoid duplicate assignments
+  boot.blacklistedKernelModules = lib.mkAfter (
+    (lib.optionals blacklistRadeon [ "radeon" ])
+    ++ (lib.optionals isNvidia [ "nouveau" ])
+  );
 
   # Collect optional GPU-related kernel params into a single assignment to avoid conflicts
   boot.kernelParams = lib.mkAfter (
