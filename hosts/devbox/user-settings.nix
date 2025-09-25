@@ -50,6 +50,18 @@
     showStatus = true;
     console = "tty0"; # also try "ttyS0,115200n8" for serial logs
     # useLatest = true; # enable for newest kernel when GPU support is needed
+    # Debugging toggles if netlink/systemd stalls persist
+    systemdDebug = true;
+    systemdRescue = false; # set true to boot into rescue target
+    earlySerial = null; # e.g. "ttyS0,115200n8" to capture early logs
+    iommu = {
+      mode = null; # try "soft" or "pt" if hangs relate to IOMMU
+      vendor = "amd";
+    };
+    disableEfifb = false;
+    disableVesafb = true; # often avoids early fb conflicts
+    pcieAspmOff = true;   # some boards hang without this
+    pciNoAER = true;      # silence AER storms that can look like stalls
   };
 
   # Graphics configuration; keep conservative defaults to avoid black screens
@@ -63,5 +75,9 @@
     # Additional AMD safety toggles
     # blacklistRadeon = true; # uncomment to ensure radeon is not loaded
     # oldAmd.forceAmdgpu = true; # uncomment for SI/CIK-era GPUs
+    amd = {
+      dcDisable = false;  # set true if blank screen remains
+      dpmDisable = false; # set true if power mgmt causes stalls
+    };
   };
 }

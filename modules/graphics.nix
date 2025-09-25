@@ -9,6 +9,9 @@ let
   blacklistRadeon = gfx.blacklistRadeon or false;
   oldAmd = gfx.oldAmd or { };
   forceAmdgpu = oldAmd.forceAmdgpu or false; # forces amdgpu on SI/CIK and disables radeon
+  amd = gfx.amd or { };
+  dcDisable = amd.dcDisable or false; # amdgpu.dc=0 can help some displays
+  dpmDisable = amd.dpmDisable or false; # amdgpu.dpm=0 for troubleshooting
 in {
   # OpenGL/DRI are broadly useful; allow users to opt-out via settings
   hardware.opengl.enable = enableOpenGL;
@@ -35,6 +38,10 @@ in {
       "radeon.cik_support=0"
     ]
   );
+
+  # AMD troubleshooting switches
+  boot.kernelParams = lib.mkIf dcDisable (lib.mkAfter [ "amdgpu.dc=0" ]);
+  boot.kernelParams = lib.mkIf dpmDisable (lib.mkAfter [ "amdgpu.dpm=0" ]);
 }
 
 
