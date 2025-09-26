@@ -6,37 +6,18 @@
     defaultEditor = true;
     viAlias = true;
     vimAlias = true;
+  };
 
-    # Install packages needed for kickstart
-    configure = {
-      packages.all = with pkgs.vimPlugins; {
-        start = [
-          # Core dependencies for kickstart
-          nvim-treesitter.withAllGrammars
-          telescope-nvim
-          telescope-fzf-native-nvim
-          nvim-lspconfig
-          nvim-cmp
-          cmp-nvim-lsp
-          cmp-buffer
-          cmp-path
-          cmp-cmdline
-          luasnip
-          cmp_luasnip
-          friendly-snippets
-          gitsigns-nvim
-          which-key-nvim
-          comment-nvim
-          indent-blankline-nvim
-          lualine-nvim
-          nvim-autopairs
-          nvim-colorizer-lua
-          plenary-nvim
-          nvim-web-devicons
-          telescope-ui-select-nvim
-        ];
-      };
-    };
+  # Clone kickstart.nvim to user's config directory
+  system.activationScripts.kickstart-nvim = {
+    text = ''
+      if [ ! -d /home/dev/.config/nvim ]; then
+        mkdir -p /home/dev/.config
+        ${pkgs.git}/bin/git clone https://github.com/nvim-lua/kickstart.nvim.git /home/dev/.config/nvim
+        chown -R dev:users /home/dev/.config/nvim
+      fi
+    '';
+    deps = [];
   };
 
   # Additional packages for development
@@ -54,6 +35,14 @@
     fd       # Required by telescope
     git      # Required by gitsigns
     gcc      # Required for treesitter compilation
+
+    # Proton applications
+    protonmail-desktop      # ProtonMail desktop app
+    protonmail-bridge       # ProtonMail bridge for email clients
+    protonmail-bridge-gui   # ProtonMail bridge GUI
+    proton-pass            # Proton Pass password manager
+    protonvpn-gui          # ProtonVPN GUI
+    protonvpn-cli          # ProtonVPN CLI
 
     # Other editors (optional)
     vscode
