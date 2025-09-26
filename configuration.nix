@@ -106,6 +106,8 @@
     #  thunderbird
     firefox
     ];
+    # Ensure shell environment for SSH
+    openssh.authorizedKeys.keyFiles = [];
   };
 
   # Install firefox.
@@ -129,10 +131,9 @@
 
   # Terminal and shell tools
   kitty           # Terminal emulator
-  zsh             # Shell
-  oh-my-zsh       # Zsh framework
   tmux            # Terminal multiplexer
   docker          # Container platform
+  ethtool         # Network interface configuration tool for Wake-on-LAN
   ];
 
 # Add Bun's binary path to environment variables (adjust path if necessary)
@@ -143,65 +144,19 @@ environment.variables.PATH = [
 # Environment variables
 environment.sessionVariables = {
   NIXOS_OZONE_WL = "1";
+  # Ensure zsh is used in all contexts
+  SHELL = "${pkgs.zsh}/bin/zsh";
 };
 
-# Enable zsh system-wide
+# Enable zsh system-wide (minimal configuration)
 programs.zsh = {
   enable = true;
-  ohMyZsh = {
-    enable = true;
-    plugins = [
-      "git"
-      "docker"
-      "npm"
-      "node"
-      "tmux"
-      "history-substring-search"
-    ];
-    theme = "robbyrussell";
-  };
-  autosuggestions.enable = true;
-  syntaxHighlighting.enable = true;
   enableCompletion = true;
 
-  # Enhanced history configuration
-  histSize = 10000;
-  histFile = "$HOME/.zsh_history";
-
-  # Shell initialization with better history search
-  interactiveShellInit = ''
-    # History configuration
-    setopt HIST_IGNORE_DUPS
-    setopt HIST_IGNORE_ALL_DUPS
-    setopt HIST_IGNORE_SPACE
-    setopt HIST_SAVE_NO_DUPS
-    setopt SHARE_HISTORY
-    setopt APPEND_HISTORY
-    setopt INC_APPEND_HISTORY
-    setopt HIST_REDUCE_BLANKS
-    setopt HIST_VERIFY
-
-    # Better history search with up/down arrows
-    autoload -U up-line-or-beginning-search
-    autoload -U down-line-or-beginning-search
-    zle -N up-line-or-beginning-search
-    zle -N down-line-or-beginning-search
-    bindkey "^[[A" up-line-or-beginning-search
-    bindkey "^[[B" down-line-or-beginning-search
-
-    # Additional useful key bindings
-    bindkey "^[[1;5C" forward-word    # Ctrl+Right
-    bindkey "^[[1;5D" backward-word   # Ctrl+Left
-    bindkey "^[[3~" delete-char       # Delete key
-    bindkey "^[[H" beginning-of-line  # Home key
-    bindkey "^[[F" end-of-line        # End key
-
-    # Tmux aliases and functions
-    alias tm='tmux'
-    alias tma='tmux attach'
-    alias tms='tmux list-sessions'
-    alias tmn='tmux new-session'
-    alias tmz='tmux new-session -s main -c $HOME'  # New session with zsh
+  # Ensure zsh is the default shell for all sessions
+  shellInit = ''
+    # Force zsh for all terminal sessions
+    export SHELL=${pkgs.zsh}/bin/zsh
   '';
 };
 
@@ -214,7 +169,11 @@ programs.tmux = {
   terminal = "screen-256color";
 
   extraConfig = ''
-    # Use zsh as default shell (both settings for compatibility)
+    # Use zsh as default shell (multiple methods for maximum compatibility)
+    set-option -g default-shell ${pkgs.zsh}/bin/zsh
+    set-option -g default-command ${pkgs.zsh}/bin/zsh
+
+    # Alternative paths for compatibility
     set-option -g default-shell /run/current-system/sw/bin/zsh
     set-option -g default-command /run/current-system/sw/bin/zsh
 
@@ -269,7 +228,87 @@ xdg.portal = {
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
+  services.openssh = {
+    enable = true;
+    settings = {
+      # Allow users to use their configured shell
+      PermitUserEnvironment = true;
+      AcceptEnv = "SHELL LANG LC_*";
+    };
+    extraConfig = ''
+      # Force zsh for all interactive SSH sessions
+      ForceCommand ${pkgs.bash}/bin/bash -c 'if [ -t 0 ]; then exec ${pkgs.zsh}/bin/zsh -l; else exec "$SHELL" -c "$SSH_ORIGINAL_COMMAND"; fi'
+    '';
+  };
+
+  # Set default shell for SSH sessions
+  programs.ssh.extraConfig = ''
+    SetEnv SHELL=${pkgs.zsh}/bin/zsh
+  '';
+
+  # Ensure SSH sessions use zsh by default
+  environment.shellInit = ''
+    # Force zsh for SSH sessions
+    if [ -n "$SSH_CONNECTION" ] && [ "$SHELL" != "${pkgs.zsh}/bin/zsh" ]; then
+      export SHELL=${pkgs.zsh}/bin/zsh
+      [ -x ${pkgs.zsh}/bin/zsh ] && exec ${pkgs.zsh}/bin/zsh -l
+    fi
+  '';
+
+  # Power management configuration for SSH availability
+  # Wake-on-LAN for ethernet + prevent sleep for WiFi availability
+
+  # Enable Wake-on-LAN for ethernet interfaces (when plugged in)
+  systemd.services.wake-on-lan = {
+    description = "Enable Wake-on-LAN for ethernet interfaces";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = ''
+        ${pkgs.bash}/bin/bash -c '
+          for iface in $(ls /sys/class/net | grep -E "^(en|eth)"); do
+            ${pkgs.ethtool}/bin/ethtool -s $iface wol g 2>/dev/null || true
+          done
+        '
+      '';
+    };
+  };
+
+  # Re-enable Wake-on-LAN after suspend/resume
+  powerManagement.powerUpCommands = ''
+    for iface in $(ls /sys/class/net | grep -E "^(en|eth)"); do
+      ${pkgs.ethtool}/bin/ethtool -s $iface wol g 2>/dev/null || true
+    done
+  '';
+
+  # Prevent system from sleeping to maintain SSH availability
+  services.logind.extraConfig = ''
+    HandleSuspendKey=ignore
+    HandleHibernateKey=ignore
+    HandleLidSwitch=ignore
+    HandleLidSwitchDocked=ignore
+    IdleAction=ignore
+  '';
+
+  # Disable automatic suspend
+  systemd.targets.sleep.enable = false;
+  systemd.targets.suspend.enable = false;
+  systemd.targets.hibernate.enable = false;
+  systemd.targets.hybrid-sleep.enable = false;
+
+  # Keep WiFi connection alive
+  networking.networkmanager.wifi.powersave = false;
+
+  # Ensure NetworkManager doesn't put WiFi to sleep
+  networking.networkmanager.extraConfig = ''
+    [connection]
+    wifi.powersave = 2
+
+    [device]
+    wifi.scan-rand-mac-address = no
+  '';
 
   # Enable Docker service
   virtualisation.docker.enable = true;
