@@ -49,8 +49,10 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable SDDM Display Manager
+  # Enable SDDM Display Manager with auto-login
   services.displayManager.sddm.enable = true;
+  services.displayManager.autoLogin.enable = true;
+  services.displayManager.autoLogin.user = "dev";
 
   # Enable GNOME as fallback desktop
   services.xserver.desktopManager.gnome.enable = true;
@@ -83,6 +85,9 @@
   # Enable polkit for authentication
   security.polkit.enable = true;
 
+  # Enable passwordless sudo for wheel group
+  security.sudo.wheelNeedsPassword = false;
+
   # Enable dbus for desktop integration
   services.dbus.enable = true;
 
@@ -95,6 +100,8 @@
     description = "dev";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     shell = pkgs.zsh;
+    # Enable passwordless sudo for convenience
+    hashedPassword = null;
     packages = with pkgs; [
     #  thunderbird
     firefox
