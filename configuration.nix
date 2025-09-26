@@ -49,13 +49,13 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable SDDM Display Manager with auto-login
-  services.displayManager.sddm.enable = true;
+  # Enable GDM Display Manager with auto-login (better for GNOME)
+  services.displayManager.gdm.enable = true;
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = "dev";
 
   # Enable GNOME as fallback desktop
-  services.xserver.desktopManager.gnome.enable = true;
+  services.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -94,14 +94,14 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  # Define a user account. Don't forget to set a password with 'passwd'.
+  # Define a user account with no password for automatic login
   users.users.dev = {
     isNormalUser = true;
     description = "dev";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     shell = pkgs.zsh;
-    # Enable passwordless sudo for convenience
-    hashedPassword = null;
+    # No password required for automatic login
+    hashedPassword = "";
     packages = with pkgs; [
     #  thunderbird
     firefox
@@ -124,7 +124,7 @@
   nodejs
   bun
   flatpak
-  _1password
+  _1password-cli
   _1password-gui
 
   # Terminal and shell tools
