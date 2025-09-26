@@ -3,7 +3,7 @@
 set -e
 
 echo "Rebuilding NixOS configuration..."
-sudo nixos-rebuild switch --flake /home/dev/nixos#current-system
+sudo nixos-rebuild switch --flake /home/dev/nixos#nixos
 
 echo "System rebuilt successfully!"
 echo "You can now switch to zsh by running: zsh"
