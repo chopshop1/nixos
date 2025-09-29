@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ../modules/neovim-complete.nix
+    ../modules/neovim-latest.nix
   ];
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
@@ -251,6 +251,9 @@
     defaultEditor = true;
     viAlias = true;
     vimAlias = true;
+
+    # Use the latest Neovim package available
+    package = pkgs.neovim-unwrapped;
 
     # Install required packages
     extraPackages = with pkgs; [

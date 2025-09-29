@@ -29,16 +29,18 @@ in
   config = mkMerge [
     (mkIf cfg.preventSuspend {
       # Prevent system from sleeping to maintain SSH availability
-      services.logind.extraConfig = ''
-        HandleSuspendKey=ignore
-        HandleHibernateKey=ignore
-        HandleLidSwitch=ignore
-        HandleLidSwitchDocked=ignore
-        HandleLidSwitchExternalPower=ignore
-        IdleAction=ignore
-        IdleActionSec=0
-        UserStopDelaySec=0
-      '';
+      services.logind.settings = {
+        Login = {
+          HandleSuspendKey = "ignore";
+          HandleHibernateKey = "ignore";
+          HandleLidSwitch = "ignore";
+          HandleLidSwitchDocked = "ignore";
+          HandleLidSwitchExternalPower = "ignore";
+          IdleAction = "ignore";
+          IdleActionSec = "0";
+          UserStopDelaySec = "0";
+        };
+      };
 
       # Disable automatic suspend completely
       systemd.targets.sleep.enable = false;
