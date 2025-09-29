@@ -3,7 +3,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./modules/editor.nix
+    ./modules/editor-declarative.nix
     ./modules/docker.nix
     ./modules/cli-tools.nix
     ./modules/desktop-apps.nix
@@ -48,12 +48,12 @@
   services.xserver.enable = true;
 
   # Enable GDM Display Manager with auto-login
-  services.displayManager.gdm.enable = true;
+  services.xserver.displayManager.gdm.enable = true;
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = "dev";
 
   # Enable GNOME desktop
-  services.desktopManager.gnome.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -65,7 +65,7 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire
-  services.pulseaudio.enable = false;
+  hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -98,6 +98,9 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+
+  # Enable flakes and nix-command
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # XDG Desktop Portal configuration
   xdg.portal = {

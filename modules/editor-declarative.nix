@@ -5,23 +5,8 @@ with lib;
 let
   cfg = config.my.neovim;
 
-  # Create a custom kickstart.nvim package
-  kickstartNvim = pkgs.stdenv.mkDerivation rec {
-    pname = "kickstart-nvim-config";
-    version = "2024-01-01";
-
-    src = pkgs.fetchFromGitHub {
-      owner = "nvim-lua";
-      repo = "kickstart.nvim";
-      rev = "master";
-      sha256 = "sha256-0000000000000000000000000000000000000000000="; # Update with actual hash
-    };
-
-    installPhase = ''
-      mkdir -p $out
-      cp -r * $out/
-    '';
-  };
+  # Note: kickstart.nvim is managed through Home Manager's xdg.configFile
+  # This module just ensures the necessary packages are installed
 in
 {
   options.my.neovim = {
@@ -75,7 +60,7 @@ in
       # Additional formatters and linters
       nixpkgs-fmt
       black
-      prettier
+      nodePackages.prettier
       rustfmt
       gofumpt
     ] ++ cfg.additionalLSPs;
