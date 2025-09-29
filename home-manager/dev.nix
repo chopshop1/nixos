@@ -1,6 +1,9 @@
 { config, pkgs, lib, ... }:
 
 {
+  imports = [
+    ../modules/neovim-complete.nix
+  ];
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "dev";
@@ -128,6 +131,9 @@
     };
 
     initExtra = ''
+      # Add Bun to PATH
+      export PATH="/home/dev/.bun/bin:$PATH"
+
       # Enhanced history search with up/down arrows
       bindkey '^[[A' history-substring-search-up
       bindkey '^[[B' history-substring-search-down
@@ -260,20 +266,13 @@
       ripgrep
       fd
       gcc
+      git  # Required for lazy.nvim to clone plugins
     ];
 
     # We'll migrate kickstart.nvim configuration here later
     # For now, we'll use xdg.configFile to manage the config
   };
 
-  # Manage Neovim config declaratively using kickstart.nvim
-  # For now, we'll manage the config through activation script to avoid pure eval issues
-  # TODO: Package kickstart.nvim properly as a derivation
-  xdg.configFile."nvim/init.lua".text = ''
-    -- Kickstart.nvim will be installed on first run
-    -- This is a placeholder that will bootstrap the config
-    vim.api.nvim_echo({{"Kickstart.nvim will be configured on first run", "WarningMsg"}}, true, {})
-  '';
 
   # Bash configuration (for compatibility)
   programs.bash = {
