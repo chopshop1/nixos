@@ -26,7 +26,7 @@ in
       zsh-autosuggestions
       zsh-syntax-highlighting
       zsh-completions
-      oh-my-zsh
+      starship
 
       # Modern CLI tools
     ] ++ (if cfg.modern then with pkgs; [
