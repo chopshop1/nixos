@@ -112,9 +112,44 @@
       # Add Bun to PATH
       export PATH="/home/dev/.bun/bin:$PATH"
 
+      # Save and restore last working directory
+      LAST_DIR_FILE="$HOME/.zsh_last_dir"
+
+      # Restore last directory on shell start (but not in tmux, since tmux handles it)
+      if [[ -z "$TMUX" ]] && [[ -f "$LAST_DIR_FILE" ]]; then
+        LAST_DIR=$(cat "$LAST_DIR_FILE")
+        if [[ -d "$LAST_DIR" ]]; then
+          cd "$LAST_DIR"
+        fi
+      fi
+
+      # Save current directory on every directory change (only outside tmux)
+      function save_last_dir() {
+        if [[ -z "$TMUX" ]]; then
+          pwd > "$LAST_DIR_FILE"
+        fi
+      }
+      add-zsh-hook chpwd save_last_dir
+      add-zsh-hook zshexit save_last_dir
+
+      # Enhanced completion settings
+      zstyle ':completion:*' menu select
+      zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+      zstyle ':completion:*' list-colors "''${(s.:.)LS_COLORS}"
+      zstyle ':completion:*' special-dirs true
+      zstyle ':completion:*' squeeze-slashes true
+      zstyle ':completion:*:*:*:*:descriptions' format '%F{green}-- %d --%f'
+      zstyle ':completion:*:*:*:*:corrections' format '%F{yellow}!- %d (errors: %e) -!%f'
+      zstyle ':completion:*:messages' format ' %F{purple} -- %d --%f'
+      zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
+      zstyle ':completion:*' group-name ""
+
       # Enhanced history search with up/down arrows
       bindkey '^[[A' history-substring-search-up
       bindkey '^[[B' history-substring-search-down
+
+      # Tab completion navigation
+      bindkey '^[[Z' reverse-menu-complete  # Shift+Tab for reverse
 
       # Additional useful key bindings
       bindkey "^[[1;5C" forward-word    # Ctrl+Right
@@ -156,6 +191,53 @@
           esac
         else
           echo "'$1' is not a valid file"
+        fi
+      }
+
+      # Open a tmux dev workspace for the current directory
+      dev() {
+        # Use current folder name as session name
+        session="$(basename "$PWD")"
+        root="$PWD"
+
+        # If session already exists, just attach/switch
+        if tmux has-session -t "$session" 2>/dev/null; then
+          if [ -n "$TMUX" ]; then
+            tmux switch-client -t "$session"
+          else
+            tmux attach -t "$session"
+          fi
+          return
+        fi
+
+        # Create detached session rooted at the directory
+        tmux new-session -d -s "$session" -c "$root"
+
+        # Split horizontally to create right pane
+        tmux split-window -h -c "$root"
+
+        # Select left pane and split it vertically
+        tmux select-pane -t 0
+        tmux split-window -v -c "$root"
+
+        # Now we have:
+        # Pane 0: top-left
+        # Pane 1: right
+        # Pane 2: bottom-left
+
+        # Send commands
+        tmux send-keys -t 0 'claude --dangerously-skip-permissions' C-m
+        tmux send-keys -t 1 'nvim .' C-m
+        tmux send-keys -t 2 'docker compose up -d' C-m
+
+        # Focus right pane with nvim
+        tmux select-pane -t 1
+
+        # Attach/switch
+        if [ -n "$TMUX" ]; then
+          tmux switch-client -t "$session"
+        else
+          tmux attach -t "$session"
         fi
       }
 
@@ -411,19 +493,36 @@
       # Enable mouse support
       set -g mouse on
 
-      # Better key bindings
-      bind-key v split-window -h
-      bind-key s split-window -v
+      # Open new windows and panes in current directory
+      bind-key c new-window -c "#{pane_current_path}"
+      bind-key v split-window -h -c "#{pane_current_path}"
+      bind-key s split-window -v -c "#{pane_current_path}"
+      bind-key '"' split-window -v -c "#{pane_current_path}"
+      bind-key % split-window -h -c "#{pane_current_path}"
+
+      # Pane navigation with vim keybinds (lowercase)
       bind-key h select-pane -L
       bind-key j select-pane -D
       bind-key k select-pane -U
       bind-key l select-pane -R
 
-      # Resize panes
-      bind-key H resize-pane -L 5
-      bind-key J resize-pane -D 5
-      bind-key K resize-pane -U 5
-      bind-key L resize-pane -R 5
+      # Window navigation with vim keybinds (uppercase)
+      bind-key H previous-window
+      bind-key L next-window
+      bind-key J previous-window
+      bind-key K next-window
+
+      # Session navigation with Ctrl + vim keybinds
+      bind-key C-h switch-client -p
+      bind-key C-l switch-client -n
+      bind-key C-j switch-client -p
+      bind-key C-k switch-client -n
+
+      # Resize panes with arrow keys
+      bind-key -r Left resize-pane -L 5
+      bind-key -r Down resize-pane -D 5
+      bind-key -r Up resize-pane -U 5
+      bind-key -r Right resize-pane -R 5
 
       # Status bar
       set -g status-bg black

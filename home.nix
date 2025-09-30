@@ -42,6 +42,38 @@
       # Ensure zsh is the shell for all contexts
       export SHELL="$(which zsh)"
 
+      # Save and restore last working directory
+      LAST_DIR_FILE="$HOME/.zsh_last_dir"
+
+      # Restore last directory on shell start (but not in tmux, since tmux handles it)
+      if [[ -z "$TMUX" ]] && [[ -f "$LAST_DIR_FILE" ]]; then
+        LAST_DIR=$(cat "$LAST_DIR_FILE")
+        if [[ -d "$LAST_DIR" ]]; then
+          cd "$LAST_DIR"
+        fi
+      fi
+
+      # Save current directory on every directory change (only outside tmux)
+      function save_last_dir() {
+        if [[ -z "$TMUX" ]]; then
+          pwd > "$LAST_DIR_FILE"
+        fi
+      }
+      add-zsh-hook chpwd save_last_dir
+      add-zsh-hook zshexit save_last_dir
+
+      # Enhanced completion settings
+      zstyle ':completion:*' menu select
+      zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+      zstyle ':completion:*' list-colors "''${(s.:.)LS_COLORS}"
+      zstyle ':completion:*' special-dirs true
+      zstyle ':completion:*' squeeze-slashes true
+      zstyle ':completion:*:*:*:*:descriptions' format '%F{green}-- %d --%f'
+      zstyle ':completion:*:*:*:*:corrections' format '%F{yellow}!- %d (errors: %e) -!%f'
+      zstyle ':completion:*:messages' format ' %F{purple} -- %d --%f'
+      zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
+      zstyle ':completion:*' group-name ""
+
       # Enhanced history search with up/down arrows
       autoload -U up-line-or-beginning-search
       autoload -U down-line-or-beginning-search
@@ -49,6 +81,9 @@
       zle -N down-line-or-beginning-search
       bindkey "^[[A" up-line-or-beginning-search
       bindkey "^[[B" down-line-or-beginning-search
+
+      # Tab completion navigation
+      bindkey '^[[Z' reverse-menu-complete  # Shift+Tab for reverse
 
       # Additional useful key bindings
       bindkey "^[[1;5C" forward-word    # Ctrl+Right
