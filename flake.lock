@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "chopshop-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1759177231,
+        "narHash": "sha256-EX1PhtNqoOENmKjUb2vKugwZOwYqaqmfHQtmJaadBy0=",
+        "owner": "chopshop1",
+        "repo": ".nvim",
+        "rev": "00bbc9bc37a2d6eee8d9cdf5578a8b3d3e2dbf75",
+        "type": "github"
+      },
+      "original": {
+        "owner": "chopshop1",
+        "repo": ".nvim",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -39,6 +55,7 @@
     },
     "root": {
       "inputs": {
+        "chopshop-nvim": "chopshop-nvim",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs"
       }

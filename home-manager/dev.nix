@@ -1,9 +1,7 @@
 { config, pkgs, lib, ... }:
 
 {
-  imports = [
-    ../modules/neovim-latest.nix
-  ];
+  # Neovim config is now managed directly in flake.nix
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "dev";
@@ -105,6 +103,7 @@
       ".." = "cd ..";
       "..." = "cd ../..";
       "...." = "cd ../../..";
+      work = "cd /home/dev/work";  # Jump to work folder from anywhere
 
       # Git shortcuts
       gs = "git status";
