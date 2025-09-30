@@ -3,11 +3,11 @@
     "chopshop-nvim": {
       "flake": false,
       "locked": {
-        "lastModified": 1759177231,
-        "narHash": "sha256-EX1PhtNqoOENmKjUb2vKugwZOwYqaqmfHQtmJaadBy0=",
+        "lastModified": 1759199115,
+        "narHash": "sha256-qTfyLBt68Y1OhMgLSwV82kKj07g/c+toBKgHWOwl7uQ=",
         "owner": "chopshop1",
         "repo": ".nvim",
-        "rev": "00bbc9bc37a2d6eee8d9cdf5578a8b3d3e2dbf75",
+        "rev": "9638cd00392dbbd8ca4d6b6652d66200df146fcc",
         "type": "github"
       },
       "original": {
