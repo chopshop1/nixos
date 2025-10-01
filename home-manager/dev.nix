@@ -344,6 +344,16 @@
       git_status = {
         style = "bg:yellow";
         format = "[[($all_status$ahead_behind )](fg:crust bg:yellow)]($style)";
+        ahead = "⇡\${count}";
+        behind = "⇣\${count}";
+        diverged = "⇕⇡\${ahead_count}⇣\${behind_count}";
+        up_to_date = "";
+        untracked = "?\${count}";
+        stashed = "$\${count}";
+        modified = "!\${count}";
+        staged = "+\${count}";
+        renamed = "»\${count}";
+        deleted = "✘\${count}";
       };
 
       nodejs = {
