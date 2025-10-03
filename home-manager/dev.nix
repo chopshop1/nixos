@@ -93,6 +93,7 @@
       gco = "git checkout";
       gb = "git branch";
       glog = "git log --oneline --graph --decorate";
+      ezp = "git add -A && git commit -m \"update\" && git push";
 
       # Docker shortcuts
       dps = "docker ps";
@@ -193,6 +194,32 @@
           echo "'$1' is not a valid file"
         fi
       }
+
+      # Smart tmux attach/switch - works both inside and outside tmux
+      ta() {
+        if [ -z "$1" ]; then
+          echo "Usage: ta <session-name>"
+          echo "Available sessions:"
+          tmux list-sessions 2>/dev/null || echo "No tmux sessions running"
+          return 1
+        fi
+
+        if [ -n "$TMUX" ]; then
+          # Inside tmux, switch to session
+          tmux switch-client -t "$1"
+        else
+          # Outside tmux, attach to session
+          tmux attach -t "$1"
+        fi
+      }
+
+      # Autocomplete for ta function - list tmux sessions
+      _ta_completion() {
+        local sessions
+        sessions=(''${(f)"$(tmux list-sessions -F '#S' 2>/dev/null)"})
+        _describe 'tmux session' sessions
+      }
+      compdef _ta_completion ta
 
       # Open a tmux dev workspace for the current directory
       dev() {
