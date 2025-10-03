@@ -276,7 +276,7 @@
     '';
   };
 
-  # Starship prompt - Modern dark minimal theme
+  # Starship prompt - Tokyo Night theme (2025 trendy build)
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
@@ -284,20 +284,20 @@
     settings = {
       "$schema" = "https://starship.rs/config-schema.json";
 
-      format = "[](dark_bg1)$os$username[](bg:dark_bg2 fg:dark_bg1)$directory[](bg:git_bg fg:dark_bg2)$git_branch$git_status$git_state[](fg:git_bg bg:lang_bg)$c$rust$golang$nodejs$php$java$kotlin$haskell$python[](fg:lang_bg bg:dark_bg3)$docker_context$conda[](fg:dark_bg3)$cmd_duration$line_break$character";
+      format = "[░▒▓](#a3aed2)[  ](bg:#a3aed2 fg:#090c0c)$os[](bg:#769ff0 fg:#a3aed2)$directory[](fg:#769ff0 bg:#394260)$git_branch$git_status$git_state[](fg:#394260 bg:#212736)$c$rust$golang$nodejs$php$java$kotlin$haskell$python$bun[](fg:#212736 bg:#1d2230)$docker_context$conda$aws[](fg:#1d2230 bg:#16161e)$time[ ](fg:#16161e)$line_break$character";
 
-      palette = "modern_dark";
+      palette = "tokyo_night";
 
       os = {
         disabled = false;
-        style = "bg:dark_bg1 fg:dim_text";
+        style = "bg:#a3aed2 fg:#090c0c";
         symbols = {
-          Windows = "";
+          Windows = "󰍲";
           Ubuntu = "󰕈";
           SUSE = "";
           Raspbian = "󰐿";
           Mint = "󰣭";
-          Macos = "󰀵";
+          Macos = "";
           Manjaro = "";
           Linux = "󰌽";
           Gentoo = "󰣨";
@@ -311,18 +311,12 @@
           Debian = "󰣚";
           Redhat = "󱄛";
           RedHatEnterprise = "󱄛";
+          NixOS = "";
         };
       };
 
-      username = {
-        show_always = true;
-        style_user = "bg:dark_bg1 fg:dim_text";
-        style_root = "bg:dark_bg1 fg:warning";
-        format = "[ $user]($style)";
-      };
-
       directory = {
-        style = "bg:dark_bg2 fg:text";
+        style = "fg:#e3e5e5 bg:#769ff0";
         format = "[ $path ]($style)";
         truncation_length = 3;
         truncation_symbol = "…/";
@@ -332,111 +326,128 @@
           Music = "󰝚 ";
           Pictures = " ";
           Developer = "󰲋 ";
+          work = " ";
         };
       };
 
       git_branch = {
         symbol = "";
-        style = "bg:git_bg fg:git_text";
-        format = "[[ $symbol $branch ](bg:git_bg fg:git_text)]($style)";
+        style = "bg:#394260";
+        format = "[[ $symbol $branch ](fg:#769ff0 bg:#394260)]($style)";
       };
 
       git_status = {
-        style = "bg:git_bg fg:git_text";
-        conflicted = "[!\${count}](bg:git_bg fg:error) ";
-        ahead = "[⇡\${count}](bg:git_bg fg:git_text) ";
-        behind = "[⇣\${count}](bg:git_bg fg:git_text) ";
-        diverged = "[⇕\${ahead_count}⇣\${behind_count}](bg:git_bg fg:git_warn) ";
-        up_to_date = "[✓](bg:git_bg fg:success)";
-        untracked = "[?\${count}](bg:git_bg fg:dim_text) ";
-        stashed = "[$\${count}](bg:git_bg fg:muted) ";
-        modified = "[●\${count}](bg:git_bg fg:git_warn) ";
-        staged = "[+\${count}](bg:git_bg fg:success) ";
-        renamed = "[»\${count}](bg:git_bg fg:muted) ";
-        deleted = "[✘\${count}](bg:git_bg fg:error) ";
+        style = "bg:#394260";
+        conflicted = "[!\${count}](bg:#394260 fg:#f7768e) ";
+        ahead = "[⇡\${count}](bg:#394260 fg:#769ff0) ";
+        behind = "[⇣\${count}](bg:#394260 fg:#769ff0) ";
+        diverged = "[⇕\${ahead_count}⇣\${behind_count}](bg:#394260 fg:#e0af68) ";
+        up_to_date = "[✓](bg:#394260 fg:#9ece6a)";
+        untracked = "[?\${count}](bg:#394260 fg:#787c99) ";
+        stashed = "[$\${count}](bg:#394260 fg:#bb9af7) ";
+        modified = "[●\${count}](bg:#394260 fg:#e0af68) ";
+        staged = "[+\${count}](bg:#394260 fg:#9ece6a) ";
+        renamed = "[»\${count}](bg:#394260 fg:#7dcfff) ";
+        deleted = "[✘\${count}](bg:#394260 fg:#f7768e) ";
+        format = "[[($all_status$ahead_behind )](fg:#769ff0 bg:#394260)]($style)";
       };
 
       git_state = {
-        style = "bg:git_bg fg:warning";
-        format = "[[ $state($progress_current/$progress_total) ](bg:git_bg fg:warning)]($style)";
-        rebase = "rebasing";
-        merge = "merging";
-        revert = "reverting";
-        cherry_pick = "cherry-picking";
-        bisect = "bisecting";
-        am = "am";
-        am_or_rebase = "am/rebase";
-      };
-
-      nodejs = {
-        symbol = "";
-        style = "bg:lang_bg fg:muted";
-        format = "[[ $symbol( $version) ](bg:lang_bg fg:muted)]($style)";
+        style = "bg:#394260 fg:#e0af68";
+        format = "[[ $state($progress_current/$progress_total) ](bg:#394260 fg:#e0af68)]($style)";
+        rebase = "REBASING";
+        merge = "MERGING";
+        revert = "REVERTING";
+        cherry_pick = "CHERRY-PICKING";
+        bisect = "BISECTING";
+        am = "AM";
+        am_or_rebase = "AM/REBASE";
       };
 
       c = {
         symbol = " ";
-        style = "bg:lang_bg fg:muted";
-        format = "[[ $symbol( $version) ](bg:lang_bg fg:muted)]($style)";
+        style = "bg:#212736";
+        format = "[[ $symbol($version) ](fg:#769ff0 bg:#212736)]($style)";
       };
 
       rust = {
         symbol = "";
-        style = "bg:lang_bg fg:muted";
-        format = "[[ $symbol( $version) ](bg:lang_bg fg:muted)]($style)";
+        style = "bg:#212736";
+        format = "[[ $symbol($version) ](fg:#769ff0 bg:#212736)]($style)";
       };
 
       golang = {
         symbol = "";
-        style = "bg:lang_bg fg:muted";
-        format = "[[ $symbol( $version) ](bg:lang_bg fg:muted)]($style)";
+        style = "bg:#212736";
+        format = "[[ $symbol($version) ](fg:#769ff0 bg:#212736)]($style)";
+      };
+
+      nodejs = {
+        symbol = "";
+        style = "bg:#212736";
+        format = "[[ $symbol($version) ](fg:#769ff0 bg:#212736)]($style)";
       };
 
       php = {
         symbol = "";
-        style = "bg:lang_bg fg:muted";
-        format = "[[ $symbol( $version) ](bg:lang_bg fg:muted)]($style)";
+        style = "bg:#212736";
+        format = "[[ $symbol($version) ](fg:#769ff0 bg:#212736)]($style)";
       };
 
       java = {
         symbol = " ";
-        style = "bg:lang_bg fg:muted";
-        format = "[[ $symbol( $version) ](bg:lang_bg fg:muted)]($style)";
+        style = "bg:#212736";
+        format = "[[ $symbol($version) ](fg:#769ff0 bg:#212736)]($style)";
       };
 
       kotlin = {
         symbol = "";
-        style = "bg:lang_bg fg:muted";
-        format = "[[ $symbol( $version) ](bg:lang_bg fg:muted)]($style)";
+        style = "bg:#212736";
+        format = "[[ $symbol($version) ](fg:#769ff0 bg:#212736)]($style)";
       };
 
       haskell = {
         symbol = "";
-        style = "bg:lang_bg fg:muted";
-        format = "[[ $symbol( $version) ](bg:lang_bg fg:muted)]($style)";
+        style = "bg:#212736";
+        format = "[[ $symbol($version) ](fg:#769ff0 bg:#212736)]($style)";
       };
 
       python = {
         symbol = "";
-        style = "bg:lang_bg fg:muted";
-        format = "[[ $symbol( $version)(($virtualenv)) ](bg:lang_bg fg:muted)]($style)";
+        style = "bg:#212736";
+        format = "[[ $symbol($version)(($virtualenv)) ](fg:#769ff0 bg:#212736)]($style)";
+      };
+
+      bun = {
+        symbol = "󰛦 ";
+        style = "bg:#212736";
+        format = "[[ $symbol($version) ](fg:#769ff0 bg:#212736)]($style)";
       };
 
       docker_context = {
         symbol = "";
-        style = "bg:dark_bg3 fg:muted";
-        format = "[[ $symbol( $context) ](bg:dark_bg3 fg:muted)]($style)";
+        style = "bg:#1d2230";
+        format = "[[ $symbol($context) ](fg:#769ff0 bg:#1d2230)]($style)";
       };
 
       conda = {
         symbol = " ";
-        style = "bg:dark_bg3 fg:muted";
-        format = "[[ $symbol$environment ](bg:dark_bg3 fg:muted)]($style)";
+        style = "bg:#1d2230";
+        format = "[[ $symbol$environment ](fg:#769ff0 bg:#1d2230)]($style)";
         ignore_base = false;
       };
 
+      aws = {
+        symbol = " ";
+        style = "bg:#1d2230";
+        format = "[[ $symbol($profile)(\\($region\\)) ](fg:#769ff0 bg:#1d2230)]($style)";
+      };
+
       time = {
-        disabled = true;
+        disabled = false;
+        time_format = "%R";
+        style = "bg:#16161e";
+        format = "[[  $time ](fg:#a9b1d6 bg:#16161e)]($style)";
       };
 
       line_break = {
@@ -445,49 +456,54 @@
 
       character = {
         disabled = false;
-        success_symbol = "[❯](bold success)";
-        error_symbol = "[❯](bold error)";
-        vimcmd_symbol = "[❮](bold success)";
-        vimcmd_replace_one_symbol = "[❮](bold warning)";
-        vimcmd_replace_symbol = "[❮](bold warning)";
-        vimcmd_visual_symbol = "[❮](bold muted)";
+        success_symbol = "[❯](bold fg:#9ece6a)";
+        error_symbol = "[❯](bold fg:#f7768e)";
+        vimcmd_symbol = "[❮](bold fg:#9ece6a)";
+        vimcmd_replace_one_symbol = "[❮](bold fg:#bb9af7)";
+        vimcmd_replace_symbol = "[❮](bold fg:#bb9af7)";
+        vimcmd_visual_symbol = "[❮](bold fg:#e0af68)";
       };
 
       cmd_duration = {
         show_milliseconds = false;
-        format = "[ $duration]($style)";
-        style = "bg:dark_bg3 fg:dim_text";
+        format = "took [$duration](bold yellow) ";
         disabled = false;
         min_time = 2000;
         show_notifications = true;
         min_time_to_notify = 45000;
       };
 
-      palettes.modern_dark = {
-        # Dark backgrounds
-        dark_bg1 = "#1c1c1c";
-        dark_bg2 = "#2a2a2a";
-        dark_bg3 = "#303030";
-
-        # Git section - dark slate
-        git_bg = "#2c3440";
-
-        # Language section
-        lang_bg = "#2d2d2d";
-
-        # Text colors - clearer grays
-        text = "#e0e0e0";
-        dim_text = "#9e9e9e";
-        muted = "#8a8a8a";
-
-        # Git colors - more visible
-        git_text = "#b0bec5";
-        git_warn = "#d4a574";
-
-        # Status colors - more vibrant
-        success = "#6b9b6b";
-        warning = "#c79c5f";
-        error = "#b56b6b";
+      palettes.tokyo_night = {
+        # Tokyo Night Storm color palette
+        bg = "#24283b";
+        bg_dark = "#1f2335";
+        bg_highlight = "#292e42";
+        terminal_black = "#414868";
+        fg = "#c0caf5";
+        fg_dark = "#a9b1d6";
+        fg_gutter = "#3b4261";
+        dark3 = "#545c7e";
+        comment = "#565f89";
+        dark5 = "#737aa2";
+        blue0 = "#3d59a1";
+        blue = "#7aa2f7";
+        cyan = "#7dcfff";
+        blue1 = "#2ac3de";
+        blue2 = "#0db9d7";
+        blue5 = "#89ddff";
+        blue6 = "#b4f9f8";
+        blue7 = "#394b70";
+        magenta = "#bb9af7";
+        magenta2 = "#ff007c";
+        purple = "#9d7cd8";
+        orange = "#ff9e64";
+        yellow = "#e0af68";
+        green = "#9ece6a";
+        green1 = "#73daca";
+        green2 = "#41a6b5";
+        teal = "#1abc9c";
+        red = "#f7768e";
+        red1 = "#db4b4b";
       };
     };
   };
