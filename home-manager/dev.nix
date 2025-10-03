@@ -223,9 +223,15 @@
 
       # Open a tmux dev workspace for the current directory
       dev() {
-        # Use current folder name as session name
-        session="$(basename "$PWD")"
-        root="$PWD"
+        # Use provided path or current directory
+        if [ -n "$1" ]; then
+          root="$(cd "$1" && pwd)"
+        else
+          root="$PWD"
+        fi
+
+        # Use folder name as session name
+        session="$(basename "$root")"
 
         # If session already exists, just attach/switch
         if tmux has-session -t "$session" 2>/dev/null; then
@@ -671,6 +677,24 @@
       fi
     '';
   };
+
+  # Claude Code configuration - symlink to agents repo
+  home.file.".config/claude".source = config.lib.file.mkOutOfStoreSymlink "/home/dev/work/agents";
+
+  # Activation script to clone/update agents repo
+  home.activation.updateAgentsRepo = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    AGENTS_DIR="/home/dev/work/agents"
+    AGENTS_REPO="git@github.com:chopshop1/agents.git"
+
+    export PATH="${pkgs.openssh}/bin:${pkgs.git}/bin:$PATH"
+
+    if [ ! -d "$AGENTS_DIR" ]; then
+      $DRY_RUN_CMD ${pkgs.git}/bin/git clone "$AGENTS_REPO" "$AGENTS_DIR"
+    else
+      cd "$AGENTS_DIR"
+      $DRY_RUN_CMD ${pkgs.git}/bin/git pull
+    fi
+  '';
 
   # Let Home Manager install and manage itself
   programs.home-manager.enable = true;
