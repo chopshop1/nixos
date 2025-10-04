@@ -554,6 +554,7 @@
       sensible
       yank
       prefix-highlight
+      cpu
     ];
 
     extraConfig = ''
@@ -591,16 +592,51 @@
       bind-key -r Up resize-pane -U 5
       bind-key -r Right resize-pane -R 5
 
-      # Status bar
-      set -g status-bg black
-      set -g status-fg white
-      set -g status-left-length 40
-      set -g status-left "#[fg=green]Session: #S #[fg=yellow]#I #[fg=cyan]#P"
-      set -g status-right "#[fg=cyan]%d %b %R"
-      set -g status-justify centre
+      # Tokyo Night Theme Colors
+      set -g @tokyo-night-bg "#1a1b26"
+      set -g @tokyo-night-fg "#c0caf5"
+      set -g @tokyo-night-blue "#7aa2f7"
+      set -g @tokyo-night-cyan "#7dcfff"
+      set -g @tokyo-night-green "#9ece6a"
+      set -g @tokyo-night-magenta "#bb9af7"
+      set -g @tokyo-night-red "#f7768e"
+      set -g @tokyo-night-yellow "#e0af68"
+      set -g @tokyo-night-gray "#414868"
 
-      # Highlight active window
-      setw -g window-status-current-style fg=white,bg=red,bright
+      # 3D Effect - Pane borders
+      set -g pane-border-style "fg=#414868"
+      set -g pane-active-border-style "fg=#7aa2f7,bold"
+
+      # Status bar style
+      set -g status-style "bg=#1a1b26,fg=#c0caf5"
+      set -g status-left-length 50
+      set -g status-right-length 100
+      set -g status-justify left
+
+      # Left status: Session info
+      set -g status-left "#[fg=#1a1b26,bg=#7aa2f7,bold] 󰣇 #S #[fg=#7aa2f7,bg=#414868] #[fg=#c0caf5,bg=#414868] #I:#P #[fg=#414868,bg=#1a1b26]"
+
+      # Right status: CPU, RAM, and time
+      set -g status-right "#[fg=#414868,bg=#1a1b26]#[fg=#c0caf5,bg=#414868] #{cpu_fg_color}󰻠 #{cpu_percentage}#[fg=#c0caf5] | #{ram_fg_color}󰍛 #{ram_percentage} #[fg=#7aa2f7,bg=#414868]#[fg=#1a1b26,bg=#7aa2f7,bold] %H:%M %d-%b "
+
+      # Window status
+      set -g window-status-format "#[fg=#1a1b26,bg=#414868]#[fg=#c0caf5,bg=#414868] #I:#W #[fg=#414868,bg=#1a1b26]"
+      set -g window-status-current-format "#[fg=#1a1b26,bg=#bb9af7]#[fg=#1a1b26,bg=#bb9af7,bold] #I:#W #[fg=#bb9af7,bg=#1a1b26]"
+      set -g window-status-separator ""
+
+      # Messages
+      set -g message-style "fg=#1a1b26,bg=#7aa2f7,bold"
+      set -g message-command-style "fg=#1a1b26,bg=#7aa2f7,bold"
+
+      # Pane number display
+      set -g display-panes-active-colour "#7aa2f7"
+      set -g display-panes-colour "#414868"
+
+      # Clock
+      set -g clock-mode-colour "#7aa2f7"
+
+      # Copy mode
+      set -g mode-style "fg=#1a1b26,bg=#7aa2f7"
     '';
   };
 
