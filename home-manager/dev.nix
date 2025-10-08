@@ -616,8 +616,19 @@
       # Left status: Session info
       set -g status-left "#[fg=#1a1b26,bg=#7aa2f7,bold] 󰣇 #S #[fg=#7aa2f7,bg=#414868] #[fg=#c0caf5,bg=#414868] #I:#P #[fg=#414868,bg=#1a1b26]"
 
+      # CPU plugin configuration
+      set -g @cpu_low_fg_color "#[fg=#9ece6a]"
+      set -g @cpu_medium_fg_color "#[fg=#e0af68]"
+      set -g @cpu_high_fg_color "#[fg=#f7768e]"
+      set -g @cpu_percentage_format "%3.0f%%"
+
+      set -g @ram_low_fg_color "#[fg=#9ece6a]"
+      set -g @ram_medium_fg_color "#[fg=#e0af68]"
+      set -g @ram_high_fg_color "#[fg=#f7768e]"
+      set -g @ram_percentage_format "%3.0f%%"
+
       # Right status: CPU, RAM, and time
-      set -g status-right "#[fg=#414868,bg=#1a1b26]#[fg=#c0caf5,bg=#414868] #{cpu_fg_color}󰻠 #{cpu_percentage}#[fg=#c0caf5] | #{ram_fg_color}󰍛 #{ram_percentage} #[fg=#7aa2f7,bg=#414868]#[fg=#1a1b26,bg=#7aa2f7,bold] %H:%M %d-%b "
+      set -g status-right "#[fg=#414868,bg=#1a1b26]#[fg=#7aa2f7,bg=#414868] 󰻠 #{cpu_percentage} #[fg=#c0caf5]| #[fg=#7aa2f7]󰍛 #{ram_percentage} #[fg=#7aa2f7,bg=#414868]#[fg=#1a1b26,bg=#7aa2f7,bold] %H:%M %d-%b "
 
       # Window status
       set -g window-status-format "#[fg=#1a1b26,bg=#414868]#[fg=#c0caf5,bg=#414868] #I:#W #[fg=#414868,bg=#1a1b26]"
