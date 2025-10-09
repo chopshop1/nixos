@@ -627,8 +627,11 @@
       set -g @ram_high_fg_color "#[fg=#f7768e]"
       set -g @ram_percentage_format "%3.0f%%"
 
-      # Right status: CPU, RAM, and time
-      set -g status-right "#[fg=#414868,bg=#1a1b26]#[fg=#7aa2f7,bg=#414868] 󰻠 #{cpu_percentage} #[fg=#c0caf5]| #[fg=#7aa2f7]󰍛 #{ram_percentage} #[fg=#7aa2f7,bg=#414868]#[fg=#1a1b26,bg=#7aa2f7,bold] %H:%M %d-%b "
+      # Status interval for updating status bar
+      set -g status-interval 2
+
+      # Right status: CPU, RAM, and time (using shell commands)
+      set -g status-right "#[fg=#414868,bg=#1a1b26]#[fg=#7aa2f7,bg=#414868] 󰻠 #(top -bn1 | grep 'Cpu(s)' | awk '{print 100-$8\"%\"}') #[fg=#c0caf5]| #[fg=#7aa2f7]󰍛 #(free | awk '/Mem:/ {printf \"%.0f%%\", $3/$2*100}') #[fg=#7aa2f7,bg=#414868]#[fg=#1a1b26,bg=#7aa2f7,bold] %H:%M %d-%b "
 
       # Window status
       set -g window-status-format "#[fg=#1a1b26,bg=#414868]#[fg=#c0caf5,bg=#414868] #I:#W #[fg=#414868,bg=#1a1b26]"
@@ -740,6 +743,19 @@
     else
       cd "$AGENTS_DIR"
       $DRY_RUN_CMD ${pkgs.git}/bin/git pull
+    fi
+  '';
+
+  # Activation script to update nvim config
+  home.activation.updateNvimConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    NVIM_DIR="$HOME/.config/nvim"
+
+    export PATH="${pkgs.openssh}/bin:${pkgs.git}/bin:$PATH"
+
+    if [ -d "$NVIM_DIR/.git" ]; then
+      cd "$NVIM_DIR"
+      # Just try to pull, ignore all errors since home-manager creates symlinks
+      $DRY_RUN_CMD ${pkgs.git}/bin/git pull --no-rebase 2>/dev/null || echo "Nvim config update skipped (has local changes or symlinks)"
     fi
   '';
 
