@@ -33,51 +33,8 @@
                 ./home-manager/dev.nix
               ];
 
-              # Override the neovim config files with our patched version
-              xdg.configFile = let
-                # Create a patched version that removes the hardtime requirement
-                chopshop-nvim-patched = pkgs.stdenv.mkDerivation {
-                  name = "chopshop-nvim-config-patched";
-                  src = chopshop-nvim;
-
-                  buildPhase = ''
-                    # Remove or comment out the hardtime requirement
-                    if grep -q 'require("hardtime")' init.lua; then
-                      sed -i 's/require("hardtime").setup()/-- require("hardtime").setup() -- Commented out by NixOS config/' init.lua
-                    fi
-                    if grep -q "require('hardtime')" init.lua; then
-                      sed -i "s/require('hardtime').setup()/-- require('hardtime').setup() -- Commented out by NixOS config/" init.lua
-                    fi
-                  '';
-
-                  installPhase = ''
-                    mkdir -p $out
-                    cp -r * $out/
-                  '';
-                };
-              in {
-                # Main init.lua file (patched)
-                "nvim/init.lua".source = "${chopshop-nvim-patched}/init.lua";
-
-                # Copy the entire lua directory structure
-                "nvim/lua".source = "${chopshop-nvim-patched}/lua";
-
-                # Copy doc directory if it exists
-                "nvim/doc".source = "${chopshop-nvim-patched}/doc";
-
-                # Copy any other config files
-                "nvim/.stylua.toml".source = "${chopshop-nvim-patched}/.stylua.toml";
-
-                # Add a file to track the source
-                "nvim/.config-info".text = ''
-                  Neovim config fetched from: https://github.com/chopshop1/.nvim
-                  Managed by NixOS flake input
-
-                  To update to the latest version:
-                  Run: nix flake update chopshop-nvim
-                  Then: sudo nixos-rebuild switch --flake .#nixos
-                '';
-              };
+              # Nvim config is now managed as a git repository (see home-manager/dev.nix activation script)
+              # The updateNvimConfig activation script pulls fresh from kickstart.nvim on each rebuild
             });
             # Backup existing files that conflict with Home Manager
             home-manager.backupFileExtension = "hm-backup";

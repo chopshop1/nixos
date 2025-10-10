@@ -41,6 +41,8 @@
     proton-pass
     protonvpn-gui
     protonvpn-cli
+    libsecret
+    gnome-keyring
 
     # Development
     vscode
@@ -112,6 +114,12 @@
     initContent = ''
       # Add Bun to PATH
       export PATH="/home/dev/.bun/bin:$PATH"
+
+      # Initialize gnome-keyring if not already running
+      if [ -z "$GNOME_KEYRING_CONTROL" ] && command -v gnome-keyring-daemon &> /dev/null; then
+        eval $(gnome-keyring-daemon --start --components=secrets 2>/dev/null)
+        export GNOME_KEYRING_CONTROL
+      fi
 
       # Save and restore last working directory
       LAST_DIR_FILE="$HOME/.zsh_last_dir"
@@ -746,16 +754,30 @@
     fi
   '';
 
-  # Activation script to update nvim config
-  home.activation.updateNvimConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  # Activation script to update nvim config (force pull from remote)
+  home.activation.updateNvimConfig = lib.hm.dag.entryBefore ["checkLinkTargets"] ''
     NVIM_DIR="$HOME/.config/nvim"
 
     export PATH="${pkgs.openssh}/bin:${pkgs.git}/bin:$PATH"
 
+    # Remove old home-manager backup files to prevent conflicts
+    if [ -d "$NVIM_DIR" ]; then
+      echo "Cleaning up old nvim backup files..."
+      $DRY_RUN_CMD find "$NVIM_DIR" -name "*.hm-backup" -exec rm -rf {} + 2>/dev/null || true
+    fi
+
     if [ -d "$NVIM_DIR/.git" ]; then
       cd "$NVIM_DIR"
-      # Just try to pull, ignore all errors since home-manager creates symlinks
-      $DRY_RUN_CMD ${pkgs.git}/bin/git pull --no-rebase 2>/dev/null || echo "Nvim config update skipped (has local changes or symlinks)"
+
+      # Get the default branch name (main or master)
+      DEFAULT_BRANCH=$(${pkgs.git}/bin/git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@') || DEFAULT_BRANCH="main"
+
+      # Force update to latest from remote, discarding all local changes
+      echo "Updating nvim config from remote..."
+      $DRY_RUN_CMD ${pkgs.git}/bin/git fetch origin 2>/dev/null || true
+      $DRY_RUN_CMD ${pkgs.git}/bin/git reset --hard origin/$DEFAULT_BRANCH 2>/dev/null || echo "Nvim config update failed - check repository"
+      $DRY_RUN_CMD ${pkgs.git}/bin/git clean -fd 2>/dev/null || true
+      echo "Nvim config updated to latest from origin/$DEFAULT_BRANCH"
     fi
   '';
 
