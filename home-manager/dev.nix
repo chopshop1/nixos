@@ -17,6 +17,9 @@
     # Development tools
     bun
     nodejs
+    cargo
+    rustc
+    rust-analyzer
 
     # CLI tools
     fzf
