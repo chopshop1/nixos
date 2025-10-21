@@ -112,6 +112,9 @@
       tms = "tmux list-sessions";
       tmn = "tmux new-session";
       tmz = "tmux new-session -s main -c $HOME";
+
+      # LazyVim in separate config
+      lv = "NVIM_APPNAME=lazyvim nvim";
     };
 
     initContent = ''
