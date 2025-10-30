@@ -309,6 +309,11 @@
       # Force zsh when someone SSHs into this machine
       if [ -n "$SSH_CONNECTION" ]; then
         export SHELL=${pkgs.zsh}/bin/zsh
+
+        # Auto-attach to tmux on SSH (attach to latest session)
+        if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
+          tmux attach 2>/dev/null
+        fi
       fi
     '';
 
