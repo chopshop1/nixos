@@ -50,10 +50,9 @@
     # Development
     vscode
 
-    # Playwright and browsers
+    # Playwright (browsers are pre-patched for NixOS)
     playwright-driver
-    chromium
-    # Firefox already included above
+    playwright-driver.browsers
   ];
 
   # Environment variables
