@@ -9,6 +9,7 @@
     ./modules/desktop-apps.nix
     ./modules/system-base.nix
     ./modules/power-management.nix
+    ./modules/nvidia.nix
   ];
 
   # Bootloader
