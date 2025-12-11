@@ -42,7 +42,6 @@
     protonmail-bridge-gui   # ProtonMail bridge GUI
     proton-pass            # Proton Pass password manager
     protonvpn-gui          # ProtonVPN GUI
-    protonvpn-cli          # ProtonVPN CLI
 
     # Other editors (optional)
     vscode

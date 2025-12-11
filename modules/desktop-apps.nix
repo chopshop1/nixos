@@ -44,7 +44,6 @@ in
         protonmail-bridge-gui
         proton-pass
         protonvpn-gui
-        protonvpn-cli
       ] else [])
       ++ (if cfg.onePassword then [
         _1password-cli

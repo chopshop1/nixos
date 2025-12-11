@@ -11,7 +11,7 @@
     # Extra packages for Vulkan and video encoding
     extraPackages = with pkgs; [
       nvidia-vaapi-driver  # VAAPI driver for NVIDIA (hardware video decode)
-      vaapiVdpau           # VDPAU backend for VAAPI
+      libva-vdpau-driver   # VDPAU backend for VAAPI
       libvdpau-va-gl       # VAAPI backend for VDPAU
     ];
     extraPackages32 = with pkgs.pkgsi686Linux; [
@@ -60,6 +60,6 @@
     libva-utils           # vainfo command to verify VAAPI
     vdpauinfo             # VDPAU info tool
     vulkan-tools          # vulkaninfo
-    glxinfo               # OpenGL info
+    mesa-demos            # OpenGL info (glxinfo, etc.)
   ];
 }

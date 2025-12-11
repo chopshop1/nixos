@@ -43,7 +43,6 @@
     protonmail-bridge-gui
     proton-pass
     protonvpn-gui
-    protonvpn-cli
     libsecret
     gnome-keyring
 

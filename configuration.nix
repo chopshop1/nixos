@@ -10,6 +10,7 @@
     ./modules/system-base.nix
     ./modules/power-management.nix
     ./modules/networkmanager-fix.nix
+    ./modules/sunshine.nix
   ];
 
   # Bootloader
@@ -24,6 +25,9 @@
     "consoleblank=0"
     "noresume"
     "nohibernate"
+    # Virtual display on DP-1 for Sunshine streaming (4K@60Hz)
+    # This creates a fake monitor that clients can stream from independently
+    "video=DP-1:3840x2160@60e"
   ];
 
   networking.hostName = "nixos";
