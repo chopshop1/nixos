@@ -8,6 +8,15 @@
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
+    # Extra packages for Vulkan and video encoding
+    extraPackages = with pkgs; [
+      nvidia-vaapi-driver  # VAAPI driver for NVIDIA (hardware video decode)
+      vaapiVdpau           # VDPAU backend for VAAPI
+      libvdpau-va-gl       # VAAPI backend for VDPAU
+    ];
+    extraPackages32 = with pkgs.pkgsi686Linux; [
+      nvidia-vaapi-driver
+    ];
   };
 
   # NVIDIA driver configuration
@@ -32,8 +41,25 @@
     nvidiaSettings = true;
   };
 
+  # Environment variables for NVIDIA hardware encoding (used by Sunshine)
+  environment.sessionVariables = {
+    # Force VAAPI to use NVIDIA
+    LIBVA_DRIVER_NAME = "nvidia";
+    # Required for Firefox hardware acceleration
+    MOZ_DISABLE_RDD_SANDBOX = "1";
+    # NVIDIA VDPAU
+    VDPAU_DRIVER = "nvidia";
+    # Help with Proton/Wine game capture
+    __GL_GSYNC_ALLOWED = "1";
+    __GL_VRR_ALLOWED = "1";
+  };
+
   # Add NVIDIA-related packages
   environment.systemPackages = with pkgs; [
     nvtopPackages.nvidia  # GPU monitoring tool
+    libva-utils           # vainfo command to verify VAAPI
+    vdpauinfo             # VDPAU info tool
+    vulkan-tools          # vulkaninfo
+    glxinfo               # OpenGL info
   ];
 }

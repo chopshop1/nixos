@@ -10,6 +10,8 @@
     ./modules/system-base.nix
     ./modules/power-management.nix
     ./modules/nvidia.nix
+    ./modules/gaming.nix
+    ./modules/sunshine.nix
   ];
 
   # Bootloader
