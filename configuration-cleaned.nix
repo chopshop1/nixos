@@ -12,6 +12,7 @@
     ./modules/nvidia.nix
     ./modules/gaming.nix
     ./modules/sunshine.nix
+    # ./modules/sway-headless.nix  # Disabled: wlroots capture doesn't work with NVIDIA
   ];
 
   # Bootloader
@@ -52,6 +53,7 @@
 
   # Enable GDM Display Manager with auto-login
   services.xserver.displayManager.gdm.enable = true;
+  # Keep Wayland enabled (Xorg session causes GDM crashes)
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = "dev";
 

@@ -25,9 +25,6 @@
     "consoleblank=0"
     "noresume"
     "nohibernate"
-    # Virtual display on DP-1 for Sunshine streaming (4K@60Hz)
-    # This creates a fake monitor that clients can stream from independently
-    "video=DP-1:3840x2160@60e"
   ];
 
   networking.hostName = "nixos";
@@ -55,6 +52,7 @@
 
   # Enable GDM Display Manager with auto-login
   services.xserver.displayManager.gdm.enable = true;
+  services.displayManager.gdm.wayland = false;  # Force Xorg for virtual display support
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = "dev";
 

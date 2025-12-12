@@ -19,6 +19,9 @@
     ];
   };
 
+  # Force 1920x1080 resolution via kernel mode setting (for physical display)
+  boot.kernelParams = [ "video=HDMI-A-1:1920x1080@60" ];
+
   # NVIDIA driver configuration
   hardware.nvidia = {
     # Use the stable driver (recommended for GTX 1080 Ti)

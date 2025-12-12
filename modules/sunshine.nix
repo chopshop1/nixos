@@ -8,51 +8,35 @@
     capSysAdmin = true;  # Required for KMS capture
     openFirewall = true;
 
-    # Application profiles using virtual display (DP-1) for independent streaming
-    # The virtual display is created via kernel parameter: video=DP-1:3840x2160@60e
+    settings = {
+      # Use KMS capture for GNOME Wayland (wlroots doesn't work with NVIDIA headless)
+      capture = "kms";
+      adapter_name = "/dev/dri/card1";
+      output_name = "0";
+      min_fps_factor = "1";
+
+      # Resolution list (limited to display's native resolution without dummy plug)
+      resolutions = ''
+        [
+          1280x720,
+          1920x1080
+        ]
+      '';
+    };
+
+    # Application profiles for streaming
     applications = {
-      env = {
-        PATH = "$(PATH)";
-        DISPLAY = ":0";
-      };
       apps = [
         {
-          name = "Desktop (Virtual 4K)";
+          name = "Desktop";
+          auto-detach = "true";
+          # Set resolution to match client before starting
           prep-cmd = [
             {
-              # Enable virtual display and set to 4K, disable physical display for streaming
-              do = "${pkgs.xorg.xrandr}/bin/xrandr --output DP-1 --mode 3840x2160 --rate 60 --primary";
-              # Re-enable physical display on disconnect
-              undo = "${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-A-1 --primary";
+              do = "/etc/sway-headless/set-resolution.sh";
+              undo = "true";
             }
           ];
-          exclude-global-prep-cmd = "false";
-          auto-detach = "true";
-        }
-        {
-          name = "Desktop (Virtual 1080p)";
-          prep-cmd = [
-            {
-              do = "${pkgs.xorg.xrandr}/bin/xrandr --output DP-1 --mode 1920x1080 --rate 60 --primary";
-              undo = "${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-A-1 --primary";
-            }
-          ];
-          auto-detach = "true";
-        }
-        {
-          name = "Desktop (Virtual 1440p)";
-          prep-cmd = [
-            {
-              do = "${pkgs.xorg.xrandr}/bin/xrandr --output DP-1 --mode 2560x1440 --rate 60 --primary";
-              undo = "${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-A-1 --primary";
-            }
-          ];
-          auto-detach = "true";
-        }
-        {
-          name = "Desktop (Physical Monitor)";
-          # No prep-cmd - streams from your physical HDMI-A-1 display as-is
-          auto-detach = "true";
         }
       ];
     };
@@ -98,5 +82,8 @@
 
   # Load uinput module for virtual input devices
   boot.kernelModules = [ "uinput" ];
+
+  # Note: For 4K streaming without a 4K monitor, you need a hardware HDMI dummy plug
+  # The headless Sway + wlroots approach doesn't work with NVIDIA GPUs
 
 }
