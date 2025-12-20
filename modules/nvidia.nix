@@ -19,8 +19,8 @@
     ];
   };
 
-  # Force 1920x1080 resolution via kernel mode setting (for physical display)
-  boot.kernelParams = [ "video=HDMI-A-1:1920x1080@60" ];
+  # With 4K dummy plug, let it auto-detect the native 4K resolution
+  # boot.kernelParams = [ "video=HDMI-A-1:3840x2160@60" ];
 
   # NVIDIA driver configuration
   hardware.nvidia = {

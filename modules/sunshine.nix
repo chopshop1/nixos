@@ -9,17 +9,28 @@
     openFirewall = true;
 
     settings = {
-      # Use KMS capture for GNOME Wayland (wlroots doesn't work with NVIDIA headless)
+      # Use KMS capture for GNOME Wayland
       capture = "kms";
       adapter_name = "/dev/dri/card1";
       output_name = "0";
       min_fps_factor = "1";
 
-      # Resolution list (limited to display's native resolution without dummy plug)
+      # Full resolution list with 4K dummy plug
       resolutions = ''
         [
           1280x720,
-          1920x1080
+          1920x1080,
+          2560x1440,
+          3840x2160
+        ]
+      '';
+
+      # Enable 120fps for 1080p and 1440p (4K limited to 60Hz by HDMI 2.0)
+      fps = ''
+        [
+          30,
+          60,
+          120
         ]
       '';
     };
@@ -30,13 +41,6 @@
         {
           name = "Desktop";
           auto-detach = "true";
-          # Set resolution to match client before starting
-          prep-cmd = [
-            {
-              do = "/etc/sway-headless/set-resolution.sh";
-              undo = "true";
-            }
-          ];
         }
       ];
     };

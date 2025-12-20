@@ -43,6 +43,7 @@ in
       tokei     # Code statistics
       hyperfine # Command-line benchmarking
       tealdeer  # Better tldr
+      gh        # GitHub CLI
     ] else []);
   };
 }
