@@ -11,6 +11,7 @@
     ./modules/power-management.nix
     ./modules/networkmanager-fix.nix
     ./modules/sunshine.nix
+    ./modules/vibe-kanban.nix
   ];
 
   # Bootloader

@@ -9,11 +9,10 @@
     openFirewall = true;
 
     settings = {
-      # Use KMS capture for GNOME Wayland
-      capture = "kms";
-      adapter_name = "/dev/dri/card1";
-      output_name = "0";
+      # Let Sunshine auto-detect capture method
       min_fps_factor = "1";
+
+      # Let Sunshine auto-detect encoder (nvenc -> vaapi -> software)
 
       # Full resolution list with 4K dummy plug
       resolutions = ''
@@ -76,8 +75,8 @@
     };
   };
 
-  # Ensure the dev user is in the input group for capture
-  users.users.dev.extraGroups = [ "input" "video" ];
+  # Ensure the dev user is in required groups for capture
+  users.users.dev.extraGroups = [ "input" "video" "render" ];
 
   # Udev rules for Sunshine to access input devices
   services.udev.extraRules = ''

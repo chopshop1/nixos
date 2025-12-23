@@ -12,6 +12,7 @@
     ./modules/nvidia.nix
     ./modules/gaming.nix
     ./modules/sunshine.nix
+    ./modules/vibe-kanban.nix
     # ./modules/sway-headless.nix  # Disabled: wlroots capture doesn't work with NVIDIA
   ];
 
