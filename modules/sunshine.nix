@@ -9,10 +9,12 @@
     openFirewall = true;
 
     settings = {
-      # Let Sunshine auto-detect capture method
-      min_fps_factor = "1";
+      # Use KMS capture for X11/Wayland with NVIDIA
+      capture = "kms";
+      adapter_name = "/dev/dri/card1";
+      output_name = "0";
 
-      # Let Sunshine auto-detect encoder (nvenc -> vaapi -> software)
+      min_fps_factor = "1";
 
       # Full resolution list with 4K dummy plug
       resolutions = ''

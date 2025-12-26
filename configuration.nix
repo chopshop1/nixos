@@ -12,6 +12,7 @@
     ./modules/networkmanager-fix.nix
     ./modules/sunshine.nix
     ./modules/vibe-kanban.nix
+    ./modules/gaming.nix
   ];
 
   # Bootloader
