@@ -1,0 +1,25 @@
+# Nix build outputs
+result
+result-*
+
+# Secrets (never commit these)
+*.pem
+*.key
+secrets/
+.env
+.env.*
+credentials.json
+
+# Claude Code local settings
+.claude/
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
