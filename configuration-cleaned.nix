@@ -59,6 +59,7 @@
   };
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = "dev";
+  services.displayManager.defaultSession = "plasmax11";  # Force Plasma X11 session for Sunshine
 
   # Enable KDE Plasma desktop (better X11 support than GNOME)
   services.desktopManager.plasma6.enable = true;

@@ -65,4 +65,9 @@
     vulkan-tools          # vulkaninfo
     mesa-demos            # OpenGL info (glxinfo, etc.)
   ];
+
+  # Set default display resolution to 1080p 120Hz on login
+  services.xserver.displayManager.setupCommands = ''
+    ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-0 --mode 1920x1080 --rate 120 --primary || true
+  '';
 }

@@ -12,25 +12,26 @@
       # X11 capture for KDE Plasma on X11
       capture = "x11";
       adapter_name = "/dev/dri/card1";
+      output_name = "1";  # Display ID 1 = HDMI-0 (connected)
 
       min_fps_factor = "1";
 
-      # Full resolution list with 4K dummy plug
+      # Default to 1080p 120Hz - order matters, first is default
       resolutions = ''
         [
-          1280x720,
           1920x1080,
+          1280x720,
           2560x1440,
           3840x2160
         ]
       '';
 
-      # Enable 120fps for 1080p and 1440p (4K limited to 60Hz by HDMI 2.0)
+      # Default to 120fps - order matters, first is default
       fps = ''
         [
-          30,
+          120,
           60,
-          120
+          30
         ]
       '';
     };
