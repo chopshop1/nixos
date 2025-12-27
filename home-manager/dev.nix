@@ -589,7 +589,10 @@
       # Open new windows and panes in current directory
       bind-key c new-window -c "#{pane_current_path}"
       bind-key v split-window -h -c "#{pane_current_path}"
-      bind-key s split-window -v -c "#{pane_current_path}"
+      bind-key x split-window -v -c "#{pane_current_path}"
+
+      # Session switcher (prefix + s)
+      bind-key s choose-tree -s
       bind-key '"' split-window -v -c "#{pane_current_path}"
       bind-key % split-window -h -c "#{pane_current_path}"
 
