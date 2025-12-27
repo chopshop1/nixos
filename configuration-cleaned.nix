@@ -54,7 +54,7 @@
 
   # Enable GDM Display Manager with auto-login
   services.xserver.displayManager.gdm.enable = true;
-  # Keep Wayland enabled (Xorg session causes GDM crashes)
+  # Keep Wayland enabled (Xorg session causes GDM crashes with NVIDIA)
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = "dev";
 

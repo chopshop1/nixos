@@ -9,7 +9,8 @@
     openFirewall = true;
 
     settings = {
-      # Use KMS capture for X11/Wayland with NVIDIA
+      # KMS capture for NVIDIA (note: doesn't work on Wayland/GNOME)
+      # TODO: Find a working solution for Sunshine on Wayland
       capture = "kms";
       adapter_name = "/dev/dri/card1";
       output_name = "0";
