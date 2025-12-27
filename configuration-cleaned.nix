@@ -52,14 +52,16 @@
   # Enable the X11 windowing system
   services.xserver.enable = true;
 
-  # Enable GDM Display Manager with auto-login
-  services.xserver.displayManager.gdm.enable = true;
-  # Keep Wayland enabled (Xorg session causes GDM crashes with NVIDIA)
+  # Enable SDDM Display Manager with auto-login (works better with X11 + NVIDIA)
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = false;  # Force X11 for Sunshine compatibility
+  };
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = "dev";
 
-  # Enable GNOME desktop
-  services.xserver.desktopManager.gnome.enable = true;
+  # Enable KDE Plasma desktop (better X11 support than GNOME)
+  services.desktopManager.plasma6.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -108,13 +110,7 @@
   # Enable flakes and nix-command
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # XDG Desktop Portal configuration
-  xdg.portal = {
-    enable = true;
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-gtk
-    ];
-  };
+  # XDG Desktop Portal configuration (KDE portal is auto-enabled with Plasma)
 
   # Enable the OpenSSH daemon
   services.openssh = {

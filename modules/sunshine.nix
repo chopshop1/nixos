@@ -9,11 +9,9 @@
     openFirewall = true;
 
     settings = {
-      # KMS capture for NVIDIA (note: doesn't work on Wayland/GNOME)
-      # TODO: Find a working solution for Sunshine on Wayland
-      capture = "kms";
+      # X11 capture for KDE Plasma on X11
+      capture = "x11";
       adapter_name = "/dev/dri/card1";
-      output_name = "0";
 
       min_fps_factor = "1";
 

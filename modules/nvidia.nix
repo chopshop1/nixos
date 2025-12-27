@@ -27,8 +27,8 @@
     # Use the stable driver (recommended for GTX 1080 Ti)
     package = config.boot.kernelPackages.nvidiaPackages.stable;
 
-    # Modesetting is required for most Wayland compositors and GNOME
-    modesetting.enable = true;
+    # Modesetting disabled for X11 (only needed for Wayland)
+    modesetting.enable = false;
 
     # Enable power management (experimental, may cause issues on some systems)
     powerManagement.enable = false;
