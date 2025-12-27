@@ -56,6 +56,7 @@
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = false;  # Force X11 for Sunshine compatibility
+    theme = "breeze";  # Use Breeze theme (respects system dark mode)
   };
   services.displayManager.autoLogin.enable = true;
   services.displayManager.autoLogin.user = "dev";
@@ -63,6 +64,14 @@
 
   # Enable KDE Plasma desktop (better X11 support than GNOME)
   services.desktopManager.plasma6.enable = true;
+
+  # Force dark mode system-wide
+  environment.sessionVariables = {
+    # GTK dark theme
+    GTK_THEME = "Breeze-Dark";
+    # Qt/KDE dark theme
+    QT_STYLE_OVERRIDE = "breeze-dark";
+  };
 
   # Configure keymap in X11
   services.xserver.xkb = {

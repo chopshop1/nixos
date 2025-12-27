@@ -682,7 +682,7 @@
     '';
   };
 
-  # Kitty terminal configuration
+  # Kitty terminal configuration with Tokyo Night theme
   programs.kitty = {
     enable = true;
     settings = {
@@ -690,12 +690,99 @@
       confirm_os_window_close = 0;
       enable_audio_bell = false;
       window_padding_width = 10;
+
+      # Tokyo Night Storm colorscheme
+      background = "#1a1b26";
+      foreground = "#c0caf5";
+      selection_background = "#283457";
+      selection_foreground = "#c0caf5";
+      url_color = "#73daca";
+      cursor = "#c0caf5";
+      cursor_text_color = "#1a1b26";
+
+      # Tabs
+      active_tab_background = "#7aa2f7";
+      active_tab_foreground = "#1f2335";
+      inactive_tab_background = "#292e42";
+      inactive_tab_foreground = "#545c7e";
+
+      # Normal colors
+      color0 = "#15161e";
+      color1 = "#f7768e";
+      color2 = "#9ece6a";
+      color3 = "#e0af68";
+      color4 = "#7aa2f7";
+      color5 = "#bb9af7";
+      color6 = "#7dcfff";
+      color7 = "#a9b1d6";
+
+      # Bright colors
+      color8 = "#414868";
+      color9 = "#f7768e";
+      color10 = "#9ece6a";
+      color11 = "#e0af68";
+      color12 = "#7aa2f7";
+      color13 = "#bb9af7";
+      color14 = "#7dcfff";
+      color15 = "#c0caf5";
     };
     font = {
       name = "monospace";
       size = 11;
     };
   };
+
+  # GTK dark theme configuration
+  gtk = {
+    enable = true;
+    theme = {
+      name = "Breeze-Dark";
+      package = pkgs.kdePackages.breeze-gtk;
+    };
+    iconTheme = {
+      name = "breeze-dark";
+      package = pkgs.kdePackages.breeze-icons;
+    };
+    gtk3.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+    };
+    gtk4.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+    };
+  };
+
+  # Qt/KDE dark theme configuration
+  qt = {
+    enable = true;
+    platformTheme.name = "kde";
+    style.name = "breeze-dark";
+  };
+
+  # Set color scheme preference for XDG portal
+  dconf.settings = {
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
+    };
+  };
+
+  # KDE Plasma dark mode configuration files
+  home.file.".config/kdeglobals".text = ''
+    [General]
+    ColorScheme=BreezeDark
+
+    [KDE]
+    LookAndFeelPackage=org.kde.breezedark.desktop
+  '';
+
+  home.file.".config/kwinrc".text = ''
+    [org.kde.kdecoration2]
+    theme=Breeze
+  '';
+
+  home.file.".config/plasmarc".text = ''
+    [Theme]
+    name=breeze-dark
+  '';
 
   # Git configuration
   programs.git = {
