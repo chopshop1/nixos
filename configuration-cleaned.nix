@@ -51,6 +51,7 @@
       "${pkgs.webkitgtk_4_1}/lib"
       "${pkgs.libsoup_3}/lib"
       "${pkgs.alsa-lib}/lib"
+      "${pkgs.libayatana-appindicator}/lib"
     ];
     PKG_CONFIG_PATH = lib.concatStringsSep ":" [
       "${pkgs.gtk3.dev}/lib/pkgconfig"
@@ -74,6 +75,10 @@
       "${pkgs.alsa-lib.dev}/lib/pkgconfig"
       "${pkgs.dbus.dev}/lib/pkgconfig"
       "${pkgs.zlib.dev}/lib/pkgconfig"
+      "${pkgs.libayatana-appindicator.dev}/lib/pkgconfig"
+      "${pkgs.libayatana-indicator}/lib/pkgconfig"
+      "${pkgs.libdbusmenu-gtk3}/lib/pkgconfig"
+      "${pkgs.ayatana-ido}/lib/pkgconfig"
     ];
   };
 
