@@ -127,6 +127,11 @@
       # Add Bun to PATH
       export PATH="/home/dev/.bun/bin:$PATH"
 
+      # X11/Display settings
+      export DISPLAY=:0
+      export XAUTHORITY=/tmp/xauth_ngmBGE
+      export LD_LIBRARY_PATH="/nix/store/lbrzj84lmhn77v8gbm4h2b4bwk988w5i-libayatana-appindicator-0.5.92/lib:$LD_LIBRARY_PATH"
+
       # Initialize gnome-keyring if not already running
       if [ -z "$GNOME_KEYRING_CONTROL" ] && command -v gnome-keyring-daemon &> /dev/null; then
         eval $(gnome-keyring-daemon --start --components=secrets 2>/dev/null)

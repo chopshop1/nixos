@@ -156,6 +156,7 @@ in
       squashfsTools  # AppImage builds
       dpkg           # .deb package builds
       rpm            # .rpm package builds
+      flatpak-builder # Flatpak builds
 
       # Node/Bun/Python
       bun

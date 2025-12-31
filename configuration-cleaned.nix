@@ -79,6 +79,7 @@
       "${pkgs.libayatana-indicator}/lib/pkgconfig"
       "${pkgs.libdbusmenu-gtk3}/lib/pkgconfig"
       "${pkgs.ayatana-ido}/lib/pkgconfig"
+      "${pkgs.gobject-introspection.dev}/lib/pkgconfig"
     ];
   };
 
