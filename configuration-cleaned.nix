@@ -38,6 +38,7 @@
     PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
     LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
     PKG_CONFIG_PATH = lib.makeSearchPath "lib/pkgconfig" [
+      # GTK/WebKit
       pkgs.gtk3.dev
       pkgs.glib.dev
       pkgs.cairo.dev
@@ -48,11 +49,34 @@
       pkgs.fontconfig.dev
       pkgs.libsoup_3.dev
       pkgs.webkitgtk_4_1.dev
+      pkgs.librsvg.dev
+      pkgs.libpng.dev
+      pkgs.pixman
+      pkgs.fribidi.dev
+      pkgs.libepoxy.dev
+
+      # X11
+      pkgs.xorg.libX11.dev
+      pkgs.xorg.libXcursor.dev
+      pkgs.xorg.libXrandr.dev
+      pkgs.xorg.libXi.dev
+      pkgs.xorg.libxcb.dev
+      pkgs.xorg.libXext.dev
+      pkgs.xorg.libXfixes.dev
+      pkgs.xorg.libXcomposite
+      pkgs.xorg.libXdamage
+      pkgs.xorg.libXinerama
+
+      # Wayland
+      pkgs.wayland.dev
+      pkgs.libxkbcommon.dev
+
+      # Other
       pkgs.at-spi2-core.dev
+      pkgs.dbus.dev
       pkgs.libayatana-appindicator.dev
       pkgs.openssl.dev
       pkgs.alsa-lib.dev
-      pkgs.librsvg.dev
     ];
   };
 
