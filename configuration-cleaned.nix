@@ -37,6 +37,21 @@
   environment.variables = {
     PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
     LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
+    # Library path for linker to find shared libraries
+    LIBRARY_PATH = lib.concatStringsSep ":" [
+      "${pkgs.zlib}/lib"
+      "${pkgs.openssl.out}/lib"
+      "${pkgs.glib.out}/lib"
+      "${pkgs.gtk3}/lib"
+      "${pkgs.cairo}/lib"
+      "${pkgs.pango.out}/lib"
+      "${pkgs.gdk-pixbuf}/lib"
+      "${pkgs.harfbuzz}/lib"
+      "${pkgs.atk}/lib"
+      "${pkgs.webkitgtk_4_1}/lib"
+      "${pkgs.libsoup_3}/lib"
+      "${pkgs.alsa-lib}/lib"
+    ];
     PKG_CONFIG_PATH = lib.concatStringsSep ":" [
       "${pkgs.gtk3.dev}/lib/pkgconfig"
       "${pkgs.pango.dev}/lib/pkgconfig"
@@ -58,6 +73,7 @@
       "${pkgs.openssl.dev}/lib/pkgconfig"
       "${pkgs.alsa-lib.dev}/lib/pkgconfig"
       "${pkgs.dbus.dev}/lib/pkgconfig"
+      "${pkgs.zlib.dev}/lib/pkgconfig"
     ];
   };
 

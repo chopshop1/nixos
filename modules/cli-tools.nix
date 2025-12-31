@@ -38,6 +38,8 @@ in
       llvmPackages.clang
       clang
       cmake
+      zlib
+      zlib.dev
 
       # GTK/WebKit core (including dev outputs for Rust builds)
       webkitgtk_4_1
