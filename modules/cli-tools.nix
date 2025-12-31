@@ -56,6 +56,8 @@ in
       gdk-pixbuf.dev
       harfbuzz
       harfbuzz.dev
+      graphite2
+      graphite2.dev
       freetype
       freetype.dev
       fontconfig

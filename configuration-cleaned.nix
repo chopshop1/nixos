@@ -37,46 +37,27 @@
   environment.variables = {
     PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
     LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
-    PKG_CONFIG_PATH = lib.makeSearchPath "lib/pkgconfig" [
-      # GTK/WebKit
-      pkgs.gtk3.dev
-      pkgs.glib.dev
-      pkgs.cairo.dev
-      pkgs.pango.dev
-      pkgs.gdk-pixbuf.dev
-      pkgs.harfbuzz.dev
-      pkgs.freetype.dev
-      pkgs.fontconfig.dev
-      pkgs.libsoup_3.dev
-      pkgs.webkitgtk_4_1.dev
-      pkgs.librsvg.dev
-      pkgs.libpng.dev
-      pkgs.pixman
-      pkgs.fribidi.dev
-      pkgs.libepoxy.dev
-
-      # X11
-      pkgs.xorg.libX11.dev
-      pkgs.xorg.libXcursor.dev
-      pkgs.xorg.libXrandr.dev
-      pkgs.xorg.libXi.dev
-      pkgs.xorg.libxcb.dev
-      pkgs.xorg.libXext.dev
-      pkgs.xorg.libXfixes.dev
-      pkgs.xorg.libXcomposite
-      pkgs.xorg.libXdamage
-      pkgs.xorg.libXinerama
-
-      # Wayland
-      pkgs.wayland.dev
-      pkgs.libxkbcommon.dev
-
-      # Other
-      pkgs.at-spi2-core.dev
-      pkgs.dbus.dev
-      pkgs.libayatana-appindicator.dev
-      pkgs.openssl.dev
-      pkgs.alsa-lib.dev
+    PKG_CONFIG_PATH = lib.concatStringsSep ":" [
+      "${pkgs.gtk3.dev}/lib/pkgconfig"
+      "${pkgs.pango.dev}/lib/pkgconfig"
+      "${pkgs.glib.dev}/lib/pkgconfig"
+      "${pkgs.cairo.dev}/lib/pkgconfig"
+      "${pkgs.harfbuzz.dev}/lib/pkgconfig"
+      "${pkgs.gdk-pixbuf.dev}/lib/pkgconfig"
+      "${pkgs.at-spi2-core.dev}/lib/pkgconfig"
+      "${pkgs.fontconfig.dev}/lib/pkgconfig"
+      "${pkgs.freetype.dev}/lib/pkgconfig"
+      "${pkgs.libpng.dev}/lib/pkgconfig"
+      "${pkgs.pixman}/lib/pkgconfig"
+      "${pkgs.libxkbcommon.dev}/lib/pkgconfig"
+      "${pkgs.libepoxy.dev}/lib/pkgconfig"
+      "${pkgs.fribidi.dev}/lib/pkgconfig"
+      "${pkgs.graphite2.dev}/lib/pkgconfig"
+      "${pkgs.libsoup_3.dev}/lib/pkgconfig"
+      "${pkgs.webkitgtk_4_1.dev}/lib/pkgconfig"
+      "${pkgs.openssl.dev}/lib/pkgconfig"
+      "${pkgs.alsa-lib.dev}/lib/pkgconfig"
+      "${pkgs.dbus.dev}/lib/pkgconfig"
     ];
   };
 
