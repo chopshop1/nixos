@@ -141,6 +141,17 @@ in
       # OpenSSL (for reqwest/downloads)
       openssl
 
+      # SVG icon support for Tauri
+      librsvg
+      librsvg.dev
+
+      # Tauri build tools
+      file           # file type detection
+      patchelf       # binary patching
+      squashfsTools  # AppImage builds
+      dpkg           # .deb package builds
+      rpm            # .rpm package builds
+
       # Node/Bun
       bun
       nodejs

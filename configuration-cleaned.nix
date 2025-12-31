@@ -52,6 +52,7 @@
       pkgs.libayatana-appindicator.dev
       pkgs.openssl.dev
       pkgs.alsa-lib.dev
+      pkgs.librsvg.dev
     ];
   };
 
