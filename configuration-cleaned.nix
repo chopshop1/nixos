@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports = [
@@ -32,6 +32,27 @@
 
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
+
+  # Development environment variables (Playwright, GTK/GDK for Rust/Tauri)
+  environment.variables = {
+    PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
+    PKG_CONFIG_PATH = lib.makeSearchPath "lib/pkgconfig" [
+      pkgs.gtk3.dev
+      pkgs.glib.dev
+      pkgs.cairo.dev
+      pkgs.pango.dev
+      pkgs.gdk-pixbuf.dev
+      pkgs.harfbuzz.dev
+      pkgs.freetype.dev
+      pkgs.fontconfig.dev
+      pkgs.libsoup_3.dev
+      pkgs.webkitgtk_4_1.dev
+      pkgs.at-spi2-core.dev
+      pkgs.libayatana-appindicator.dev
+      pkgs.openssl.dev
+      pkgs.alsa-lib.dev
+    ];
+  };
 
   # Time zone and locale
   time.timeZone = "America/New_York";
@@ -143,13 +164,74 @@
   # System state version
   system.stateVersion = "25.05";
 
-  # Enable nix-ld for running unpackaged binaries
+  # Enable nix-ld for running unpackaged binaries (including Playwright browsers)
   programs.nix-ld = {
     enable = true;
     libraries = with pkgs; [
+      # Core
       glibc
-      gcc
+      gcc.cc.lib
       zlib
+      stdenv.cc.cc.lib
+
+      # GTK/WebKit (Playwright browser deps)
+      glib
+      gtk3
+      gtk4
+      cairo
+      pango
+      gdk-pixbuf
+      harfbuzz
+      freetype
+      fontconfig
+      atk
+      at-spi2-atk
+      at-spi2-core
+
+      # X11
+      xorg.libX11
+      xorg.libXcursor
+      xorg.libXrandr
+      xorg.libXi
+      xorg.libxcb
+      xorg.libXext
+      xorg.libXfixes
+      xorg.libXcomposite
+      xorg.libXdamage
+      xorg.libXrender
+
+      # Wayland
+      wayland
+      libxkbcommon
+
+      # Networking/Security
+      nss
+      nspr
+      openssl
+      curl
+
+      # Media
+      alsa-lib
+      libpulseaudio
+      libdrm
+      mesa.drivers
+      libGL
+      libva
+      libvdpau
+
+      # GStreamer
+      gst_all_1.gstreamer
+      gst_all_1.gst-plugins-base
+
+      # Other
+      cups
+      dbus
+      expat
+      libpng
+      libjpeg
+      icu
+      libxslt
+      libxml2
     ];
   };
 }

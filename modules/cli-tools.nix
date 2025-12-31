@@ -28,6 +28,120 @@ in
       zsh-completions
       starship
 
+      # Tauri v2 / Playwright development dependencies
+      pkg-config
+      rustup
+
+      # GTK/WebKit core (including dev outputs for Rust builds)
+      webkitgtk_4_1
+      webkitgtk_4_1.dev
+      gtk3
+      gtk3.dev
+      glib
+      glib.dev
+      gobject-introspection
+      gobject-introspection.dev
+      cairo
+      cairo.dev
+      pango
+      pango.dev
+      gdk-pixbuf
+      gdk-pixbuf.dev
+      harfbuzz
+      harfbuzz.dev
+      freetype
+      freetype.dev
+      fontconfig
+      fontconfig.dev
+
+      # HTTP library for WebKit
+      libsoup_3
+      libsoup_3.dev
+
+      # System tray support
+      libayatana-appindicator
+      libayatana-appindicator.dev
+
+      # X11 dependencies
+      xorg.libX11
+      xorg.libXcursor
+      xorg.libXrandr
+      xorg.libXi
+      xorg.libxcb
+      xorg.libXext
+      xorg.libXfixes
+      xorg.libXcomposite
+      xorg.libXdamage
+      xorg.libXinerama
+      xorg.libXtst
+      xorg.libXrender
+      xorg.xorgserver  # for xvfb
+
+      # Wayland
+      wayland
+      libxkbcommon
+
+      # Other GTK dependencies
+      at-spi2-core
+      at-spi2-atk
+      atk
+      dbus
+      fribidi
+      libepoxy
+      libpng
+      pixman
+
+      # Playwright browser dependencies
+      cups
+      libdrm
+      mesa
+      nspr
+      nss
+      gtk4
+      icu
+      enchant
+      libevent
+      flite
+      libjpeg
+      lcms2
+      libmanette
+      libopus
+      libsecret
+      libvpx
+      libwebp
+      woff2
+      libxml2
+      libxslt
+      x264
+      libavif
+
+      # GStreamer (for video/audio in Playwright)
+      gst_all_1.gstreamer
+      gst_all_1.gst-plugins-base
+      gst_all_1.gst-plugins-good
+      gst_all_1.gst-plugins-bad
+      gst_all_1.gst-libav
+
+      # Fonts for browser rendering
+      noto-fonts
+      noto-fonts-color-emoji
+      liberation_ttf
+      freefont_ttf
+      wqy_zenhei
+
+      # Audio (for cpal - microphone capture)
+      alsa-lib
+
+      # OpenSSL (for reqwest/downloads)
+      openssl
+
+      # Node/Bun
+      bun
+      nodejs
+
+      # Playwright with pre-patched browsers for NixOS
+      playwright-driver.browsers
+
       # Modern CLI tools
     ] ++ (if cfg.modern then with pkgs; [
       fzf       # Fuzzy finder
