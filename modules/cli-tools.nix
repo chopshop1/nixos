@@ -157,9 +157,10 @@ in
       dpkg           # .deb package builds
       rpm            # .rpm package builds
 
-      # Node/Bun
+      # Node/Bun/Python
       bun
       nodejs
+      python312
 
       # Playwright with pre-patched browsers for NixOS
       playwright-driver.browsers
