@@ -32,6 +32,12 @@ in
       pkg-config
       rustup
 
+      # Development libraries (libssl-dev, libclang-dev equivalents)
+      openssl.dev
+      llvmPackages.libclang
+      llvmPackages.clang
+      clang
+
       # GTK/WebKit core (including dev outputs for Rust builds)
       webkitgtk_4_1
       webkitgtk_4_1.dev

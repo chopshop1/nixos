@@ -36,6 +36,7 @@
   # Development environment variables (Playwright, GTK/GDK for Rust/Tauri)
   environment.variables = {
     PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
+    LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
     PKG_CONFIG_PATH = lib.makeSearchPath "lib/pkgconfig" [
       pkgs.gtk3.dev
       pkgs.glib.dev
