@@ -187,6 +187,12 @@
     SetEnv SHELL=${pkgs.zsh}/bin/zsh
   '';
 
+  # Enable direnv for automatic shell environment loading
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;  # Cached nix-shell for faster loads
+  };
+
   # Enable Tailscale
   services.tailscale.enable = true;
 
