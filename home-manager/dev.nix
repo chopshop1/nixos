@@ -589,6 +589,9 @@
     ];
 
     extraConfig = ''
+      # Status bar at top
+      set -g status-position top
+
       # Enable mouse support
       set -g mouse on
 
@@ -643,12 +646,12 @@
 
       # Status bar style
       set -g status-style "bg=#1a1b26,fg=#c0caf5"
-      set -g status-left-length 50
-      set -g status-right-length 100
+      set -g status-left-length 100
+      set -g status-right-length 200
       set -g status-justify left
 
-      # Left status: Session info
-      set -g status-left "#[fg=#1a1b26,bg=#7aa2f7,bold] 󰣇 #S #[fg=#7aa2f7,bg=#414868] #[fg=#c0caf5,bg=#414868] #I:#P #[fg=#414868,bg=#1a1b26]"
+      # Left status: Session info and git status
+      set -g status-left "#[fg=#1a1b26,bg=#7aa2f7,bold] #S #[fg=#7aa2f7,bg=#414868]#[fg=#bb9af7,bg=#414868]#(cd #{pane_current_path} && git branch --show-current 2>/dev/null | xargs -I{} echo ' {}')#[fg=#9ece6a]#(cd #{pane_current_path} && git diff --cached --numstat 2>/dev/null | wc -l | awk '$1>0{print \" +\"$1}')#[fg=#e0af68]#(cd #{pane_current_path} && git diff --numstat 2>/dev/null | wc -l | awk '$1>0{print \" ~\"$1}')#[fg=#787c99]#(cd #{pane_current_path} && git ls-files --others --exclude-standard 2>/dev/null | wc -l | awk '$1>0{print \" ?\"$1}')#[fg=#9ece6a]#(cd #{pane_current_path} && git status --porcelain 2>/dev/null | wc -l | awk '$1==0{print \" ✓\"}') #[fg=#414868,bg=#1a1b26]"
 
       # CPU plugin configuration
       set -g @cpu_low_fg_color "#[fg=#9ece6a]"
@@ -664,8 +667,8 @@
       # Status interval for updating status bar
       set -g status-interval 2
 
-      # Right status: Git, CPU, RAM, and time (using shell commands)
-      set -g status-right "#[fg=#414868,bg=#1a1b26]#[fg=#bb9af7,bg=#414868]#(cd #{pane_current_path}; if git rev-parse --git-dir > /dev/null 2>&1; then branch=$(git branch --show-current 2>/dev/null); dirty=$(git status --porcelain 2>/dev/null | head -1); if [ -n \"$dirty\" ]; then echo \" $branch ●\"; else echo \" $branch\"; fi; fi) #[fg=#c0caf5]|#[fg=#7aa2f7] 󰻠 #(top -bn1 | grep 'Cpu(s)' | awk '{print 100-$8\"%\"}') #[fg=#c0caf5]| #[fg=#7aa2f7]󰍛 #(free | awk '/Mem:/ {printf \"%.0f%%\", $3/$2*100}') #[fg=#7aa2f7,bg=#414868]#[fg=#1a1b26,bg=#7aa2f7,bold] %H:%M %d-%b "
+      # Right status: CPU, RAM, and time
+      set -g status-right "#[fg=#414868,bg=#1a1b26]#[fg=#7aa2f7,bg=#414868] 󰻠 #(top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\\([0-9.]*\\)%* id.*/\\1/' | awk '{print 100-$1\"%\"}') #[fg=#c0caf5]| #[fg=#7aa2f7]󰍛 #(free | awk '/Mem:/ {printf \"%.0f%%\", $3/$2*100}') #[fg=#7aa2f7,bg=#414868]#[fg=#1a1b26,bg=#7aa2f7,bold] %H:%M %d-%b "
 
       # Window status
       set -g window-status-format "#[fg=#1a1b26,bg=#414868]#[fg=#c0caf5,bg=#414868] #I:#W #[fg=#414868,bg=#1a1b26]"
