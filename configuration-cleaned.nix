@@ -159,7 +159,7 @@
     description = "dev";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     shell = pkgs.zsh;
-    hashedPassword = ""; # No password for automatic login
+    hashedPassword = "$6$JT7mJZ0wAUOsRsY4$mv2ikIv9dwMTIwonyt/TlIulyqpb1Pd8JsXgt4Efiwu2EAZXJHKk446hx8gqBhBuO1.HwVABBHvQZTQC.j0K50"; # Password: nixos
   };
 
   # Allow unfree packages
@@ -177,6 +177,8 @@
       PermitUserEnvironment = true;
       AcceptEnv = "SHELL LANG LC_*";
       UsePAM = true;
+      PasswordAuthentication = true;
+      PermitEmptyPasswords = false;
     };
   };
 
