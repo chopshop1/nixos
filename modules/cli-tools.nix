@@ -188,6 +188,7 @@ in
 
     # Nerd Fonts for terminal/coding (must be in fonts.packages, not systemPackages)
     fonts.packages = with pkgs; [
+      nerd-fonts._0xproto        # 0xProto
       nerd-fonts.jetbrains-mono
       nerd-fonts.fira-code
       nerd-fonts.hack
