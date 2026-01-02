@@ -1,9 +1,5 @@
 # Hardware configuration for AMD Ryzen 9 7950X3D + RX 7900 XTX
-#
-# IMPORTANT: This is a template! Generate the actual config by running:
-#   sudo nixos-generate-config --show-hardware-config > hosts/amd-workstation/hardware-configuration.nix
-#
-# Or copy the auto-generated /etc/nixos/hardware-configuration.nix after installing NixOS
+# Using same nvme0n1 drive layout as current machine
 
 { config, lib, pkgs, modulesPath, ... }:
 
@@ -18,22 +14,20 @@
   boot.kernelModules = [ "kvm-amd" ];  # AMD virtualization support
   boot.extraModulePackages = [ ];
 
-  # Filesystem configuration - UPDATE THESE UUIDs after installation!
-  # Run `blkid` to get your actual UUIDs
+  # Filesystem configuration
   fileSystems."/" = {
-    device = "/dev/disk/by-uuid/REPLACE-WITH-YOUR-ROOT-UUID";
-    fsType = "ext4";  # or "btrfs" if you prefer
+    device = "/dev/disk/by-uuid/ab8e7627-11fa-4d7c-abb7-e71df743e6de";
+    fsType = "ext4";
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/REPLACE-WITH-YOUR-BOOT-UUID";
+    device = "/dev/disk/by-uuid/756A-4127";
     fsType = "vfat";
     options = [ "fmask=0077" "dmask=0077" ];
   };
 
   swapDevices = [
-    # Uncomment and set if you have a swap partition:
-    # { device = "/dev/disk/by-uuid/REPLACE-WITH-YOUR-SWAP-UUID"; }
+    { device = "/dev/disk/by-uuid/d5cafe24-c457-4033-83e0-1e48943c50ea"; }
   ];
 
   # Network interface - will be auto-detected, but typically:
