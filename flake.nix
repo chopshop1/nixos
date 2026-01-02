@@ -14,48 +14,87 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, chopshop-nvim, ... }@inputs: {
-    nixosConfigurations = {
-      nixos = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          ./configuration-cleaned.nix
-          ./hardware-configuration.nix
+  outputs = { self, nixpkgs, home-manager, chopshop-nvim, ... }@inputs:
+  let
+    system = "x86_64-linux";
 
-          # Import Home Manager module
-          home-manager.nixosModules.home-manager
+    # Shared modules used by all hosts
+    sharedModules = [
+      ./configuration-cleaned.nix
+
+      # Import Home Manager module
+      home-manager.nixosModules.home-manager
+      {
+        home-manager.useGlobalPkgs = true;
+        home-manager.useUserPackages = true;
+        home-manager.users.dev = ({ pkgs, ... }: {
+          imports = [
+            ./home-manager/dev.nix
+          ];
+        });
+        home-manager.backupFileExtension = "hm-backup";
+      }
+
+      # Shared module options
+      {
+        my.cli-tools.enable = true;
+        my.desktop-apps.enable = true;
+        my.docker.enable = true;
+        my.neovim.enable = true;
+        my.powerManagement = {
+          preventSuspend = true;
+          enableWakeOnLan = true;
+          keepWifiAlive = true;
+        };
+      }
+    ];
+
+    # Helper to create a host configuration
+    mkHost = { hostName, hardwareConfig, gpuType, gpuConfig ? {}, extraModules ? [] }:
+      nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = sharedModules ++ [
+          hardwareConfig
           {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.dev = ({ pkgs, ... }: {
-              imports = [
-                # Import the main dev.nix but we'll override the neovim config
-                ./home-manager/dev.nix
-              ];
-
-              # Nvim config is now managed as a git repository (see home-manager/dev.nix activation script)
-              # The updateNvimConfig activation script pulls fresh from kickstart.nvim on each rebuild
-            });
-            # Backup existing files that conflict with Home Manager
-            home-manager.backupFileExtension = "hm-backup";
+            networking.hostName = hostName;
+            my.gpu = {
+              type = gpuType;
+            } // gpuConfig;
           }
-
-          # Enable module options
-          {
-            # Enable all our custom modules with their defaults
-            my.cli-tools.enable = true;
-            my.desktop-apps.enable = true;
-            my.docker.enable = true;
-            my.neovim.enable = true;
-            my.powerManagement = {
-              preventSuspend = true;
-              enableWakeOnLan = true;
-              keepWifiAlive = true;
-            };
-          }
-        ];
+        ] ++ extraModules;
         specialArgs = { inherit inputs; };
       };
+
+  in {
+    nixosConfigurations = {
+      # Current machine: NVIDIA GTX 1080 Ti
+      nixos = mkHost {
+        hostName = "nixos";
+        hardwareConfig = ./hardware-configuration.nix;
+        gpuType = "nvidia";
+        gpuConfig = {
+          nvidia.package = "stable";
+          nvidia.open = false;  # Pascal doesn't support open drivers
+          primaryMonitor = "HDMI-0";
+          defaultResolution = "1920x1080";
+          defaultRefreshRate = 120;
+        };
+      };
+
+      # AMD Ryzen 9 7950X3D + RX 7900 XTX build
+      nixos-amd = mkHost {
+        hostName = "nixos-amd";
+        hardwareConfig = ./hosts/amd-workstation/hardware-configuration.nix;
+        gpuType = "amd";
+        gpuConfig = {
+          primaryMonitor = "DP-1";  # Adjust based on your actual monitor connection
+          defaultResolution = "2560x1440";  # Or 3840x2160 for 4K
+          defaultRefreshRate = 144;  # RX 7900 XTX can handle high refresh 1440p
+        };
+      };
+
+      # Legacy alias (points to current machine)
+      default = self.nixosConfigurations.nixos;
     };
   };
 }

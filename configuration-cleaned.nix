@@ -2,18 +2,16 @@
 
 {
   imports = [
-    ./hardware-configuration.nix
     ./modules/editor-declarative.nix
     ./modules/docker.nix
     ./modules/cli-tools.nix
     ./modules/desktop-apps.nix
     ./modules/system-base.nix
     ./modules/power-management.nix
-    ./modules/nvidia.nix
+    ./modules/gpu.nix  # Auto-configured per-host (NVIDIA/AMD/Intel)
     ./modules/gaming.nix
     ./modules/sunshine.nix
     ./modules/vibe-kanban.nix
-    # ./modules/sway-headless.nix  # Disabled: wlroots capture doesn't work with NVIDIA
   ];
 
   # Bootloader
@@ -30,7 +28,7 @@
     "nohibernate"
   ];
 
-  networking.hostName = "nixos";
+  # networking.hostName is set per-host in flake.nix
   networking.networkmanager.enable = true;
 
   # Development environment variables (Playwright, GTK/GDK for Rust/Tauri)
