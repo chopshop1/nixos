@@ -32,6 +32,7 @@
     firefox
     thunderbird
     kitty
+    obsidian
 
     # 1Password
     _1password-cli
@@ -663,8 +664,8 @@
       # Status interval for updating status bar
       set -g status-interval 2
 
-      # Right status: CPU, RAM, and time (using shell commands)
-      set -g status-right "#[fg=#414868,bg=#1a1b26]#[fg=#7aa2f7,bg=#414868] 󰻠 #(top -bn1 | grep 'Cpu(s)' | awk '{print 100-$8\"%\"}') #[fg=#c0caf5]| #[fg=#7aa2f7]󰍛 #(free | awk '/Mem:/ {printf \"%.0f%%\", $3/$2*100}') #[fg=#7aa2f7,bg=#414868]#[fg=#1a1b26,bg=#7aa2f7,bold] %H:%M %d-%b "
+      # Right status: Git, CPU, RAM, and time (using shell commands)
+      set -g status-right "#[fg=#414868,bg=#1a1b26]#[fg=#bb9af7,bg=#414868]#(cd #{pane_current_path}; if git rev-parse --git-dir > /dev/null 2>&1; then branch=$(git branch --show-current 2>/dev/null); dirty=$(git status --porcelain 2>/dev/null | head -1); if [ -n \"$dirty\" ]; then echo \" $branch ●\"; else echo \" $branch\"; fi; fi) #[fg=#c0caf5]|#[fg=#7aa2f7] 󰻠 #(top -bn1 | grep 'Cpu(s)' | awk '{print 100-$8\"%\"}') #[fg=#c0caf5]| #[fg=#7aa2f7]󰍛 #(free | awk '/Mem:/ {printf \"%.0f%%\", $3/$2*100}') #[fg=#7aa2f7,bg=#414868]#[fg=#1a1b26,bg=#7aa2f7,bold] %H:%M %d-%b "
 
       # Window status
       set -g window-status-format "#[fg=#1a1b26,bg=#414868]#[fg=#c0caf5,bg=#414868] #I:#W #[fg=#414868,bg=#1a1b26]"
@@ -732,7 +733,7 @@
       color15 = "#c0caf5";
     };
     font = {
-      name = "monospace";
+      name = "JetBrainsMono Nerd Font";
       size = 11;
     };
   };
@@ -792,10 +793,9 @@
   # Git configuration
   programs.git = {
     enable = true;
-    userName = "dev";
-    userEmail = "dev@localhost";
-
-    extraConfig = {
+    settings = {
+      user.name = "dev";
+      user.email = "dev@localhost";
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
       pull.rebase = true;

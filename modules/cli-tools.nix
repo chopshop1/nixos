@@ -140,6 +140,8 @@ in
       freefont_ttf
       wqy_zenhei
 
+      # Note: Nerd Fonts moved to fonts.packages below
+
       # Audio (for cpal - microphone capture)
       alsa-lib
 
@@ -183,5 +185,16 @@ in
       tealdeer  # Better tldr
       gh        # GitHub CLI
     ] else []);
+
+    # Nerd Fonts for terminal/coding (must be in fonts.packages, not systemPackages)
+    fonts.packages = with pkgs; [
+      nerd-fonts.jetbrains-mono
+      nerd-fonts.fira-code
+      nerd-fonts.hack
+      nerd-fonts.meslo-lg
+      nerd-fonts.caskaydia-cove  # Cascadia Code
+      nerd-fonts.iosevka
+      nerd-fonts.sauce-code-pro  # Source Code Pro
+    ];
   };
 }
