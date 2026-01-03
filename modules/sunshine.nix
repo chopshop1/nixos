@@ -11,8 +11,8 @@
     settings = {
       # X11 capture for KDE Plasma on X11
       capture = "x11";
-      adapter_name = "/dev/dri/card1";
-      output_name = "1";  # Display ID 1 = HDMI-0 (connected)
+      adapter_name = "/dev/dri/card0";  # RX 7900 XTX (discrete GPU)
+      output_name = "7";  # HDMI-A-1-0 (display id from Sunshine detection)
 
       min_fps_factor = "1";
 

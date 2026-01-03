@@ -24,6 +24,12 @@ in
       default = true;
       description = "Keep WiFi connection alive and prevent power saving";
     };
+
+    preferEthernet = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Prioritize ethernet connections over WiFi";
+    };
   };
 
   config = mkMerge [
@@ -125,6 +131,23 @@ in
         };
         device = {
           "wifi.scan-rand-mac-address" = "no";
+        };
+      };
+    })
+
+    (mkIf cfg.preferEthernet {
+      # Prioritize ethernet over WiFi by setting route metrics
+      # Lower metric = higher priority (ethernet: 100, WiFi: 600)
+      networking.networkmanager.settings = {
+        "connection-ethernet" = {
+          "match-device" = "type:ethernet";
+          "ipv4.route-metric" = 100;
+          "ipv6.route-metric" = 100;
+        };
+        "connection-wifi" = {
+          "match-device" = "type:wifi";
+          "ipv4.route-metric" = 600;
+          "ipv6.route-metric" = 600;
         };
       };
     })
