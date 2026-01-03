@@ -41,6 +41,7 @@
         my.desktop-apps.enable = true;
         my.docker.enable = true;
         my.neovim.enable = true;
+        my.yubikey.enable = true;
         my.powerManagement = {
           preventSuspend = true;
           enableWakeOnLan = true;

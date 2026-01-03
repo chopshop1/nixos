@@ -12,6 +12,7 @@
     ./modules/gaming.nix
     ./modules/sunshine.nix
     ./modules/vibe-kanban.nix
+    ./modules/yubikey.nix
   ];
 
   # Bootloader
@@ -159,7 +160,7 @@
     description = "dev";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     shell = pkgs.zsh;
-    hashedPassword = "$6$JT7mJZ0wAUOsRsY4$mv2ikIv9dwMTIwonyt/TlIulyqpb1Pd8JsXgt4Efiwu2EAZXJHKk446hx8gqBhBuO1.HwVABBHvQZTQC.j0K50"; # Password: nixos
+    initialHashedPassword = "$6$JT7mJZ0wAUOsRsY4$mv2ikIv9dwMTIwonyt/TlIulyqpb1Pd8JsXgt4Efiwu2EAZXJHKk446hx8gqBhBuO1.HwVABBHvQZTQC.j0K50"; # Initial password: nixos (can be changed with passwd)
   };
 
   # Allow unfree packages

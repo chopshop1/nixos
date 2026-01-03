@@ -16,18 +16,18 @@
 
   # Filesystem configuration
   fileSystems."/" = {
-    device = "/dev/disk/by-uuid/ab8e7627-11fa-4d7c-abb7-e71df743e6de";
+    device = "/dev/disk/by-uuid/c6fdfd15-a5ad-4c81-ace1-932b2b6edc79";
     fsType = "ext4";
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/756A-4127";
+    device = "/dev/disk/by-uuid/EEDA-8B03";
     fsType = "vfat";
     options = [ "fmask=0077" "dmask=0077" ];
   };
 
   swapDevices = [
-    { device = "/dev/disk/by-uuid/d5cafe24-c457-4033-83e0-1e48943c50ea"; }
+    { device = "/dev/disk/by-uuid/bbddf905-46bf-4cda-a379-f065b9f382dd"; }
   ];
 
   # Network interface - will be auto-detected, but typically:
