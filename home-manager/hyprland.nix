@@ -175,6 +175,13 @@
         "float, class:^(pavucontrol)$"     # Float audio control
         "float, class:^(nm-connection-editor)$"  # Float network manager
         "float, title:^(Picture-in-Picture)$"    # Float PiP windows
+
+        # Steam window rules (fix for windows closing immediately)
+        "stayfocused, title:^()$,class:^(steam)$"
+        "minsize 1 1, title:^()$,class:^(steam)$"
+        "float, class:^(steam)$,title:^(Friends List)$"
+        "float, class:^(steam)$,title:^(Steam Settings)$"
+        "float, class:^(steam)$,title:^(Steam - News)$"
       ];
     };
   };

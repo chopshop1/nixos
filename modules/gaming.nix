@@ -7,6 +7,14 @@
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
     gamescopeSession.enable = true;  # Helps with game capture
+
+    # Force Steam to use XWayland (fixes window closing issues on Wayland)
+    package = pkgs.steam.override {
+      extraEnv = {
+        SDL_VIDEODRIVER = "x11";
+        GDK_BACKEND = "x11";
+      };
+    };
   };
 
   # Enable Gamescope compositor (useful for game streaming)
