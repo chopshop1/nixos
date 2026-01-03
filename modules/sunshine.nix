@@ -11,8 +11,8 @@
     settings = {
       # wlroots capture for Hyprland (Wayland)
       capture = "wlr";
-      adapter_name = "/dev/dri/card0";  # RX 7900 XTX (discrete GPU)
-      output_name = "0";  # Primary Wayland output
+      adapter_name = "/dev/dri/card1";  # RX 7900 XTX (discrete GPU, card0 is iGPU)
+      output_name = "0";  # Primary Wayland output (HDMI-A-1)
 
       # Use VA-API hardware encoding on AMD
       encoder = "vaapi";
