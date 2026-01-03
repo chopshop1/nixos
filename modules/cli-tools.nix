@@ -96,8 +96,12 @@ in
       at-spi2-core
       at-spi2-atk
       atk
+      atkmm  # Accessibility for Tauri
       dbus
       fribidi
+
+      # Automation (libxdo for Tauri)
+      xdotool
       libepoxy
       libpng
       pixman
@@ -185,6 +189,11 @@ in
       tealdeer  # Better tldr
       gh        # GitHub CLI
     ] else []);
+
+    # LD_LIBRARY_PATH for Tauri appindicator (system tray)
+    environment.sessionVariables = {
+      LD_LIBRARY_PATH = lib.makeLibraryPath [ pkgs.libayatana-appindicator ];
+    };
 
     # Nerd Fonts for terminal/coding (must be in fonts.packages, not systemPackages)
     fonts.packages = with pkgs; [
