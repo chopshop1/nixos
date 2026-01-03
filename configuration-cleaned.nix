@@ -53,6 +53,7 @@
       "${pkgs.libsoup_3}/lib"
       "${pkgs.alsa-lib}/lib"
       "${pkgs.libayatana-appindicator}/lib"
+      "${pkgs.xdotool}/lib"
     ];
     PKG_CONFIG_PATH = lib.concatStringsSep ":" [
       "${pkgs.gtk3.dev}/lib/pkgconfig"
@@ -82,6 +83,22 @@
       "${pkgs.ayatana-ido}/lib/pkgconfig"
       "${pkgs.gobject-introspection.dev}/lib/pkgconfig"
     ];
+    # C compiler include paths for native builds (SQLCipher/OpenSSL)
+    CPATH = lib.concatStringsSep ":" [
+      "${pkgs.openssl.dev}/include"
+      "${pkgs.glib.dev}/include"
+      "${pkgs.gtk3.dev}/include"
+      "${pkgs.zlib.dev}/include"
+    ];
+    # Runtime library path
+    LD_LIBRARY_PATH = lib.mkForce (lib.concatStringsSep ":" [
+      "${pkgs.libayatana-appindicator}/lib"
+      "${pkgs.gtk3}/lib"
+      "${pkgs.webkitgtk_4_1}/lib"
+      "${pkgs.glib.out}/lib"
+    ]);
+    # Wayland display for GTK apps
+    WAYLAND_DISPLAY = "wayland-1";
   };
 
   # Time zone and locale
