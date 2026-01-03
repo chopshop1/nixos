@@ -376,6 +376,12 @@
       layer = "overlay";
       insensitive = true;
       prompt = "";
+      # Vim-style keybindings
+      key_down = "Ctrl-j";
+      key_up = "Ctrl-k";
+      key_pgdn = "Ctrl-d";
+      key_pgup = "Ctrl-u";
+      key_exit = "Escape";
     };
     style = ''
       window {
