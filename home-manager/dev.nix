@@ -832,7 +832,12 @@
       $DRY_RUN_CMD ${pkgs.git}/bin/git clone "$NVIM_REPO" "$NVIM_DIR"
     else
       cd "$NVIM_DIR"
-      $DRY_RUN_CMD ${pkgs.git}/bin/git pull
+      # Only pull if working tree is clean, otherwise skip to avoid losing local changes
+      if ${pkgs.git}/bin/git diff --quiet && ${pkgs.git}/bin/git diff --cached --quiet; then
+        $DRY_RUN_CMD ${pkgs.git}/bin/git pull
+      else
+        echo "Skipping nvim repo update: local changes detected in $NVIM_DIR"
+      fi
     fi
   '';
 
