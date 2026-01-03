@@ -10,11 +10,32 @@
 
     # Force Steam to use XWayland (fixes window closing issues on Wayland)
     package = pkgs.steam.override {
+      extraPkgs = pkgs: with pkgs; [
+        xorg.libXcursor
+        xorg.libXi
+        xorg.libXinerama
+        xorg.libXScrnSaver
+        libpng
+        libpulseaudio
+        libvorbis
+        stdenv.cc.cc.lib
+        libkrb5
+        keyutils
+      ];
       extraEnv = {
+        # Force Steam and CEF to use XWayland
         SDL_VIDEODRIVER = "x11";
         GDK_BACKEND = "x11";
+        # Fix Steam CEF browser issues on Wayland
+        STEAM_ENABLE_WAYLAND = "0";
       };
     };
+  };
+
+  # Environment variables to force Steam to use XWayland
+  environment.sessionVariables = {
+    # Force Steam to use X11/XWayland
+    STEAM_FORCE_DESKTOPUI_SCALING = "2";  # Match your 200% scaling
   };
 
   # Enable Gamescope compositor (useful for game streaming)
@@ -38,8 +59,12 @@
     };
   };
 
-  # Wine and Proton dependencies
+  # Wine, Proton dependencies, and gaming utilities
   environment.systemPackages = with pkgs; [
+    # Steam through gamescope (for big picture mode)
+    (writeShellScriptBin "steam-gamescope" ''
+      exec ${pkgs.gamescope}/bin/gamescope -W 2560 -H 1440 -r 120 --expose-wayland -- steam -tenfoot "$@"
+    '')
     # Wine packages
     wineWowPackages.stagingFull  # 64-bit and 32-bit Wine with staging patches
     winetricks
