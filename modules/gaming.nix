@@ -11,16 +11,49 @@
     # Force Steam to use XWayland (fixes window closing issues on Wayland)
     package = pkgs.steam.override {
       extraPkgs = pkgs: with pkgs; [
+        # X11 libraries
         xorg.libXcursor
         xorg.libXi
         xorg.libXinerama
         xorg.libXScrnSaver
+        xorg.libXrandr
+        xorg.libXrender
+        xorg.libXfixes
+        xorg.libXcomposite
+        xorg.libXdamage
+        xorg.libXtst
+
+        # CEF/Chromium dependencies (required for Store/Library)
+        nss
+        nspr
+        cups
+        at-spi2-atk
+        at-spi2-core
+        libdrm
+        mesa
+        libxkbcommon
+        pango
+        cairo
+        glib
+        gdk-pixbuf
+        gtk3
+        dbus
+
+        # Audio/media
         libpng
         libpulseaudio
         libvorbis
+        alsa-lib
+
+        # General dependencies
         stdenv.cc.cc.lib
         libkrb5
         keyutils
+        openssl
+        freetype
+        harfbuzz
+        fontconfig
+        libudev-zero
       ];
       extraEnv = {
         # Force Steam and CEF to use XWayland
@@ -30,12 +63,19 @@
         STEAM_ENABLE_WAYLAND = "0";
       };
     };
+
+    # Extra compatibility packages for Steam runtime
+    extraCompatPackages = with pkgs; [
+      proton-ge-bin
+    ];
   };
 
-  # Environment variables to force Steam to use XWayland
+  # Environment variables for Steam
   environment.sessionVariables = {
     # Force Steam to use X11/XWayland (no scaling since display is at native 2K)
     STEAM_FORCE_DESKTOPUI_SCALING = "1";
+    # Disable GPU compositor in CEF to fix blank Store/Library
+    STEAM_DISABLE_BROWSER_SANDBOX = "1";
   };
 
   # Enable Gamescope compositor (useful for game streaming)
