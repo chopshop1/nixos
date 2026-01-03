@@ -176,12 +176,24 @@
         "float, class:^(nm-connection-editor)$"  # Float network manager
         "float, title:^(Picture-in-Picture)$"    # Float PiP windows
 
-        # Steam window rules (fix for windows closing immediately)
+        # Steam window rules (fix for windows closing immediately on Wayland)
+        # Handle Steam's empty title windows that cause issues
         "stayfocused, title:^()$,class:^(steam)$"
         "minsize 1 1, title:^()$,class:^(steam)$"
+
+        # Force Steam windows to stay open
+        "noinitialfocus, class:^(steam)$, title:^()$"
+        "nofocus, class:^(steam)$, title:^()$"
+
+        # Float Steam popup windows
         "float, class:^(steam)$,title:^(Friends List)$"
         "float, class:^(steam)$,title:^(Steam Settings)$"
         "float, class:^(steam)$,title:^(Steam - News)$"
+        "float, class:^(steam)$,title:^(Screenshot Manager)$"
+        "float, class:^(steam)$,title:^(Steam Guard)$"
+
+        # Keep Steam main window
+        "workspace 2 silent, class:^(steam)$,title:^(Steam)$"
       ];
     };
   };
@@ -357,7 +369,9 @@
       width = 500;
       height = 400;
       always_parse_args = true;
-      show_all = false;
+      show_all = true;
+      allow_images = true;
+      image_size = 24;
       print_command = true;
       layer = "overlay";
       insensitive = true;
