@@ -54,10 +54,23 @@
         harfbuzz
         fontconfig
         libudev-zero
+
+        # Additional dependencies for games like Arc Raiders
+        SDL2
+        SDL2_image
+        SDL2_mixer
+        SDL2_ttf
+        curl
+        zlib
+        libidn2
+        icu
+        bzip2
+        xz
+        libgcrypt
       ];
       extraEnv = {
-        # Force Steam and CEF to use XWayland
-        SDL_VIDEODRIVER = "x11";
+        # Note: Removed SDL_VIDEODRIVER=x11 as it breaks EAC games like Arc Raiders
+        # Games can override this individually if needed
         GDK_BACKEND = "x11";
         # Fix Steam CEF browser issues on Wayland
         STEAM_ENABLE_WAYLAND = "0";

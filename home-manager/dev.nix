@@ -1,5 +1,17 @@
 { config, pkgs, lib, ... }:
 
+let
+  # Import secrets (gitignored) - copy secrets.nix.example to secrets.nix
+  secretsPath = ../secrets.nix;
+  secrets = if builtins.pathExists secretsPath
+    then import secretsPath
+    else {
+      git = {
+        userName = "dev";
+        userEmail = "dev@localhost";
+      };
+    };
+in
 {
   imports = [
     ./hyprland.nix  # Hyprland window manager configuration
@@ -742,12 +754,12 @@
 
   # GTK/Qt theme configuration is in hyprland.nix
 
-  # Git configuration
+  # Git configuration (uses secrets.nix for user info)
   programs.git = {
     enable = true;
     settings = {
-      user.name = "dev";
-      user.email = "dev@localhost";
+      user.name = secrets.git.userName;
+      user.email = secrets.git.userEmail;
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
       pull.rebase = true;

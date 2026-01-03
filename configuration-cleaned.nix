@@ -14,6 +14,7 @@
     ./modules/vibe-kanban.nix
     ./modules/yubikey.nix
     ./modules/hyprland.nix  # Hyprland window manager
+    ./modules/xfce.nix      # XFCE desktop environment
     ./modules/ollama.nix    # Local LLM server
   ];
 
@@ -122,6 +123,9 @@
 
   # Enable Hyprland (configured in modules/hyprland.nix)
   my.hyprland.enable = true;
+
+  # Enable XFCE (for X11 gaming compatibility)
+  my.xfce.enable = true;
 
   # Enable Ollama local LLM server
   my.ollama.enable = true;

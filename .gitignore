@@ -6,6 +6,7 @@ result-*
 *.pem
 *.key
 secrets/
+secrets.nix
 .env
 .env.*
 credentials.json

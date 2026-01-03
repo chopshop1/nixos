@@ -9,53 +9,22 @@
     openFirewall = true;
 
     settings = {
-      # wlroots capture for Hyprland (Wayland)
-      capture = "wlr";
+      # X11 capture for XFCE/X11 desktop
+      # Use "wlr" for Hyprland/Wayland, "x11" for X11 desktops
+      capture = "x11";
       adapter_name = "/dev/dri/card1";  # RX 7900 XTX (discrete GPU, card0 is iGPU)
-      output_name = "0";  # Primary Wayland output (HDMI-A-1)
+      output_name = "0";  # Primary output
 
       # Use VA-API hardware encoding on AMD
       encoder = "vaapi";
 
-      min_fps_factor = "1";
-
-      # Video codec - HEVC/AV1 have better quality per bit than H.264
-      hevc_mode = "2";         # 0=never, 1=prefer, 2=always
+      # Video codec - prefer HEVC but allow fallback to H.264
+      hevc_mode = "1";         # 0=never, 1=prefer, 2=always
       av1_mode = "1";          # Enable AV1 when client supports it
 
-      # Color accuracy settings
-      colorspace = "rec709";   # rec709 for SDR, bt2020 for HDR
-      colorrange = "full";     # Full RGB range (0-255) for better gradients
-
-      # CRITICAL for text sharpness - 4:4:4 chroma (no subsampling)
-      # 4:2:0 causes color bleed on text edges making it blurry
-      encoder_csc = "1";       # 0 = 4:2:0, 1 = 4:4:4
-
-      # Encoder quality - lower qp = higher quality (18-23 recommended)
+      # Encoder quality
       qp = "20";
       min_threads = "2";
-
-      # AMD VA-API quality preference (0 = quality, higher = speed)
-      vaapi_coder = "0";
-
-      # Default to 2K 120Hz - order matters, first is default
-      resolutions = ''
-        [
-          2560x1440,
-          1920x1080,
-          1280x720,
-          3840x2160
-        ]
-      '';
-
-      # Default to 120fps - order matters, first is default
-      fps = ''
-        [
-          120,
-          60,
-          30
-        ]
-      '';
     };
 
     # Application profiles for streaming

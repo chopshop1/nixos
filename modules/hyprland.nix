@@ -110,16 +110,32 @@ in
       enable = true;
       settings = {
         default_session = {
-          command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd Hyprland";
+          # Show session menu with both Hyprland and XFCE options
+          command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --sessions /etc/greetd/sessions";
           user = "greeter";
         };
-        # Auto-login configuration
+        # Auto-login to XFCE
         initial_session = {
-          command = "Hyprland";
+          command = "startxfce4";
           user = "dev";
         };
       };
     };
+
+    # Create session files for greetd
+    environment.etc."greetd/sessions/hyprland.desktop".text = ''
+      [Desktop Entry]
+      Name=Hyprland
+      Exec=Hyprland
+      Type=Application
+    '';
+
+    environment.etc."greetd/sessions/xfce.desktop".text = ''
+      [Desktop Entry]
+      Name=XFCE
+      Exec=startxfce4
+      Type=Application
+    '';
 
     # Security - needed for Hyprland
     security.pam.services.hyprlock = {};
