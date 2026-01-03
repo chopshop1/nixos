@@ -8,8 +8,8 @@
     settings = {
       # Monitor configuration (AMD RX 7900 XTX)
       monitor = [
-        "DP-1,2560x1440@144,0x0,1"
-        ",preferred,auto,1"  # Fallback for any other monitors
+        "HDMI-A-1,2560x1440@120,0x0,2"  # 2K 120Hz with 200% scaling
+        ",preferred,auto,2"  # Fallback for any other monitors
       ];
 
       # General settings
