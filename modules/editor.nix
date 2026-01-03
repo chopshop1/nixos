@@ -8,21 +8,12 @@
     vimAlias = true;
   };
 
-  # Clone kickstart.nvim to user's config directory
-  system.activationScripts.kickstart-nvim = {
-    text = ''
-      if [ ! -d /home/dev/.config/nvim ]; then
-        mkdir -p /home/dev/.config
-        ${pkgs.git}/bin/git clone https://github.com/nvim-lua/kickstart.nvim.git /home/dev/.config/nvim
-        chown -R dev:users /home/dev/.config/nvim
-      fi
-    '';
-    deps = [];
-  };
+  # Neovim config is managed via Home Manager (symlinked from ~/work/.nvim)
+  # Uses lazy.nvim as plugin manager
 
   # Additional packages for development
   environment.systemPackages = with pkgs; [
-    # Language servers for kickstart
+    # Language servers for neovim
     lua-language-server
     nil  # Nix LSP
     nodePackages.typescript-language-server
@@ -33,7 +24,7 @@
     # Additional tools
     ripgrep  # Required by telescope
     fd       # Required by telescope
-    git      # Required by gitsigns
+    git      # Required by lazy.nvim and gitsigns
     gcc      # Required for treesitter compilation
 
     # Proton applications

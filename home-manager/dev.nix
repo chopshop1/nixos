@@ -869,32 +869,23 @@
     fi
   '';
 
-  # Activation script to update nvim config (DISABLED - now using LazyVim)
-  # home.activation.updateNvimConfig = lib.hm.dag.entryBefore ["checkLinkTargets"] ''
-  #   NVIM_DIR="$HOME/.config/nvim"
-  #
-  #   export PATH="${pkgs.openssh}/bin:${pkgs.git}/bin:$PATH"
-  #
-  #   # Remove old home-manager backup files to prevent conflicts
-  #   if [ -d "$NVIM_DIR" ]; then
-  #     echo "Cleaning up old nvim backup files..."
-  #     $DRY_RUN_CMD find "$NVIM_DIR" -name "*.hm-backup" -exec rm -rf {} + 2>/dev/null || true
-  #   fi
-  #
-  #   if [ -d "$NVIM_DIR/.git" ]; then
-  #     cd "$NVIM_DIR"
-  #
-  #     # Get the default branch name (main or master)
-  #     DEFAULT_BRANCH=$(${pkgs.git}/bin/git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@') || DEFAULT_BRANCH="main"
-  #
-  #     # Force update to latest from remote, discarding all local changes
-  #     echo "Updating nvim config from remote..."
-  #     $DRY_RUN_CMD ${pkgs.git}/bin/git fetch origin 2>/dev/null || true
-  #     $DRY_RUN_CMD ${pkgs.git}/bin/git reset --hard origin/$DEFAULT_BRANCH 2>/dev/null || echo "Nvim config update failed - check repository"
-  #     $DRY_RUN_CMD ${pkgs.git}/bin/git clean -fd 2>/dev/null || true
-  #     echo "Nvim config updated to latest from origin/$DEFAULT_BRANCH"
-  #   fi
-  # '';
+  # Neovim config - symlink to .nvim repo (uses lazy.nvim)
+  home.file.".config/nvim".source = config.lib.file.mkOutOfStoreSymlink "/home/dev/work/.nvim";
+
+  # Activation script to clone/update .nvim repo
+  home.activation.updateNvimRepo = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    NVIM_DIR="/home/dev/work/.nvim"
+    NVIM_REPO="git@github.com:chopshop1/.nvim.git"
+
+    export PATH="${pkgs.openssh}/bin:${pkgs.git}/bin:$PATH"
+
+    if [ ! -d "$NVIM_DIR" ]; then
+      $DRY_RUN_CMD ${pkgs.git}/bin/git clone "$NVIM_REPO" "$NVIM_DIR"
+    else
+      cd "$NVIM_DIR"
+      $DRY_RUN_CMD ${pkgs.git}/bin/git pull
+    fi
+  '';
 
   # Let Home Manager install and manage itself
   programs.home-manager.enable = true;
