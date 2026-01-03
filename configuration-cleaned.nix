@@ -14,6 +14,7 @@
     ./modules/vibe-kanban.nix
     ./modules/yubikey.nix
     ./modules/hyprland.nix  # Hyprland window manager
+    ./modules/ollama.nix    # Local LLM server
   ];
 
   # Bootloader
@@ -104,6 +105,11 @@
 
   # Enable Hyprland (configured in modules/hyprland.nix)
   my.hyprland.enable = true;
+
+  # Enable Ollama local LLM server
+  my.ollama.enable = true;
+  # Note: "rocm" builds from source (very slow), use "default" for cached binary
+  my.ollama.package = "default";
 
   # Configure keymap
   services.xserver.xkb = {

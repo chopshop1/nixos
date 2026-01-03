@@ -88,6 +88,7 @@
         # Launch apps
         "$mod, Return, exec, kitty"
         "$mod, D, exec, wofi --show drun"
+        "$mod, Space, exec, wofi --show drun"  # Alternative launcher shortcut
         "$mod, Q, killactive"
         "$mod SHIFT, E, exit"
 
@@ -150,6 +151,11 @@
       bindm = [
         "$mod, mouse:272, movewindow"
         "$mod, mouse:273, resizewindow"
+      ];
+
+      # Super key alone opens launcher (on release)
+      bindr = [
+        "SUPER, SUPER_L, exec, pkill wofi || wofi --show drun"
       ];
 
       # Autostart
