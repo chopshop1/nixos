@@ -9,10 +9,13 @@
     openFirewall = true;
 
     settings = {
-      # X11 capture for KDE Plasma on X11
-      capture = "x11";
+      # wlroots capture for Hyprland (Wayland)
+      capture = "wlr";
       adapter_name = "/dev/dri/card0";  # RX 7900 XTX (discrete GPU)
-      output_name = "7";  # HDMI-A-1-0 (display id from Sunshine detection)
+      output_name = "0";  # Primary Wayland output
+
+      # Use VA-API hardware encoding on AMD
+      encoder = "vaapi";
 
       min_fps_factor = "1";
 
@@ -88,7 +91,7 @@
   # Load uinput module for virtual input devices
   boot.kernelModules = [ "uinput" ];
 
-  # Note: For 4K streaming without a 4K monitor, you need a hardware HDMI dummy plug
-  # The headless Sway + wlroots approach doesn't work with NVIDIA GPUs
+  # Note: For 4K streaming without a 4K monitor, you may need a hardware HDMI dummy plug
+  # Hyprland with wlroots capture works natively for streaming
 
 }

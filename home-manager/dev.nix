@@ -1,6 +1,10 @@
 { config, pkgs, lib, ... }:
 
 {
+  imports = [
+    ./hyprland.nix  # Hyprland window manager configuration
+  ];
+
   # Neovim config is now managed directly in flake.nix
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
@@ -127,11 +131,6 @@
     initContent = ''
       # Add Bun to PATH
       export PATH="/home/dev/.bun/bin:$PATH"
-
-      # X11/Display settings
-      export DISPLAY=:0
-      export XAUTHORITY=/tmp/xauth_ngmBGE
-      export LD_LIBRARY_PATH="/nix/store/lbrzj84lmhn77v8gbm4h2b4bwk988w5i-libayatana-appindicator-0.5.92/lib:$LD_LIBRARY_PATH"
 
       # Initialize gnome-keyring if not already running
       if [ -z "$GNOME_KEYRING_CONTROL" ] && command -v gnome-keyring-daemon &> /dev/null; then
@@ -741,57 +740,7 @@
     };
   };
 
-  # GTK dark theme configuration
-  gtk = {
-    enable = true;
-    theme = {
-      name = "Breeze-Dark";
-      package = pkgs.kdePackages.breeze-gtk;
-    };
-    iconTheme = {
-      name = "breeze-dark";
-      package = pkgs.kdePackages.breeze-icons;
-    };
-    gtk3.extraConfig = {
-      gtk-application-prefer-dark-theme = true;
-    };
-    gtk4.extraConfig = {
-      gtk-application-prefer-dark-theme = true;
-    };
-  };
-
-  # Qt/KDE dark theme configuration
-  qt = {
-    enable = true;
-    platformTheme.name = "kde";
-    style.name = "breeze-dark";
-  };
-
-  # Set color scheme preference for XDG portal
-  dconf.settings = {
-    "org/gnome/desktop/interface" = {
-      color-scheme = "prefer-dark";
-    };
-  };
-
-  # KDE Plasma dark mode configuration files
-  home.file.".config/kdeglobals".text = ''
-    [General]
-    ColorScheme=BreezeDark
-
-    [KDE]
-    LookAndFeelPackage=org.kde.breezedark.desktop
-  '';
-
-  home.file.".config/kwinrc".text = ''
-    [org.kde.kdecoration2]
-    theme=Breeze
-  '';
-
-  home.file.".config/plasmarc".text = ''
-    [Theme]
-    name=breeze-dark
-  '';
+  # GTK/Qt theme configuration is in hyprland.nix
 
   # Git configuration
   programs.git = {

@@ -13,6 +13,7 @@
     ./modules/sunshine.nix
     ./modules/vibe-kanban.nix
     ./modules/yubikey.nix
+    ./modules/hyprland.nix  # Hyprland window manager
   ];
 
   # Bootloader
@@ -98,31 +99,13 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  # Enable the X11 windowing system
+  # Enable X server for XWayland compatibility
   services.xserver.enable = true;
 
-  # Enable SDDM Display Manager with auto-login (works better with X11 + NVIDIA)
-  services.displayManager.sddm = {
-    enable = true;
-    wayland.enable = false;  # Force X11 for Sunshine compatibility
-    theme = "breeze";  # Use Breeze theme (respects system dark mode)
-  };
-  services.displayManager.autoLogin.enable = true;
-  services.displayManager.autoLogin.user = "dev";
-  services.displayManager.defaultSession = "plasmax11";  # Force Plasma X11 session for Sunshine
+  # Enable Hyprland (configured in modules/hyprland.nix)
+  my.hyprland.enable = true;
 
-  # Enable KDE Plasma desktop (better X11 support than GNOME)
-  services.desktopManager.plasma6.enable = true;
-
-  # Force dark mode system-wide
-  environment.sessionVariables = {
-    # GTK dark theme
-    GTK_THEME = "Breeze-Dark";
-    # Qt/KDE dark theme
-    QT_STYLE_OVERRIDE = "breeze-dark";
-  };
-
-  # Configure keymap in X11
+  # Configure keymap
   services.xserver.xkb = {
     layout = "us";
     variant = "";

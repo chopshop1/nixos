@@ -118,6 +118,9 @@ in
         # RADV is used by default (part of Mesa)
         MOZ_DISABLE_RDD_SANDBOX = "1";
         __GL_VRR_ALLOWED = "1";
+        # Wayland-specific AMD settings
+        WLR_RENDERER = "vulkan";
+        WLR_NO_HARDWARE_CURSORS = "0";  # AMD supports hardware cursors
       };
 
       environment.systemPackages = with pkgs; [
@@ -132,10 +135,8 @@ in
       programs.corectrl.enable = true;
       hardware.amdgpu.overdrive.enable = true;  # Allow GPU overclocking
 
-      # Set display resolution if configured (AMD uses different output names)
-      services.xserver.displayManager.setupCommands = mkIf (cfg.primaryMonitor != null && cfg.defaultResolution != null) ''
-        ${pkgs.xorg.xrandr}/bin/xrandr --output ${cfg.primaryMonitor} --mode ${cfg.defaultResolution} ${optionalString (cfg.defaultRefreshRate != null) "--rate ${toString cfg.defaultRefreshRate}"} --primary || true
-      '';
+      # Note: Display resolution is configured in Hyprland monitor settings
+      # for Wayland, or via xrandr for X11 sessions
     })
 
     # ==================== Intel GPU ====================
