@@ -34,8 +34,8 @@
 
   # Environment variables to force Steam to use XWayland
   environment.sessionVariables = {
-    # Force Steam to use X11/XWayland
-    STEAM_FORCE_DESKTOPUI_SCALING = "2";  # Match your 200% scaling
+    # Force Steam to use X11/XWayland (no scaling since display is at native 2K)
+    STEAM_FORCE_DESKTOPUI_SCALING = "1";
   };
 
   # Enable Gamescope compositor (useful for game streaming)

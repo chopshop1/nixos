@@ -176,14 +176,9 @@
         "float, class:^(nm-connection-editor)$"  # Float network manager
         "float, title:^(Picture-in-Picture)$"    # Float PiP windows
 
-        # Steam window rules (fix for windows closing immediately on Wayland)
-        # Handle Steam's empty title windows that cause issues
-        "stayfocused, title:^()$,class:^(steam)$"
+        # Steam window rules
+        # minsize prevents Steam windows from being too small to interact with
         "minsize 1 1, title:^()$,class:^(steam)$"
-
-        # Force Steam windows to stay open
-        "noinitialfocus, class:^(steam)$, title:^()$"
-        "nofocus, class:^(steam)$, title:^()$"
 
         # Float Steam popup windows
         "float, class:^(steam)$,title:^(Friends List)$"
