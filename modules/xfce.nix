@@ -21,6 +21,8 @@ in
     # Enable XFCE
     services.xserver.desktopManager.xfce.enable = true;
 
+    # Note: Auto-login handled by greetd in hyprland.nix
+
     # XDG Portal for compatibility
     xdg.portal = {
       enable = true;
@@ -35,6 +37,10 @@ in
 
     # XFCE packages
     environment.systemPackages = with pkgs; [
+      # X11 session management
+      xorg.xinit
+      xorg.xauth
+
       # XFCE extras
       xfce.xfce4-whiskermenu-plugin
       xfce.xfce4-pulseaudio-plugin

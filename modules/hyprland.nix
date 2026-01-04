@@ -114,9 +114,9 @@ in
           command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --sessions /etc/greetd/sessions";
           user = "greeter";
         };
-        # Auto-login to XFCE
+        # Auto-login to XFCE (X11 - best for Sunshine streaming)
         initial_session = {
-          command = "startxfce4";
+          command = "startx /run/current-system/sw/bin/startxfce4 -- -keeptty";
           user = "dev";
         };
       };
@@ -133,7 +133,7 @@ in
     environment.etc."greetd/sessions/xfce.desktop".text = ''
       [Desktop Entry]
       Name=XFCE
-      Exec=startxfce4
+      Exec=startx /run/current-system/sw/bin/startxfce4
       Type=Application
     '';
 

@@ -166,12 +166,19 @@
         "wl-paste --type text --watch cliphist store"
         "wl-paste --type image --watch cliphist store"
         "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1"
+        # Start a minimal X11 app to trigger XWayland, then restart Sunshine for proper X11 capture
+        "sleep 2 && ${pkgs.xorg.xeyes}/bin/xeyes & sleep 4 && systemctl --user restart sunshine"
       ];
 
       # Window rules for gaming/Sunshine compatibility
       windowrulev2 = [
         "immediate, class:^(steam_app).*"  # Allow tearing for Steam games
         "immediate, class:^(gamescope)$"   # Allow tearing for Gamescope
+
+        # Hide xeyes (used to trigger XWayland for Sunshine)
+        "float, class:^(xeyes)$"
+        "size 1 1, class:^(xeyes)$"
+        "move -100 -100, class:^(xeyes)$"
         "float, class:^(pavucontrol)$"     # Float audio control
         "float, class:^(nm-connection-editor)$"  # Float network manager
         "float, title:^(Picture-in-Picture)$"    # Float PiP windows
