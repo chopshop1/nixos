@@ -1,16 +1,9 @@
 { config, pkgs, lib, ... }:
 
 let
-  # Import secrets (gitignored) - copy secrets.nix.example to secrets.nix
-  secretsPath = ../secrets.nix;
-  secrets = if builtins.pathExists secretsPath
-    then import secretsPath
-    else {
-      git = {
-        userName = "dev";
-        userEmail = "dev@localhost";
-      };
-    };
+  # Import secrets directly (must exist and be staged with: git add -f secrets.nix)
+  # If build fails, create secrets.nix from secrets.nix.example
+  secrets = import ../secrets.nix;
 in
 {
   imports = [
