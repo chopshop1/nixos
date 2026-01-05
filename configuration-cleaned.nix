@@ -15,6 +15,7 @@
     ./modules/yubikey.nix
     ./modules/hyprland.nix  # Hyprland window manager
     ./modules/xfce.nix      # XFCE desktop environment
+    ./modules/plasma.nix    # KDE Plasma desktop environment
     ./modules/ollama.nix    # Local LLM server
   ];
 
@@ -98,8 +99,6 @@
       "${pkgs.webkitgtk_4_1}/lib"
       "${pkgs.glib.out}/lib"
     ]);
-    # Wayland display for GTK apps
-    WAYLAND_DISPLAY = "wayland-1";
   };
 
   # Time zone and locale
@@ -122,10 +121,13 @@
   services.xserver.enable = true;
 
   # Enable Hyprland (configured in modules/hyprland.nix)
-  my.hyprland.enable = true;
+  my.hyprland.enable = false;
 
   # Enable XFCE (for X11 gaming compatibility)
-  my.xfce.enable = true;
+  my.xfce.enable = false;
+
+  # Enable KDE Plasma
+  my.plasma.enable = true;
 
   # Enable Ollama local LLM server
   my.ollama.enable = true;

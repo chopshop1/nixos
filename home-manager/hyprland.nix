@@ -456,12 +456,14 @@
     };
   };
 
-  # Qt theme for Hyprland (use kvantum for better Wayland support)
-  qt = {
-    enable = true;
-    platformTheme.name = "gtk";
-    style.name = "adwaita-dark";
-  };
+  # Qt theme - disabled for Plasma compatibility
+  # When using Plasma, KDE handles Qt theming automatically
+  # Only enable for Hyprland/Wayland sessions:
+  # qt = {
+  #   enable = true;
+  #   platformTheme.name = "gtk";
+  #   style.name = "adwaita-dark";
+  # };
 
   # dconf settings for dark theme
   dconf.settings = {

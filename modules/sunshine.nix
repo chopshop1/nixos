@@ -1,7 +1,9 @@
 { config, lib, pkgs, ... }:
 
+with lib;
+
 {
-  # Enable Sunshine - let it auto-detect capture method
+  # Enable Sunshine - X11 capture for Plasma X11 session
   services.sunshine = {
     enable = true;
     autoStart = true;
@@ -9,32 +11,61 @@
     openFirewall = true;
 
     settings = {
-      # X11 capture for XFCE desktop
+      # X11 capture for X11 session
       capture = "x11";
       encoder = "vaapi";
-      adapter_name = "/dev/dri/renderD128";
-      # Capture HDMI-1 dummy plug (id: 3 from Sunshine's display detection)
-      output_name = "3";
       # Input settings
       key_repeat_delay = "500";
       key_repeat_frequency = "24";
-      # Debug logging
-      min_log_level = "debug";
+      keyboard = "enabled";
+      mouse = "enabled";
+      gamepad = "enabled";
+      min_log_level = "info";
     };
   };
 
-  # X11 environment for XFCE session
+  # Sunshine config file
+  environment.etc."sunshine/sunshine.conf" = {
+    mode = "0644";
+    text = ''
+      capture = x11
+      encoder = vaapi
+      keyboard = enabled
+      mouse = enabled
+      gamepad = enabled
+      min_log_level = info
+      key_repeat_delay = 500
+      key_repeat_frequency = 24
+    '';
+  };
+
+  # Sunshine startup script that finds XAUTHORITY from running KDE session
+  environment.etc."sunshine-start.sh" = {
+    mode = "0755";
+    text = ''
+      #!/bin/sh
+      sleep 3
+      # Find XAUTHORITY from kwin_x11 process
+      KWIN_PID=$(${pkgs.procps}/bin/pgrep -f kwin_x11 | head -1)
+      if [ -n "$KWIN_PID" ] && [ -r "/proc/$KWIN_PID/environ" ]; then
+        export XAUTHORITY=$(cat /proc/$KWIN_PID/environ | tr '\0' '\n' | grep ^XAUTHORITY= | cut -d= -f2)
+      fi
+      export DISPLAY=:0
+      # Unset Wayland vars to ensure X11 capture
+      unset WAYLAND_DISPLAY
+      unset XDG_SESSION_TYPE
+      exec /run/wrappers/bin/sunshine /etc/sunshine/sunshine.conf
+    '';
+  };
+
+  # Sunshine service - use wrapper script
   systemd.user.services.sunshine = {
-    environment = {
-      DISPLAY = ":0";
-      XDG_RUNTIME_DIR = "/run/user/1001";
-      XAUTHORITY = "/home/dev/.Xauthority";
-      # Add libXtst to library path for XTEST input injection
-      LD_LIBRARY_PATH = "${pkgs.xorg.libXtst}/lib";
-    };
-    # Disable X11 access control before starting Sunshine (allows local connections)
+    after = [ "graphical-session.target" ];
+    wants = [ "graphical-session.target" ];
     serviceConfig = {
-      ExecStartPre = "${pkgs.xorg.xhost}/bin/xhost +local:";
+      ExecStart = mkForce "/etc/sunshine-start.sh";
+      Restart = mkForce "always";
+      RestartSec = mkForce "10s";
     };
   };
 
@@ -74,27 +105,28 @@
 
   # Udev rules for Sunshine to access input devices
   services.udev.extraRules = ''
-    KERNEL=="uinput", SUBSYSTEM=="misc", MODE="0660", GROUP="input", OPTIONS+="static_node=uinput", TAG+="uaccess"
+    # uinput for virtual input devices (mouse, keyboard, gamepad)
+    KERNEL=="uinput", SUBSYSTEM=="misc", MODE="0666", OPTIONS+="static_node=uinput", TAG+="uaccess"
+    # uhid for DualSense (ds5) gamepad emulation
+    KERNEL=="uhid", MODE="0666", OPTIONS+="static_node=uhid", TAG+="uaccess"
+    # Allow access to event devices for input
+    SUBSYSTEM=="input", MODE="0666", TAG+="uaccess"
+    # hidraw for DualSense (ds5) gamepad emulation
+    KERNEL=="hidraw*", MODE="0666", TAG+="uaccess"
   '';
 
-  # Load uinput module for virtual input devices
-  boot.kernelModules = [ "uinput" ];
+  # Load kernel modules for virtual input devices
+  boot.kernelModules = [ "uinput" "uhid" ];
 
-  # X11 input tools (xdotool uses XTEST for input injection)
+  # Input tools for streaming
   environment.systemPackages = with pkgs; [
     xdotool
     xorg.xdpyinfo
+    wl-clipboard  # Wayland clipboard
+    ydotool       # Wayland input automation
   ];
 
-  # Disable DPMS and screensaver for headless streaming (dummy plug)
-  # Without this, the monitor turns off and Sunshine shows black screen
-  services.xserver.displayManager.sessionCommands = ''
-    ${pkgs.xorg.xset}/bin/xset -dpms
-    ${pkgs.xorg.xset}/bin/xset s off
-    ${pkgs.xorg.xset}/bin/xset s noblank
-  '';
-
-  # Enable libinput for X11 input device hotplugging (required for Sunshine virtual devices)
+  # Enable libinput for input device hotplugging
   services.libinput.enable = true;
 
 }
