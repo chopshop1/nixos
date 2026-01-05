@@ -22,9 +22,14 @@ in
     services.displayManager.sddm = {
       enable = true;
       wayland.enable = false;
+      theme = "breeze";
       settings = {
         General.DefaultSession = "plasmax11.desktop";
         Autologin.Session = "plasmax11.desktop";
+        Theme = {
+          Current = "breeze";
+          CursorTheme = "breeze_cursors";
+        };
       };
     };
 
