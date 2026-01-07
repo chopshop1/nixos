@@ -20,6 +20,10 @@ with lib;
       keyboard = "enabled";
       mouse = "enabled";
       gamepad = "enabled";
+      # Force controller always connected - fixes reconnect issues
+      controller = "1";
+      # Use x360 emulation (most compatible)
+      gamepad_type = "x360";
       min_log_level = "info";
     };
   };
@@ -33,6 +37,8 @@ with lib;
       keyboard = enabled
       mouse = enabled
       gamepad = enabled
+      controller = 1
+      gamepad_type = x360
       min_log_level = info
       key_repeat_delay = 500
       key_repeat_frequency = 24
