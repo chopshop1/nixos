@@ -292,7 +292,7 @@ in
         # Send commands
         tmux send-keys -t 0 'claude --dangerously-skip-permissions' C-m
         tmux send-keys -t 1 'nvim .' C-m
-        tmux send-keys -t 2 'docker compose up -d' C-m
+        tmux send-keys -t 2 'claude --dangerously-skip-permissions' C-m
 
         # Focus right pane with nvim
         tmux select-pane -t 1
