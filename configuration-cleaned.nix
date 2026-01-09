@@ -11,6 +11,7 @@
     ./modules/gpu.nix  # Auto-configured per-host (NVIDIA/AMD/Intel)
     ./modules/gaming.nix
     ./modules/sunshine.nix
+    ./modules/streaming-optimization.nix
     ./modules/vibe-kanban.nix
     ./modules/yubikey.nix
     ./modules/hyprland.nix  # Hyprland window manager
