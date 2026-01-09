@@ -430,37 +430,40 @@
   };
 
   # Cursor theme (Breeze for Plasma compatibility)
+  # NOTE: gtk.enable disabled to avoid conflicts with Plasma's .gtkrc-2.0 management
   home.pointerCursor = {
-    gtk.enable = true;
+    gtk.enable = false;  # Plasma manages this
     x11.enable = true;
     package = pkgs.kdePackages.breeze;
     name = "breeze_cursors";
     size = 24;
   };
 
-  # GTK theme settings (Breeze-Dark for Plasma compatibility)
-  gtk = {
-    enable = true;
-    theme = {
-      name = "Breeze-Dark";
-      package = pkgs.kdePackages.breeze-gtk;
-    };
-    iconTheme = {
-      name = "breeze-dark";
-      package = pkgs.kdePackages.breeze-icons;
-    };
-    cursorTheme = {
-      name = "breeze_cursors";
-      package = pkgs.kdePackages.breeze;
-      size = 24;
-    };
-    gtk3.extraConfig = {
-      gtk-application-prefer-dark-theme = true;
-    };
-    gtk4.extraConfig = {
-      gtk-application-prefer-dark-theme = true;
-    };
-  };
+  # GTK theme settings - DISABLED when using Plasma
+  # Plasma manages .gtkrc-2.0 itself, so home-manager's GTK management conflicts
+  # Only enable this for standalone Hyprland sessions (not Plasma)
+  # gtk = {
+  #   enable = true;
+  #   theme = {
+  #     name = "Breeze-Dark";
+  #     package = pkgs.kdePackages.breeze-gtk;
+  #   };
+  #   iconTheme = {
+  #     name = "breeze-dark";
+  #     package = pkgs.kdePackages.breeze-icons;
+  #   };
+  #   cursorTheme = {
+  #     name = "breeze_cursors";
+  #     package = pkgs.kdePackages.breeze;
+  #     size = 24;
+  #   };
+  #   gtk3.extraConfig = {
+  #     gtk-application-prefer-dark-theme = true;
+  #   };
+  #   gtk4.extraConfig = {
+  #     gtk-application-prefer-dark-theme = true;
+  #   };
+  # };
 
   # Qt theme - disabled for Plasma compatibility
   # When using Plasma, KDE handles Qt theming automatically
@@ -478,48 +481,49 @@
     };
   };
 
-  # Plasma/KDE dark mode configuration
-  home.file.".config/kdeglobals".text = ''
-    [General]
-    ColorScheme=BreezeDark
-
-    [KDE]
-    LookAndFeelPackage=org.kde.breezedark.desktop
-    widgetStyle=Breeze
-
-    [Colors:View]
-    BackgroundNormal=35,38,52
-    ForegroundNormal=192,202,245
-
-    [Icons]
-    Theme=breeze-dark
-  '';
-
-  home.file.".config/plasmarc".text = ''
-    [Theme]
-    name=breeze-dark
-  '';
-
-  home.file.".config/kcminputrc".text = ''
-    [Mouse]
-    cursorTheme=breeze_cursors
-    cursorSize=24
-  '';
-
-  home.file.".config/kwinrc".text = ''
-    [org.kde.kdecoration2]
-    theme=Breeze
-  '';
-
-  # Plasma 6 color scheme
-  home.file.".config/kcolorschemerc".text = ''
-    [General]
-    Name=Breeze Dark
-  '';
-
-  # Plasma shell (desktop) theme
-  home.file.".config/plasmanotifyrc".text = ''
-    [Notifications]
-    LowPriorityHistory=true
-  '';
+  # Plasma/KDE config files - DISABLED when using Plasma desktop
+  # Plasma manages these files itself, so home-manager management causes conflicts
+  # Only enable these for standalone Hyprland sessions (not Plasma)
+  #
+  # home.file.".config/kdeglobals".text = ''
+  #   [General]
+  #   ColorScheme=BreezeDark
+  #
+  #   [KDE]
+  #   LookAndFeelPackage=org.kde.breezedark.desktop
+  #   widgetStyle=Breeze
+  #
+  #   [Colors:View]
+  #   BackgroundNormal=35,38,52
+  #   ForegroundNormal=192,202,245
+  #
+  #   [Icons]
+  #   Theme=breeze-dark
+  # '';
+  #
+  # home.file.".config/plasmarc".text = ''
+  #   [Theme]
+  #   name=breeze-dark
+  # '';
+  #
+  # home.file.".config/kcminputrc".text = ''
+  #   [Mouse]
+  #   cursorTheme=breeze_cursors
+  #   cursorSize=24
+  # '';
+  #
+  # home.file.".config/kwinrc".text = ''
+  #   [org.kde.kdecoration2]
+  #   theme=Breeze
+  # '';
+  #
+  # home.file.".config/kcolorschemerc".text = ''
+  #   [General]
+  #   Name=Breeze Dark
+  # '';
+  #
+  # home.file.".config/plasmanotifyrc".text = ''
+  #   [Notifications]
+  #   LowPriorityHistory=true
+  # '';
 }

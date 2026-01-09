@@ -172,6 +172,9 @@ in
       # Playwright with pre-patched browsers for NixOS
       playwright-driver.browsers
 
+      # Notification support (for Claude Code hooks, etc.)
+      libnotify  # notify-send command
+
       # Modern CLI tools
     ] ++ (if cfg.modern then with pkgs; [
       fzf       # Fuzzy finder

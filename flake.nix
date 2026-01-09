@@ -32,7 +32,8 @@
             ./home-manager/dev.nix
           ];
         });
-        home-manager.backupFileExtension = "hm-backup";
+        # Use a backup command that handles existing backups gracefully
+        home-manager.backupFileExtension = "hm-backup~";
       }
 
       # Shared module options
