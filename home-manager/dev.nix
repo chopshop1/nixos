@@ -80,6 +80,7 @@ in
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
     enableCompletion = true;
+    historySubstringSearch.enable = true;
 
     history = {
       size = 10000;
@@ -177,8 +178,13 @@ in
       zstyle ':completion:*' group-name ""
 
       # Enhanced history search with up/down arrows
+      # Multiple bindings to cover different terminal modes (normal, application, tmux)
       bindkey '^[[A' history-substring-search-up
       bindkey '^[[B' history-substring-search-down
+      bindkey '^[OA' history-substring-search-up    # Application mode (tmux)
+      bindkey '^[OB' history-substring-search-down  # Application mode (tmux)
+      bindkey "$terminfo[kcuu1]" history-substring-search-up    # Terminfo up
+      bindkey "$terminfo[kcud1]" history-substring-search-down  # Terminfo down
 
       # Tab completion navigation
       bindkey '^[[Z' reverse-menu-complete  # Shift+Tab for reverse
@@ -600,6 +606,21 @@ in
       # Enable mouse support
       set -g mouse on
 
+      # OSC 52 clipboard support - allows tmux to copy to local clipboard over SSH
+      # This works with most modern terminals (iTerm2, Kitty, Alacritty, Windows Terminal)
+      set -g set-clipboard on
+      set -ga terminal-features ',*:clipboard'
+
+      # Configure tmux-yank to use OSC 52 for SSH sessions
+      set -g @yank_action 'copy-pipe-no-clear'
+      set -g @yank_with_mouse on
+      set -g @yank_selection_mouse 'clipboard'
+
+      # Copy mode bindings that use OSC 52
+      bind-key -T copy-mode-vi v send-keys -X begin-selection
+      bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel
+      bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel
+
       # Open new windows and panes in current directory
       bind-key c new-window -c "#{pane_current_path}"
       bind-key v split-window -h -c "#{pane_current_path}"
@@ -747,6 +768,147 @@ in
   };
 
   # GTK/Qt theme configuration is in hyprland.nix
+
+  # Konsole (KDE Terminal) Tokyo Night theme
+  home.file.".local/share/konsole/TokyoNight.colorscheme".text = ''
+    [Background]
+    Color=26,27,38
+
+    [BackgroundFaint]
+    Color=26,27,38
+
+    [BackgroundIntense]
+    Color=36,40,59
+
+    [Color0]
+    Color=21,22,30
+
+    [Color0Faint]
+    Color=21,22,30
+
+    [Color0Intense]
+    Color=65,72,104
+
+    [Color1]
+    Color=247,118,142
+
+    [Color1Faint]
+    Color=247,118,142
+
+    [Color1Intense]
+    Color=247,118,142
+
+    [Color2]
+    Color=158,206,106
+
+    [Color2Faint]
+    Color=158,206,106
+
+    [Color2Intense]
+    Color=158,206,106
+
+    [Color3]
+    Color=224,175,104
+
+    [Color3Faint]
+    Color=224,175,104
+
+    [Color3Intense]
+    Color=224,175,104
+
+    [Color4]
+    Color=122,162,247
+
+    [Color4Faint]
+    Color=122,162,247
+
+    [Color4Intense]
+    Color=122,162,247
+
+    [Color5]
+    Color=187,154,247
+
+    [Color5Faint]
+    Color=187,154,247
+
+    [Color5Intense]
+    Color=187,154,247
+
+    [Color6]
+    Color=125,207,255
+
+    [Color6Faint]
+    Color=125,207,255
+
+    [Color6Intense]
+    Color=125,207,255
+
+    [Color7]
+    Color=169,177,214
+
+    [Color7Faint]
+    Color=169,177,214
+
+    [Color7Intense]
+    Color=192,202,245
+
+    [Foreground]
+    Color=192,202,245
+
+    [ForegroundFaint]
+    Color=169,177,214
+
+    [ForegroundIntense]
+    Color=192,202,245
+
+    [General]
+    Anchor=0.5,0.5
+    Blur=false
+    ColorRandomization=false
+    Description=Tokyo Night
+    FillStyle=Tile
+    Opacity=1
+    Wallpaper=
+    WallpaperFlipType=NoFlip
+    WallpaperOpacity=1
+  '';
+
+  home.file.".local/share/konsole/TokyoNight.profile".text = ''
+    [Appearance]
+    ColorScheme=TokyoNight
+    Font=JetBrainsMono Nerd Font,11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1
+
+    [Cursor Options]
+    CursorShape=1
+
+    [General]
+    Command=/run/current-system/sw/bin/zsh
+    Name=Tokyo Night
+    Parent=FALLBACK/
+
+    [Scrolling]
+    HistoryMode=2
+    ScrollBarPosition=2
+
+    [Terminal Features]
+    BlinkingCursorEnabled=true
+  '';
+
+  # Set Konsole to use Tokyo Night profile by default
+  home.file.".config/konsolerc".text = ''
+    [Desktop Entry]
+    DefaultProfile=TokyoNight.profile
+
+    [General]
+    ConfigVersion=1
+
+    [MainWindow]
+    MenuBar=Disabled
+    ToolBarsMovable=Disabled
+
+    [TabBar]
+    TabBarVisibility=ShowTabBarWhenNeeded
+  '';
 
   # Git configuration (uses secrets.nix for user info)
   programs.git = {
