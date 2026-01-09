@@ -89,9 +89,9 @@
         hardwareConfig = ./hosts/amd-workstation/hardware-configuration.nix;
         gpuType = "amd";
         gpuConfig = {
-          primaryMonitor = "DP-1";  # Adjust based on your actual monitor connection
-          defaultResolution = "2560x1440";  # Or 3840x2160 for 4K
-          defaultRefreshRate = 144;  # RX 7900 XTX can handle high refresh 1440p
+          primaryMonitor = "HDMI-A-1";  # Currently connected display
+          defaultResolution = "2560x1440";
+          defaultRefreshRate = 120;
         };
       };
 

@@ -135,8 +135,10 @@ in
       programs.corectrl.enable = true;
       hardware.amdgpu.overdrive.enable = true;  # Allow GPU overclocking
 
-      # Note: Display resolution is configured in Hyprland monitor settings
-      # for Wayland, or via xrandr for X11 sessions
+      # Set display resolution if configured (for X11/Plasma sessions)
+      services.xserver.displayManager.setupCommands = mkIf (cfg.primaryMonitor != null && cfg.defaultResolution != null) ''
+        ${pkgs.xorg.xrandr}/bin/xrandr --output ${cfg.primaryMonitor} --mode ${cfg.defaultResolution} ${optionalString (cfg.defaultRefreshRate != null) "--rate ${toString cfg.defaultRefreshRate}"} --primary || true
+      '';
     })
 
     # ==================== Intel GPU ====================
