@@ -655,65 +655,62 @@ in
       bind-key -r Up resize-pane -U 5
       bind-key -r Right resize-pane -R 5
 
-      # Tokyo Night Theme Colors
-      set -g @tokyo-night-bg "#1a1b26"
-      set -g @tokyo-night-fg "#c0caf5"
-      set -g @tokyo-night-blue "#7aa2f7"
-      set -g @tokyo-night-cyan "#7dcfff"
-      set -g @tokyo-night-green "#9ece6a"
-      set -g @tokyo-night-magenta "#bb9af7"
-      set -g @tokyo-night-red "#f7768e"
-      set -g @tokyo-night-yellow "#e0af68"
-      set -g @tokyo-night-gray "#414868"
+      # Custom Theme - Code Editor Principles
+      # Purple (#8031f7): Keywords, functions → session, time
+      # Pink (#d23d91): Strings, special → git branch
+      # Cyan (#76e3ea): Types, constants, success → staged, clean, active window
+      # Coral (#fc704f): Numbers, operators → modified
+      # Red (#ff4445): Errors, deletions → high usage
+      # Light Purple (#b780ff): Comments → untracked
 
       # 3D Effect - Pane borders
-      set -g pane-border-style "fg=#414868"
-      set -g pane-active-border-style "fg=#7aa2f7,bold"
+      set -g pane-border-style "fg=#3a3a5c"
+      set -g pane-active-border-style "fg=#76e3ea,bold"
 
       # Status bar style
-      set -g status-style "bg=#1a1b26,fg=#c0caf5"
+      set -g status-style "bg=#1a1a2e,fg=#e6ccff"
       set -g status-left-length 100
       set -g status-right-length 200
       set -g status-justify left
 
       # Left status: Session info and git status
-      set -g status-left "#[fg=#1a1b26,bg=#7aa2f7,bold] #S #[fg=#7aa2f7,bg=#414868]#[fg=#bb9af7,bg=#414868]#(cd #{pane_current_path} && git branch --show-current 2>/dev/null | xargs -I{} echo ' {}')#[fg=#9ece6a]#(cd #{pane_current_path} && git diff --cached --numstat 2>/dev/null | wc -l | awk '$1>0{print \" +\"$1}')#[fg=#e0af68]#(cd #{pane_current_path} && git diff --numstat 2>/dev/null | wc -l | awk '$1>0{print \" ~\"$1}')#[fg=#787c99]#(cd #{pane_current_path} && git ls-files --others --exclude-standard 2>/dev/null | wc -l | awk '$1>0{print \" ?\"$1}')#[fg=#9ece6a]#(cd #{pane_current_path} && git status --porcelain 2>/dev/null | wc -l | awk '$1==0{print \" ✓\"}') #[fg=#414868,bg=#1a1b26]"
+      set -g status-left "#[fg=#1a1a2e,bg=#8031f7,bold] #S #[fg=#8031f7,bg=#3a3a5c]#[fg=#d23d91,bg=#3a3a5c]#(cd #{pane_current_path} && git branch --show-current 2>/dev/null | xargs -I{} echo ' {}')#[fg=#76e3ea]#(cd #{pane_current_path} && git diff --cached --numstat 2>/dev/null | wc -l | awk '$1>0{print \" +\"$1}')#[fg=#fc704f]#(cd #{pane_current_path} && git diff --numstat 2>/dev/null | wc -l | awk '$1>0{print \" ~\"$1}')#[fg=#b780ff]#(cd #{pane_current_path} && git ls-files --others --exclude-standard 2>/dev/null | wc -l | awk '$1>0{print \" ?\"$1}')#[fg=#76e3ea]#(cd #{pane_current_path} && git status --porcelain 2>/dev/null | wc -l | awk '$1==0{print \" ✓\"}') #[fg=#3a3a5c,bg=#1a1a2e]"
 
       # CPU plugin configuration
-      set -g @cpu_low_fg_color "#[fg=#9ece6a]"
-      set -g @cpu_medium_fg_color "#[fg=#e0af68]"
-      set -g @cpu_high_fg_color "#[fg=#f7768e]"
+      set -g @cpu_low_fg_color "#[fg=#76e3ea]"
+      set -g @cpu_medium_fg_color "#[fg=#fc704f]"
+      set -g @cpu_high_fg_color "#[fg=#ff4445]"
       set -g @cpu_percentage_format "%3.0f%%"
 
-      set -g @ram_low_fg_color "#[fg=#9ece6a]"
-      set -g @ram_medium_fg_color "#[fg=#e0af68]"
-      set -g @ram_high_fg_color "#[fg=#f7768e]"
+      set -g @ram_low_fg_color "#[fg=#76e3ea]"
+      set -g @ram_medium_fg_color "#[fg=#fc704f]"
+      set -g @ram_high_fg_color "#[fg=#ff4445]"
       set -g @ram_percentage_format "%3.0f%%"
 
       # Status interval for updating status bar
       set -g status-interval 2
 
       # Right status: CPU, RAM, and time
-      set -g status-right "#[fg=#414868,bg=#1a1b26]#[fg=#7aa2f7,bg=#414868] 󰻠 #(top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\\([0-9.]*\\)%* id.*/\\1/' | awk '{print 100-$1\"%\"}') #[fg=#c0caf5]| #[fg=#7aa2f7]󰍛 #(free | awk '/Mem:/ {printf \"%.0f%%\", $3/$2*100}') #[fg=#7aa2f7,bg=#414868]#[fg=#1a1b26,bg=#7aa2f7,bold] %H:%M %d-%b "
+      set -g status-right "#[fg=#3a3a5c,bg=#1a1a2e]#[fg=#76e3ea,bg=#3a3a5c] 󰻠 #(top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\\([0-9.]*\\)%* id.*/\\1/' | awk '{print 100-$1\"%\"}') #[fg=#e6ccff]| #[fg=#76e3ea]󰍛 #(free | awk '/Mem:/ {printf \"%.0f%%\", $3/$2*100}') #[fg=#8031f7,bg=#3a3a5c]#[fg=#1a1a2e,bg=#8031f7,bold] %H:%M %d-%b "
 
-      # Window status
-      set -g window-status-format "#[fg=#1a1b26,bg=#414868]#[fg=#c0caf5,bg=#414868] #I:#W #[fg=#414868,bg=#1a1b26]"
-      set -g window-status-current-format "#[fg=#1a1b26,bg=#bb9af7]#[fg=#1a1b26,bg=#bb9af7,bold] #I:#W #[fg=#bb9af7,bg=#1a1b26]"
+      # Window status - Cyan for active (like highlighted type/class)
+      set -g window-status-format "#[fg=#1a1a2e,bg=#3a3a5c]#[fg=#b780ff,bg=#3a3a5c] #I:#W #[fg=#3a3a5c,bg=#1a1a2e]"
+      set -g window-status-current-format "#[fg=#1a1a2e,bg=#76e3ea]#[fg=#1a1a2e,bg=#76e3ea,bold] #I:#W #[fg=#76e3ea,bg=#1a1a2e]"
       set -g window-status-separator ""
 
       # Messages
-      set -g message-style "fg=#1a1b26,bg=#7aa2f7,bold"
-      set -g message-command-style "fg=#1a1b26,bg=#7aa2f7,bold"
+      set -g message-style "fg=#1a1a2e,bg=#76e3ea,bold"
+      set -g message-command-style "fg=#1a1a2e,bg=#8031f7,bold"
 
       # Pane number display
-      set -g display-panes-active-colour "#7aa2f7"
-      set -g display-panes-colour "#414868"
+      set -g display-panes-active-colour "#76e3ea"
+      set -g display-panes-colour "#3a3a5c"
 
       # Clock
-      set -g clock-mode-colour "#7aa2f7"
+      set -g clock-mode-colour "#8031f7"
 
-      # Copy mode
-      set -g mode-style "fg=#1a1b26,bg=#7aa2f7"
+      # Copy mode - Cyan selection like editor selection
+      set -g mode-style "fg=#1a1a2e,bg=#76e3ea"
     '';
   };
 
