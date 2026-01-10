@@ -359,12 +359,15 @@ in
     settings = {
       "$schema" = "https://starship.rs/config-schema.json";
 
-      # Clean Blue Theme
-      # Primary: #5b8af7 (vibrant blue)
-      # Secondary: #7aa2f7 (light blue)
-      # Accent: #a9b1d6 (soft lavender)
+      # Code Editor Color Principles:
+      # Purple (#8031f7): Keywords, functions → session icon, time
+      # Pink (#d23d91): Strings, special → git branch
+      # Cyan (#76e3ea): Types, constants, success → directory, staged, clean
+      # Coral (#fc704f): Numbers, operators → modified
+      # Red (#ff4445): Errors, deletions → errors, deleted
+      # Light Purple (#b780ff): Comments → untracked, secondary info
 
-      format = "[](fg:#5b8af7)[ ](bg:#5b8af7 fg:#1a1a2e)$os[ $directory](bg:#5b8af7 fg:#ffffff)[](fg:#5b8af7 bg:#7aa2f7)$git_branch$git_status$git_state[](fg:#7aa2f7 bg:#394260)$c$rust$golang$nodejs$php$java$kotlin$haskell$python$bun[](fg:#394260 bg:#1a1a2e)[ $time ](bg:#1a1a2e fg:#a9b1d6)$line_break$character";
+      format = "[░▒▓](#5b8af7)[  ](bg:#5b8af7 fg:#1a1a2e)$os$directory[](fg:#5b8af7 bg:#7aa2f7)$git_branch$git_status$git_state[](fg:#7aa2f7 bg:#2a2a4a)$c$rust$golang$nodejs$php$java$kotlin$haskell$python$bun[](fg:#2a2a4a bg:#1d1d3a)$docker_context$conda$aws[](fg:#1d1d3a bg:#1a1a2e)$time[ ](fg:#1a1a2e)$line_break$character";
 
       palette = "code_editor";
 
@@ -397,7 +400,7 @@ in
 
       directory = {
         style = "fg:#ffffff bg:#5b8af7";
-        format = "$path ";
+        format = "[ $path ]($style)";
         truncation_length = 3;
         truncation_symbol = "…/";
         substitutions = {
@@ -413,28 +416,28 @@ in
       git_branch = {
         symbol = "";
         style = "bg:#7aa2f7";
-        format = "[ $symbol $branch ](fg:#1a1a2e bg:#7aa2f7)";
+        format = "[[ $symbol $branch ](fg:#1a1a2e bg:#7aa2f7)]($style)";
       };
 
       git_status = {
         style = "bg:#7aa2f7";
-        conflicted = "[!](fg:#ff4445)";
-        ahead = "[⇡\${count}](fg:#1a1a2e)";
-        behind = "[⇣\${count}](fg:#1a1a2e)";
-        diverged = "[⇕](fg:#e0af68)";
-        up_to_date = "[✓](fg:#1a1a2e)";
-        untracked = "[?\${count}](fg:#565f89)";
-        stashed = "[$](fg:#bb9af7)";
-        modified = "[~\${count}](fg:#e0af68)";
-        staged = "[+\${count}](fg:#9ece6a)";
-        renamed = "[»](fg:#7dcfff)";
-        deleted = "[✘](fg:#f7768e)";
-        format = "[$all_status$ahead_behind ](bg:#7aa2f7)";
+        conflicted = "[!\${count}](bg:#7aa2f7 fg:#ff4445) ";
+        ahead = "[⇡\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
+        behind = "[⇣\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
+        diverged = "[⇕\${ahead_count}⇣\${behind_count}](bg:#7aa2f7 fg:#fc704f) ";
+        up_to_date = "[✓](bg:#7aa2f7 fg:#1a1a2e)";
+        untracked = "[?\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
+        stashed = "[$\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
+        modified = "[●\${count}](bg:#7aa2f7 fg:#fc704f) ";
+        staged = "[+\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
+        renamed = "[»\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
+        deleted = "[✘\${count}](bg:#7aa2f7 fg:#ff4445) ";
+        format = "[[($all_status$ahead_behind )](fg:#1a1a2e bg:#7aa2f7)]($style)";
       };
 
       git_state = {
-        style = "bg:#7aa2f7 fg:#e0af68";
-        format = "[ $state($progress_current/$progress_total) ](bg:#7aa2f7 fg:#e0af68)";
+        style = "bg:#7aa2f7 fg:#fc704f";
+        format = "[[ $state($progress_current/$progress_total) ](bg:#7aa2f7 fg:#fc704f)]($style)";
         rebase = "REBASING";
         merge = "MERGING";
         revert = "REVERTING";
@@ -446,88 +449,88 @@ in
 
       c = {
         symbol = " ";
-        style = "bg:#394260";
-        format = "[ $symbol$version ](fg:#a9b1d6 bg:#394260)";
+        style = "bg:#2a2a4a";
+        format = "[[ $symbol($version) ](fg:#b780ff bg:#2a2a4a)]($style)";
       };
 
       rust = {
-        symbol = " ";
-        style = "bg:#394260";
-        format = "[ $symbol$version ](fg:#a9b1d6 bg:#394260)";
+        symbol = "";
+        style = "bg:#2a2a4a";
+        format = "[[ $symbol($version) ](fg:#b780ff bg:#2a2a4a)]($style)";
       };
 
       golang = {
-        symbol = " ";
-        style = "bg:#394260";
-        format = "[ $symbol$version ](fg:#a9b1d6 bg:#394260)";
+        symbol = "";
+        style = "bg:#2a2a4a";
+        format = "[[ $symbol($version) ](fg:#b780ff bg:#2a2a4a)]($style)";
       };
 
       nodejs = {
-        symbol = " ";
-        style = "bg:#394260";
-        format = "[ $symbol$version ](fg:#a9b1d6 bg:#394260)";
+        symbol = "";
+        style = "bg:#2a2a4a";
+        format = "[[ $symbol($version) ](fg:#b780ff bg:#2a2a4a)]($style)";
       };
 
       php = {
-        symbol = " ";
-        style = "bg:#394260";
-        format = "[ $symbol$version ](fg:#a9b1d6 bg:#394260)";
+        symbol = "";
+        style = "bg:#2a2a4a";
+        format = "[[ $symbol($version) ](fg:#b780ff bg:#2a2a4a)]($style)";
       };
 
       java = {
         symbol = " ";
-        style = "bg:#394260";
-        format = "[ $symbol$version ](fg:#a9b1d6 bg:#394260)";
+        style = "bg:#2a2a4a";
+        format = "[[ $symbol($version) ](fg:#b780ff bg:#2a2a4a)]($style)";
       };
 
       kotlin = {
-        symbol = " ";
-        style = "bg:#394260";
-        format = "[ $symbol$version ](fg:#a9b1d6 bg:#394260)";
+        symbol = "";
+        style = "bg:#2a2a4a";
+        format = "[[ $symbol($version) ](fg:#b780ff bg:#2a2a4a)]($style)";
       };
 
       haskell = {
-        symbol = " ";
-        style = "bg:#394260";
-        format = "[ $symbol$version ](fg:#a9b1d6 bg:#394260)";
+        symbol = "";
+        style = "bg:#2a2a4a";
+        format = "[[ $symbol($version) ](fg:#b780ff bg:#2a2a4a)]($style)";
       };
 
       python = {
-        symbol = " ";
-        style = "bg:#394260";
-        format = "[ $symbol$version ](fg:#a9b1d6 bg:#394260)";
+        symbol = "";
+        style = "bg:#2a2a4a";
+        format = "[[ $symbol($version)(($virtualenv)) ](fg:#b780ff bg:#2a2a4a)]($style)";
       };
 
       bun = {
         symbol = "󰛦 ";
-        style = "bg:#394260";
-        format = "[ $symbol$version ](fg:#a9b1d6 bg:#394260)";
+        style = "bg:#2a2a4a";
+        format = "[[ $symbol($version) ](fg:#b780ff bg:#2a2a4a)]($style)";
       };
 
       docker_context = {
-        symbol = " ";
-        style = "bg:#394260";
-        format = "[ $symbol$context ](fg:#7dcfff bg:#394260)";
+        symbol = "";
+        style = "bg:#1d1d3a";
+        format = "[[ $symbol($context) ](fg:#76e3ea bg:#1d1d3a)]($style)";
       };
 
       conda = {
         symbol = " ";
-        style = "bg:#394260";
-        format = "[ $symbol$environment ](fg:#9ece6a bg:#394260)";
+        style = "bg:#1d1d3a";
+        format = "[[ $symbol$environment ](fg:#76e3ea bg:#1d1d3a)]($style)";
         ignore_base = false;
       };
 
       aws = {
         symbol = " ";
-        style = "bg:#394260";
-        format = "[ $symbol$profile ](fg:#ff9e64 bg:#394260)";
+        style = "bg:#1d1d3a";
+        format = "[[ $symbol($profile)(\\($region\\)) ](fg:#fc704f bg:#1d1d3a)]($style)";
       };
 
       time = {
         disabled = false;
         time_format = "%R";
         style = "bg:#1a1a2e";
-        format = " $time ";
+        format = "[[  $time ](fg:#8031f7 bg:#1a1a2e)]($style)";
       };
 
       line_break = {
@@ -536,17 +539,17 @@ in
 
       character = {
         disabled = false;
-        success_symbol = "[❯](bold fg:#7aa2f7)";
-        error_symbol = "[❯](bold fg:#f7768e)";
-        vimcmd_symbol = "[❮](bold fg:#7aa2f7)";
-        vimcmd_replace_one_symbol = "[❮](bold fg:#bb9af7)";
-        vimcmd_replace_symbol = "[❮](bold fg:#bb9af7)";
-        vimcmd_visual_symbol = "[❮](bold fg:#e0af68)";
+        success_symbol = "[❯](bold fg:#76e3ea)";
+        error_symbol = "[❯](bold fg:#ff4445)";
+        vimcmd_symbol = "[❮](bold fg:#76e3ea)";
+        vimcmd_replace_one_symbol = "[❮](bold fg:#8031f7)";
+        vimcmd_replace_symbol = "[❮](bold fg:#8031f7)";
+        vimcmd_visual_symbol = "[❮](bold fg:#fc704f)";
       };
 
       cmd_duration = {
         show_milliseconds = false;
-        format = "took [$duration](bold fg:#e0af68) ";
+        format = "took [$duration](bold fg:#fc704f) ";
         disabled = false;
         min_time = 2000;
         show_notifications = true;
