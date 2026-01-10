@@ -367,7 +367,7 @@ in
       # Red (#ff4445): Errors, deletions → errors, deleted
       # Light Purple (#b780ff): Comments → untracked, secondary info
 
-      format = "[░▒▓](#8031f7)[  ](bg:#8031f7 fg:#1a1a2e)$os[](bg:#76e3ea fg:#8031f7)$directory[](fg:#76e3ea bg:#3a3a5c)$git_branch$git_status$git_state[](fg:#3a3a5c bg:#2a2a4a)$c$rust$golang$nodejs$php$java$kotlin$haskell$python$bun[](fg:#2a2a4a bg:#1d1d3a)$docker_context$conda$aws[](fg:#1d1d3a bg:#1a1a2e)$time[ ](fg:#1a1a2e)$line_break$character";
+      format = "[░▒▓](#8031f7)[  ](bg:#8031f7 fg:#1a1a2e)$os$directory[](fg:#8031f7 bg:#3a3a5c)$git_branch$git_status$git_state[](fg:#3a3a5c bg:#2a2a4a)$c$rust$golang$nodejs$php$java$kotlin$haskell$python$bun[](fg:#2a2a4a bg:#1d1d3a)$docker_context$conda$aws[](fg:#1d1d3a bg:#1a1a2e)$time[ ](fg:#1a1a2e)$line_break$character";
 
       palette = "code_editor";
 
@@ -399,7 +399,7 @@ in
       };
 
       directory = {
-        style = "fg:#1a1a2e bg:#76e3ea";
+        style = "fg:#e6ccff bg:#8031f7";
         format = "[ $path ]($style)";
         truncation_length = 3;
         truncation_symbol = "…/";
