@@ -367,7 +367,7 @@ in
       # Red (#ff4445): Errors, deletions → errors, deleted
       # Light Purple (#b780ff): Comments → untracked, secondary info
 
-      format = "[░▒▓](#5b8af7)[  ](bg:#5b8af7 fg:#1a1a2e)$os$directory[](fg:#5b8af7 bg:#7aa2f7)$git_branch[](fg:#7aa2f7 bg:#3a3a5c)$git_status$git_state[](fg:#3a3a5c bg:#2a2a4a)$c$rust$golang$nodejs$php$java$kotlin$haskell$python$bun[](fg:#2a2a4a bg:#1d1d3a)$docker_context$conda$aws[](fg:#1d1d3a bg:#1a1a2e)$time[ ](fg:#1a1a2e)$line_break$character";
+      format = "[░▒▓](#5b8af7)[  ](bg:#5b8af7 fg:#1a1a2e)$os$directory[](fg:#5b8af7 bg:#7aa2f7)$git_branch$git_status$git_state[](fg:#7aa2f7 bg:#2a2a4a)$c$rust$golang$nodejs$php$java$kotlin$haskell$python$bun[](fg:#2a2a4a bg:#1d1d3a)$docker_context$conda$aws[](fg:#1d1d3a bg:#1a1a2e)$time[ ](fg:#1a1a2e)$line_break$character";
 
       palette = "code_editor";
 
@@ -420,24 +420,24 @@ in
       };
 
       git_status = {
-        style = "bg:#3a3a5c";
-        conflicted = "[!\${count}](bg:#3a3a5c fg:#ff4445) ";
-        ahead = "[⇡\${count}](bg:#3a3a5c fg:#76e3ea) ";
-        behind = "[⇣\${count}](bg:#3a3a5c fg:#76e3ea) ";
-        diverged = "[⇕\${ahead_count}⇣\${behind_count}](bg:#3a3a5c fg:#fc704f) ";
-        up_to_date = "[✓](bg:#3a3a5c fg:#76e3ea)";
-        untracked = "[?\${count}](bg:#3a3a5c fg:#b780ff) ";
-        stashed = "[$\${count}](bg:#3a3a5c fg:#8031f7) ";
-        modified = "[●\${count}](bg:#3a3a5c fg:#fc704f) ";
-        staged = "[+\${count}](bg:#3a3a5c fg:#76e3ea) ";
-        renamed = "[»\${count}](bg:#3a3a5c fg:#76e3ea) ";
-        deleted = "[✘\${count}](bg:#3a3a5c fg:#ff4445) ";
-        format = "[[($all_status$ahead_behind )](fg:#e6ccff bg:#3a3a5c)]($style)";
+        style = "bg:#7aa2f7";
+        conflicted = "[!\${count}](bg:#7aa2f7 fg:#ff4445) ";
+        ahead = "[⇡\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
+        behind = "[⇣\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
+        diverged = "[⇕\${ahead_count}⇣\${behind_count}](bg:#7aa2f7 fg:#fc704f) ";
+        up_to_date = "[✓](bg:#7aa2f7 fg:#1a1a2e)";
+        untracked = "[?\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
+        stashed = "[$\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
+        modified = "[●\${count}](bg:#7aa2f7 fg:#fc704f) ";
+        staged = "[+\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
+        renamed = "[»\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
+        deleted = "[✘\${count}](bg:#7aa2f7 fg:#ff4445) ";
+        format = "[[($all_status$ahead_behind )](fg:#1a1a2e bg:#7aa2f7)]($style)";
       };
 
       git_state = {
-        style = "bg:#3a3a5c fg:#fc704f";
-        format = "[[ $state($progress_current/$progress_total) ](bg:#3a3a5c fg:#fc704f)]($style)";
+        style = "bg:#7aa2f7 fg:#fc704f";
+        format = "[[ $state($progress_current/$progress_total) ](bg:#7aa2f7 fg:#fc704f)]($style)";
         rebase = "REBASING";
         merge = "MERGING";
         revert = "REVERTING";
