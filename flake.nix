@@ -49,8 +49,8 @@
           keepWifiAlive = true;
         };
         my.streaming = {
-          enable = true;
-          maxBitrate = 100;  # 100 Mbps for 1080p120 / 1440p60
+          enable = false;  # Disabled - was causing pixelation/blockiness
+          maxBitrate = 100;
         };
       }
     ];

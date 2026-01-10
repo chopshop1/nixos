@@ -124,12 +124,15 @@ in {
       capture = "x11";
       encoder = "vaapi";
 
-      # Video encoding - low latency preset
-      # For AMD VAAPI: use low-latency settings
-      qp = "20";  # Quality parameter (lower = better quality, 18-23 recommended)
+      # Video encoding - high quality preset
+      # For AMD VAAPI: prioritize quality
+      qp = "16";  # Quality parameter (lower = better quality, 16-20 recommended)
+
+      # Use HEVC for better quality at same bitrate (most clients support it)
+      hevc_mode = "1";  # 0=never, 1=if client supports, 2=always
 
       # Bitrate settings
-      min_bitrate = "10";
+      min_bitrate = "20";
       max_bitrate = toString cfg.maxBitrate;
 
       # Frame rate
@@ -137,7 +140,7 @@ in {
 
       # Encoding speed preset (speed vs quality tradeoff)
       # For VAAPI: 1 = quality, 7 = speed
-      vaapi_quality = "4";  # Balanced
+      vaapi_quality = "1";  # Best quality
 
       # Slices for parallel encoding (reduces latency)
       slicesPerFrame = "4";
@@ -166,12 +169,13 @@ in {
         capture = x11
         encoder = vaapi
 
-        # Video encoding - optimized for low latency
-        qp = 20
-        min_bitrate = 10
+        # Video encoding - optimized for quality
+        qp = 16
+        hevc_mode = 1
+        min_bitrate = 20
         max_bitrate = ${toString cfg.maxBitrate}
         fps = [30,60,90,120]
-        vaapi_quality = 4
+        vaapi_quality = 1
         slicesPerFrame = 4
 
         # Input
