@@ -367,7 +367,7 @@ in
       # Red (#ff4445): Errors, deletions → errors, deleted
       # Light Purple (#b780ff): Comments → untracked, secondary info
 
-      format = "[░▒▓](#5b8af7)[  ](bg:#5b8af7 fg:#1a1a2e)$os$directory[](fg:#5b8af7 bg:#7aa2f7)$git_branch$git_status$git_state[](fg:#7aa2f7 bg:#2a2a4a)$c$rust$golang$nodejs$php$java$kotlin$haskell$python$bun[](fg:#2a2a4a bg:#1d1d3a)$docker_context$conda$aws[](fg:#1d1d3a bg:#1a1a2e)$time[ ](fg:#1a1a2e)$line_break$character";
+      format = "[░▒▓](#5b8af7)[  ](bg:#5b8af7 fg:#1a1a2e)$os$directory[](fg:#5b8af7 bg:#3a3a5c)$git_branch$git_status$git_state[](fg:#3a3a5c bg:#2a2a4a)$c$rust$golang$nodejs$php$java$kotlin$haskell$python$bun[](fg:#2a2a4a bg:#1d1d3a)$docker_context$conda$aws[](fg:#1d1d3a bg:#1a1a2e)$time[ ](fg:#1a1a2e)$line_break$character";
 
       palette = "code_editor";
 
@@ -415,29 +415,29 @@ in
 
       git_branch = {
         symbol = "";
-        style = "bg:#7aa2f7";
-        format = "[[ $symbol $branch ](fg:#1a1a2e bg:#7aa2f7)]($style)";
+        style = "bg:#3a3a5c";
+        format = "[[ $symbol $branch ](fg:#d23d91 bg:#3a3a5c)]($style)";
       };
 
       git_status = {
-        style = "bg:#7aa2f7";
-        conflicted = "[!\${count}](bg:#7aa2f7 fg:#ff4445) ";
-        ahead = "[⇡\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
-        behind = "[⇣\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
-        diverged = "[⇕\${ahead_count}⇣\${behind_count}](bg:#7aa2f7 fg:#fc704f) ";
-        up_to_date = "[✓](bg:#7aa2f7 fg:#1a1a2e)";
-        untracked = "[?\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
-        stashed = "[$\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
-        modified = "[●\${count}](bg:#7aa2f7 fg:#fc704f) ";
-        staged = "[+\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
-        renamed = "[»\${count}](bg:#7aa2f7 fg:#1a1a2e) ";
-        deleted = "[✘\${count}](bg:#7aa2f7 fg:#ff4445) ";
-        format = "[[($all_status$ahead_behind )](fg:#1a1a2e bg:#7aa2f7)]($style)";
+        style = "bg:#3a3a5c";
+        conflicted = "[!\${count}](bg:#3a3a5c fg:#ff4445) ";
+        ahead = "[⇡\${count}](bg:#3a3a5c fg:#d23d91) ";
+        behind = "[⇣\${count}](bg:#3a3a5c fg:#d23d91) ";
+        diverged = "[⇕\${ahead_count}⇣\${behind_count}](bg:#3a3a5c fg:#fc704f) ";
+        up_to_date = "[✓](bg:#3a3a5c fg:#3a3a5c)";
+        untracked = "[?\${count}](bg:#3a3a5c fg:#8031f7) ";
+        stashed = "[$\${count}](bg:#3a3a5c fg:#d23d91) ";
+        modified = "[●\${count}](bg:#3a3a5c fg:#d23d91) ";
+        staged = "[+\${count}](bg:#3a3a5c fg:#d23d91) ";
+        renamed = "[»\${count}](bg:#3a3a5c fg:#d23d91) ";
+        deleted = "[✘\${count}](bg:#3a3a5c fg:#ff4445) ";
+        format = "[[($all_status$ahead_behind )](fg:#d23d91 bg:#3a3a5c)]($style)";
       };
 
       git_state = {
-        style = "bg:#7aa2f7 fg:#fc704f";
-        format = "[[ $state($progress_current/$progress_total) ](bg:#7aa2f7 fg:#fc704f)]($style)";
+        style = "bg:#3a3a5c fg:#fc704f";
+        format = "[[ $state($progress_current/$progress_total) ](bg:#3a3a5c fg:#fc704f)]($style)";
         rebase = "REBASING";
         merge = "MERGING";
         revert = "REVERTING";
@@ -677,7 +677,7 @@ in
       set -g status-justify left
 
       # Left status: Session info and git status
-      set -g status-left "#[fg=#1a1a2e,bg=#8031f7,bold] #S #[fg=#8031f7,bg=#3a3a5c]#[fg=#d23d91,bg=#3a3a5c]#(cd #{pane_current_path} && git branch --show-current 2>/dev/null | xargs -I{} echo ' {}')#[fg=#76e3ea]#(cd #{pane_current_path} && git diff --cached --numstat 2>/dev/null | wc -l | awk '$1>0{print \" +\"$1}')#[fg=#fc704f]#(cd #{pane_current_path} && git diff --numstat 2>/dev/null | wc -l | awk '$1>0{print \" ~\"$1}')#[fg=#b780ff]#(cd #{pane_current_path} && git ls-files --others --exclude-standard 2>/dev/null | wc -l | awk '$1>0{print \" ?\"$1}')#[fg=#76e3ea]#(cd #{pane_current_path} && git status --porcelain 2>/dev/null | wc -l | awk '$1==0{print \" ✓\"}') #[fg=#3a3a5c,bg=#1a1a2e]"
+      set -g status-left "#[fg=#1a1a2e,bg=#5b8af7,bold] #S #[fg=#5b8af7,bg=#3a3a5c]#[fg=#d23d91,bg=#3a3a5c]#(cd #{pane_current_path} && git branch --show-current 2>/dev/null | xargs -I{} echo ' {}')#[fg=#76e3ea]#(cd #{pane_current_path} && git diff --cached --numstat 2>/dev/null | wc -l | awk '$1>0{print \" +\"$1}')#[fg=#fc704f]#(cd #{pane_current_path} && git diff --numstat 2>/dev/null | wc -l | awk '$1>0{print \" ~\"$1}')#[fg=#b780ff]#(cd #{pane_current_path} && git ls-files --others --exclude-standard 2>/dev/null | wc -l | awk '$1>0{print \" ?\"$1}')#[fg=#76e3ea]#(cd #{pane_current_path} && git status --porcelain 2>/dev/null | wc -l | awk '$1==0{print \" ✓\"}') #[fg=#3a3a5c,bg=#1a1a2e]"
 
       # CPU plugin configuration
       set -g @cpu_low_fg_color "#[fg=#76e3ea]"
@@ -694,7 +694,7 @@ in
       set -g status-interval 2
 
       # Right status: CPU, RAM, and time
-      set -g status-right "#[fg=#3a3a5c,bg=#1a1a2e]#[fg=#76e3ea,bg=#3a3a5c] 󰻠 #(top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\\([0-9.]*\\)%* id.*/\\1/' | awk '{print 100-$1\"%\"}') #[fg=#e6ccff]| #[fg=#76e3ea]󰍛 #(free | awk '/Mem:/ {printf \"%.0f%%\", $3/$2*100}') #[fg=#8031f7,bg=#3a3a5c]#[fg=#1a1a2e,bg=#8031f7,bold] %H:%M %d-%b "
+      set -g status-right "#[fg=#3a3a5c,bg=#1a1a2e]#[fg=#76e3ea,bg=#3a3a5c] 󰻠 #(top -bn1 | grep 'Cpu(s)' | sed 's/.*, *\\([0-9.]*\\)%* id.*/\\1/' | awk '{print 100-$1\"%\"}') #[fg=#e6ccff]| #[fg=#76e3ea]󰍛 #(free | awk '/Mem:/ {printf \"%.0f%%\", $3/$2*100}') #[fg=#5b8af7,bg=#3a3a5c]#[fg=#1a1a2e,bg=#5b8af7,bold] %H:%M %d-%b "
 
       # Window status - Cyan for active (like highlighted type/class)
       set -g window-status-format "#[fg=#1a1a2e,bg=#3a3a5c]#[fg=#b780ff,bg=#3a3a5c] #I:#W #[fg=#3a3a5c,bg=#1a1a2e]"
