@@ -116,84 +116,10 @@ in {
     };
 
     # ===========================================
-    # SUNSHINE ENCODER OPTIMIZATIONS
+    # SUNSHINE - NO ENCODER OVERRIDES
     # ===========================================
-    # Override sunshine settings for optimal streaming
-    services.sunshine.settings = mkForce {
-      # Capture settings
-      capture = "x11";
-      encoder = "vaapi";
-
-      # Resolution - native 1080p
-      resolutions = "[1920x1080]";
-
-      # Video encoding - high quality for 1080p 120Hz
-      qp = "16";  # Low QP = high quality
-
-      # HEVC for better quality
-      hevc_mode = "2";  # 2=always use HEVC
-
-      # Bitrate for 1080p 120Hz
-      min_bitrate = "50";
-      max_bitrate = "150";
-
-      # Frame rate
-      fps = "[60,120]";
-
-      # Encoding preset - prioritize quality over speed
-      vaapi_quality = "1";  # 1=highest quality
-
-      # Input settings
-      key_repeat_delay = "500";
-      key_repeat_frequency = "24";
-      keyboard = "enabled";
-      mouse = "enabled";
-      gamepad = "enabled";
-      controller = "1";
-      gamepad_type = "x360";
-
-      # Network
-      channels = "2";  # Audio channels
-
-      # Logging
-      min_log_level = "info";
-    };
-
-    # Update the sunshine conf file
-    environment.etc."sunshine/sunshine.conf" = mkForce {
-      mode = "0644";
-      text = ''
-        # Capture
-        capture = x11
-        encoder = vaapi
-
-        # Resolution - native 1080p
-        resolutions = [1920x1080]
-
-        # Video encoding - high quality for 1080p 120Hz
-        qp = 16
-        hevc_mode = 2
-        min_bitrate = 50
-        max_bitrate = 150
-        fps = [60,120]
-        vaapi_quality = 1
-
-        # Input
-        keyboard = enabled
-        mouse = enabled
-        gamepad = enabled
-        controller = 1
-        gamepad_type = x360
-        key_repeat_delay = 500
-        key_repeat_frequency = 24
-
-        # Audio
-        channels = 2
-
-        # Logging
-        min_log_level = info
-      '';
-    };
+    # Let Sunshine use defaults, control quality via Moonlight client
+    # Encoder settings removed to avoid pixelation issues
 
     # ===========================================
     # CPU GOVERNOR FOR CONSISTENT PERFORMANCE

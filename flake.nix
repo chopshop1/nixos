@@ -49,7 +49,7 @@
           keepWifiAlive = true;
         };
         my.streaming = {
-          enable = false;  # Disabled - using default Sunshine settings
+          enable = true;  # Network optimizations only, no encoder overrides
           maxBitrate = 100;
         };
       }
