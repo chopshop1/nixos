@@ -416,7 +416,7 @@ in
       git_branch = {
         symbol = "";
         style = "bg:#3a3a5c";
-        format = "[[ $symbol $branch ](fg:#d23d91 bg:#3a3a5c)]($style)";
+        format = "[[ $symbol $branch ](fg:#DA7756 bg:#3a3a5c)]($style)";
       };
 
       git_status = {
@@ -428,7 +428,7 @@ in
         up_to_date = "[✓](bg:#3a3a5c fg:#3a3a5c)";
         untracked = "[?\${count}](bg:#3a3a5c fg:#8031f7) ";
         stashed = "[$\${count}](bg:#3a3a5c fg:#d23d91) ";
-        modified = "[●\${count}](bg:#3a3a5c fg:#d23d91) ";
+        modified = "[●\${count}](bg:#3a3a5c fg:#DA7756) ";
         staged = "[+\${count}](bg:#3a3a5c fg:#d23d91) ";
         renamed = "[»\${count}](bg:#3a3a5c fg:#d23d91) ";
         deleted = "[✘\${count}](bg:#3a3a5c fg:#ff4445) ";
@@ -530,7 +530,7 @@ in
         disabled = false;
         time_format = "%R";
         style = "bg:#1a1a2e";
-        format = "[[  $time ](fg:#8031f7 bg:#1a1a2e)]($style)";
+        format = "[[  $time ](fg:#76e3ea bg:#1a1a2e)]($style)";
       };
 
       line_break = {
