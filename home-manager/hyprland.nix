@@ -8,7 +8,7 @@
     settings = {
       # Monitor configuration (AMD RX 7900 XTX)
       monitor = [
-        "HDMI-A-1,2560x1440@120,0x0,1"  # 2K 120Hz, no scaling for crisp streaming
+        "HDMI-A-1,1920x1080@120,0x0,1"  # 1080p 120Hz
         ",preferred,auto,1"  # Fallback for any other monitors
       ];
 

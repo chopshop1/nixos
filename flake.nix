@@ -49,7 +49,7 @@
           keepWifiAlive = true;
         };
         my.streaming = {
-          enable = false;  # Disabled - was causing pixelation/blockiness
+          enable = false;  # Disabled - using default Sunshine settings
           maxBitrate = 100;
         };
       }
@@ -93,8 +93,8 @@
         hardwareConfig = ./hosts/amd-workstation/hardware-configuration.nix;
         gpuType = "amd";
         gpuConfig = {
-          primaryMonitor = "HDMI-A-1";  # Currently connected display
-          defaultResolution = "2560x1440";
+          primaryMonitor = "HDMI-A-1";
+          defaultResolution = "1920x1080";
           defaultRefreshRate = 120;
         };
       };

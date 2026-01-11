@@ -124,26 +124,24 @@ in {
       capture = "x11";
       encoder = "vaapi";
 
-      # Video encoding - high quality preset
-      # For AMD VAAPI: prioritize quality
-      qp = "16";  # Quality parameter (lower = better quality, 16-20 recommended)
+      # Resolution - native 1080p
+      resolutions = "[1920x1080]";
 
-      # Use HEVC for better quality at same bitrate (most clients support it)
-      hevc_mode = "1";  # 0=never, 1=if client supports, 2=always
+      # Video encoding - high quality for 1080p 120Hz
+      qp = "16";  # Low QP = high quality
 
-      # Bitrate settings
-      min_bitrate = "20";
-      max_bitrate = toString cfg.maxBitrate;
+      # HEVC for better quality
+      hevc_mode = "2";  # 2=always use HEVC
+
+      # Bitrate for 1080p 120Hz
+      min_bitrate = "50";
+      max_bitrate = "150";
 
       # Frame rate
-      fps = "[30,60,90,120]";  # Offer multiple frame rates
+      fps = "[60,120]";
 
-      # Encoding speed preset (speed vs quality tradeoff)
-      # For VAAPI: 1 = quality, 7 = speed
-      vaapi_quality = "1";  # Best quality
-
-      # Slices for parallel encoding (reduces latency)
-      slicesPerFrame = "4";
+      # Encoding preset - prioritize quality over speed
+      vaapi_quality = "1";  # 1=highest quality
 
       # Input settings
       key_repeat_delay = "500";
@@ -169,14 +167,16 @@ in {
         capture = x11
         encoder = vaapi
 
-        # Video encoding - optimized for quality
+        # Resolution - native 1080p
+        resolutions = [1920x1080]
+
+        # Video encoding - high quality for 1080p 120Hz
         qp = 16
-        hevc_mode = 1
-        min_bitrate = 20
-        max_bitrate = ${toString cfg.maxBitrate}
-        fps = [30,60,90,120]
+        hevc_mode = 2
+        min_bitrate = 50
+        max_bitrate = 150
+        fps = [60,120]
         vaapi_quality = 1
-        slicesPerFrame = 4
 
         # Input
         keyboard = enabled
