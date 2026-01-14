@@ -678,7 +678,7 @@ in
       set -g status-justify left
 
       # Left status: Session info and git status
-      set -g status-left "#[fg=#1a1a2e,bg=#5b8af7,bold] #S #[fg=#5b8af7,bg=#3a3a5c]#[fg=#d23d91,bg=#3a3a5c]#(cd #{pane_current_path} && git branch --show-current 2>/dev/null | xargs -I{} echo ' {}')#[fg=#76e3ea]#(cd #{pane_current_path} && git diff --cached --numstat 2>/dev/null | wc -l | awk '$1>0{print \" +\"$1}')#[fg=#fc704f]#(cd #{pane_current_path} && git diff --numstat 2>/dev/null | wc -l | awk '$1>0{print \" ~\"$1}')#[fg=#b780ff]#(cd #{pane_current_path} && git ls-files --others --exclude-standard 2>/dev/null | wc -l | awk '$1>0{print \" ?\"$1}')#[fg=#76e3ea]#(cd #{pane_current_path} && git status --porcelain 2>/dev/null | wc -l | awk '$1==0{print \" ✓\"}') #[fg=#3a3a5c,bg=#1a1a2e]"
+      set -g status-left "#[fg=#1a1a2e,bg=#5b8af7,bold] #S #[fg=#5b8af7,bg=#3a3a5c]#[fg=#d23d91,bg=#3a3a5c]#(cd #{pane_current_path} && git branch --show-current 2>/dev/null | xargs -I{} echo ' {}')#[fg=#d23d91]#(cd #{pane_current_path} && git rev-list --count HEAD@{upstream}..HEAD 2>/dev/null | awk '$1>0{print \" ⇡\"$1}')#[fg=#d23d91]#(cd #{pane_current_path} && git rev-list --count HEAD..HEAD@{upstream} 2>/dev/null | awk '$1>0{print \" ⇣\"$1}')#[fg=#76e3ea]#(cd #{pane_current_path} && git diff --cached --numstat 2>/dev/null | wc -l | awk '$1>0{print \" +\"$1}')#[fg=#fc704f]#(cd #{pane_current_path} && git diff --numstat 2>/dev/null | wc -l | awk '$1>0{print \" ~\"$1}')#[fg=#b780ff]#(cd #{pane_current_path} && git ls-files --others --exclude-standard 2>/dev/null | wc -l | awk '$1>0{print \" ?\"$1}')#[fg=#76e3ea]#(cd #{pane_current_path} && git status --porcelain 2>/dev/null | wc -l | awk '$1==0{print \" ✓\"}') #[fg=#3a3a5c,bg=#1a1a2e]"
 
       # CPU plugin configuration
       set -g @cpu_low_fg_color "#[fg=#76e3ea]"
@@ -956,6 +956,7 @@ in
         # Colors (matching your theme)
         local reset=$'\033[0m'
         local orange=$'\033[38;2;218;119;86m'    # Anthropic orange #DA7756
+        local pink=$'\033[38;2;210;61;145m'      # Pink #d23d91
         local cyan=$'\033[38;2;118;227;234m'     # Cyan #76e3ea
         local coral=$'\033[38;2;252;112;79m'     # Coral #fc704f
         local purple=$'\033[38;2;183;128;255m'   # Light purple #b780ff
@@ -970,11 +971,17 @@ in
               local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
               local status=""
 
+              # Check for ahead/behind
+              local ahead=$(git rev-list --count HEAD@{upstream}..HEAD 2>/dev/null || echo 0)
+              local behind=$(git rev-list --count HEAD..HEAD@{upstream} 2>/dev/null || echo 0)
+
               # Check for changes
               local staged=$(git diff --cached --numstat 2>/dev/null | wc -l)
               local modified=$(git diff --numstat 2>/dev/null | wc -l)
               local untracked=$(git ls-files --others --exclude-standard 2>/dev/null | wc -l)
 
+              [ "$ahead" -gt 0 ] && status+="''${pink}⇡$ahead ''${reset}"
+              [ "$behind" -gt 0 ] && status+="''${pink}⇣$behind ''${reset}"
               [ "$staged" -gt 0 ] && status+="''${cyan}+$staged ''${reset}"
               [ "$modified" -gt 0 ] && status+="''${coral}●$modified ''${reset}"
               [ "$untracked" -gt 0 ] && status+="''${purple}?$untracked ''${reset}"
