@@ -9,6 +9,7 @@ secrets/
 secrets.nix
 .env
 .env.*
+!.env.example
 credentials.json
 
 # Claude Code local settings

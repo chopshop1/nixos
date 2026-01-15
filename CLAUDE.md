@@ -1,15 +1,28 @@
 # NixOS Configuration
 
-## Important: secrets.nix
+## Git User Configuration
 
-**NEVER commit `secrets.nix` to git.** This file contains sensitive information.
+Git user name and email are configured via environment variables at activation time.
 
-### Workflow
+### First-time setup
 
-`secrets.nix` must be **staged** for Nix flake builds to work, but must **never be committed**.
+1. Copy `.env.example` to `.env` and fill in your values
+2. Run:
 
-- Keep it staged: `git add -f secrets.nix`
-- When committing, stage files individually (`git add <file>`) instead of `git add .` or `git add -A`
-- If you accidentally unstage it, re-stage with: `git add -f secrets.nix`
+```bash
+source .env && sudo -E nixos-rebuild switch --flake .#nixos-amd
+```
 
-The file will appear in `git status` as staged - this is expected. Just don't include it in commits.
+### Subsequent rebuilds
+
+Once set, your git config is preserved in `~/.config/git/local`. You can rebuild normally:
+
+```bash
+sudo nixos-rebuild switch --flake .#nixos-amd
+```
+
+### Updating git config
+
+To change your git user info, either:
+- Pass new environment variables to nixos-rebuild (as shown above)
+- Edit `~/.config/git/local` directly
