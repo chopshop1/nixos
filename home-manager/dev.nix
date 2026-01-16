@@ -18,6 +18,9 @@
 
   # User-specific packages
   home.packages = with pkgs; [
+    # Browsers
+    google-chrome  # Required for Claude Code browser integration
+
     # Development tools
     bun
     nodejs
@@ -623,7 +626,9 @@
       # Open new windows and panes in current directory
       bind-key c new-window -c "#{pane_current_path}"
       bind-key v split-window -h -c "#{pane_current_path}"
-      bind-key x split-window -v -c "#{pane_current_path}"
+
+      # Close pane with confirmation
+      bind-key x confirm-before -p "kill pane? (y/n)" kill-pane
 
       # Session switcher (prefix + s) with git status via fzf popup
       bind-key s display-popup -E -w 80% -h 60% "~/.local/bin/tmux-session-picker"
@@ -993,18 +998,21 @@
 
       # Use fzf to pick session with preview (vim-style modes)
       # Starts in "normal mode" - j/k navigate, press i or / for search
+      # ESC or q in normal mode closes, ESC in insert mode returns to normal
       selection=$(get_sessions_with_git | \
         fzf --ansi \
             --preview 'bash -c "get_session_info {1}"' \
             --preview-window=right:55%:wrap \
-            --header="[NORMAL] j/k=nav  i,/=search  g/G=top/bot  enter=select" \
+            --header="[NORMAL] j/k=nav  i,/=search  q/esc=close" \
             --disabled \
             --bind 'j:down,k:up,ctrl-d:half-page-down,ctrl-u:half-page-up' \
             --bind 'ctrl-j:preview-down,ctrl-k:preview-up' \
             --bind 'g:first,G:last' \
-            --bind 'i:unbind(i,/,g,G,j,k)+enable-search+transform-header(echo "[INSERT] type to search, esc=normal mode")' \
-            --bind '/:unbind(i,/,g,G,j,k)+enable-search+transform-header(echo "[INSERT] type to search, esc=normal mode")' \
-            --bind 'esc:rebind(i,/,g,G,j,k)+disable-search+transform-header(echo "[NORMAL] j/k=nav  i,/=search  g/G=top/bot  enter=select")')
+            --bind 'q:abort' \
+            --bind 'start:unbind(esc)' \
+            --bind 'i:unbind(i,/,g,G,j,k,q)+rebind(esc)+enable-search+transform-header(echo "[INSERT] type to search, esc=normal mode")' \
+            --bind '/:unbind(i,/,g,G,j,k,q)+rebind(esc)+enable-search+transform-header(echo "[INSERT] type to search, esc=normal mode")' \
+            --bind 'esc:rebind(i,/,g,G,j,k,q)+unbind(esc)+disable-search+transform-header(echo "[NORMAL] j/k=nav  i,/=search  q/esc=close")')
 
       # Extract session name (first word) and switch
       session=$(echo "$selection" | awk '{print $1}')
@@ -1260,6 +1268,8 @@
 
     clone_or_update_dotfiles
   '';
+
+  # Google Chrome (extensions must be installed manually from Chrome Web Store)
 
   # Let Home Manager install and manage itself
   programs.home-manager.enable = true;
