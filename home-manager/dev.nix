@@ -313,16 +313,11 @@
       # Ralph - Claude Code automation scripts
       # Human-in-the-loop: run once, watch what it does, run again
       ralph-once() {
-        if [ ! -f "PRD.md" ]; then
-          echo "Error: PRD.md not found in current directory"
-          echo "Create a PRD.md file with your project requirements first"
-          return 1
-        fi
         if [ ! -f "progress.txt" ]; then
           echo "Creating progress.txt..."
           touch progress.txt
         fi
-        claude --permission-mode acceptEdits "@PRD.md @progress.txt \
+        claude --dangerously-skip-permissions "@.planning/PROJECT.md @progress.txt \
 1. Read the PRD phases and progress file. \
 2. Find the next incomplete task and implement it. \
 3. Commit your changes. \
@@ -337,11 +332,6 @@ ONLY DO ONE TASK AT A TIME."
           echo "Example: afk-ralph 20"
           return 1
         fi
-        if [ ! -f "PRD.md" ]; then
-          echo "Error: PRD.md not found in current directory"
-          echo "Create a PRD.md file with your project requirements first"
-          return 1
-        fi
         if [ ! -f "progress.txt" ]; then
           echo "Creating progress.txt..."
           touch progress.txt
@@ -351,7 +341,7 @@ ONLY DO ONE TASK AT A TIME."
         for ((i=1; i<=iterations; i++)); do
           echo "=== Iteration $i of $iterations ==="
           local result
-          result=$(claude -p "@PRD.md @progress.txt \
+          result=$(claude -p "@.planning/PROJECT.md @progress.txt \
 1. Find the next phase's task and implement it. \
 2. Run your tests and type checks. \
 3. Update the PRD and phases with what was done. \
