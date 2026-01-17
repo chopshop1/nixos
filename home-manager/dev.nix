@@ -310,6 +310,66 @@
         fi
       }
 
+      # Ralph - Claude Code automation scripts
+      # Human-in-the-loop: run once, watch what it does, run again
+      ralph-once() {
+        if [ ! -f "PRD.md" ]; then
+          echo "Error: PRD.md not found in current directory"
+          echo "Create a PRD.md file with your project requirements first"
+          return 1
+        fi
+        if [ ! -f "progress.txt" ]; then
+          echo "Creating progress.txt..."
+          touch progress.txt
+        fi
+        claude --permission-mode acceptEdits "@PRD.md @progress.txt \
+1. Read the PRD phases and progress file. \
+2. Find the next incomplete task and implement it. \
+3. Commit your changes. \
+4. Update progress.txt with what you did. \
+ONLY DO ONE TASK AT A TIME."
+      }
+
+      # AFK Ralph: run Claude in a loop for autonomous work
+      afk-ralph() {
+        if [ -z "$1" ]; then
+          echo "Usage: afk-ralph <iterations>"
+          echo "Example: afk-ralph 20"
+          return 1
+        fi
+        if [ ! -f "PRD.md" ]; then
+          echo "Error: PRD.md not found in current directory"
+          echo "Create a PRD.md file with your project requirements first"
+          return 1
+        fi
+        if [ ! -f "progress.txt" ]; then
+          echo "Creating progress.txt..."
+          touch progress.txt
+        fi
+
+        local iterations=$1
+        for ((i=1; i<=iterations; i++)); do
+          echo "=== Iteration $i of $iterations ==="
+          local result
+          result=$(claude -p "@PRD.md @progress.txt \
+1. Find the next phase's task and implement it. \
+2. Run your tests and type checks. \
+3. Update the PRD and phases with what was done. \
+4. Append your progress to progress.txt. \
+5. Commit your changes. \
+ONLY WORK ON A SINGLE TASK. \
+If the PRD is complete, output <promise>COMPLETE</promise>.")
+
+          echo "$result"
+
+          if [[ "$result" == *"<promise>COMPLETE</promise>"* ]]; then
+            echo "PRD complete after $i iterations."
+            return 0
+          fi
+        done
+        echo "Completed $iterations iterations."
+      }
+
       # Colored man pages
       export LESS_TERMCAP_mb=$'\e[1;32m'
       export LESS_TERMCAP_md=$'\e[1;32m'
