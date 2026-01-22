@@ -126,6 +126,13 @@
     # Proton-GE (community Proton with extra patches)
     protonup-qt  # GUI for managing Proton versions
 
+    # Wine prefix managers
+    bottles  # Modern wineprefix manager with GUI
+
+    # UMU - Unified launcher for running Windows games outside Steam
+    umu-launcher  # Run games with Proton outside of Steam
+    faugus-launcher  # Simple GUI for UMU-Launcher
+
     # Game utilities
     lutris  # Game launcher with Wine/Proton integration
     heroic  # Epic/GOG launcher with Proton support
