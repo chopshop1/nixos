@@ -37,9 +37,9 @@
   # networking.hostName is set per-host in flake.nix
   networking.networkmanager.enable = true;
 
-  # Development environment variables (Playwright, GTK/GDK for Rust/Tauri)
+  # Development environment variables (GTK/GDK for Rust/Tauri)
+  # Note: Playwright env vars are in home-manager/environment.nix
   environment.variables = {
-    PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
     LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
     # Library path for linker to find shared libraries
     LIBRARY_PATH = lib.concatStringsSep ":" [
@@ -264,6 +264,7 @@
       libpulseaudio
       libdrm
       mesa
+      libgbm
       libGL
       libva
       libvdpau

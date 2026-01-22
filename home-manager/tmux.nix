@@ -2,17 +2,13 @@
 
 {
   # Tmux configuration
-  # Main config is in dotfiles/tmux/ for cross-platform compatibility
-  # Home-manager manages plugins on NixOS, TPM is used on macOS
+  # Main config is in dotfiles/tmux/ for cross-platform sharing
+  # Home-manager handles plugin installation via Nix
   programs.tmux = {
     enable = true;
-    baseIndex = 1;
-    escapeTime = 0;
-    keyMode = "vi";
-    terminal = "screen-256color";
     shell = "${pkgs.zsh}/bin/zsh";
 
-    # Plugins managed by home-manager on NixOS
+    # Plugins managed by Nix (faster than TPM, declarative)
     plugins = with pkgs.tmuxPlugins; [
       sensible
       yank
@@ -20,27 +16,23 @@
       cpu
     ];
 
-    # Source the cross-platform config from dotfiles
-    # This config handles OS detection and sources platform-specific files
+    # Source the shared dotfiles config
+    # This overrides home-manager defaults with our cross-platform settings
     extraConfig = ''
-      # Source cross-platform config from dotfiles
-      source-file ~/.config/tmux/dotfiles.conf
+      # Source main config from dotfiles (shared with macOS)
+      source-file ~/.config/tmux/dotfiles/tmux.conf
     '';
   };
 
-  # Symlink tmux config files from dotfiles
-  # Main config with cross-platform settings and theme
-  home.file.".config/tmux/dotfiles.conf".source =
+  # Symlink dotfiles tmux configs
+  home.file.".config/tmux/dotfiles/tmux.conf".source =
     config.lib.file.mkOutOfStoreSymlink "/home/dev/work/dotfiles/tmux/tmux.conf";
-
-  # Platform-specific configs (sourced by dotfiles.conf based on OS)
   home.file.".config/tmux/platform-nixos.conf".source =
     config.lib.file.mkOutOfStoreSymlink "/home/dev/work/dotfiles/tmux/platform-nixos.conf";
   home.file.".config/tmux/platform-macos.conf".source =
     config.lib.file.mkOutOfStoreSymlink "/home/dev/work/dotfiles/tmux/platform-macos.conf";
 
-  # Session picker script from dotfiles
-  # Note: executable bit is set on the source file in dotfiles repo
+  # Symlink tmux session picker script from dotfiles
   home.file.".local/bin/tmux-session-picker".source =
     config.lib.file.mkOutOfStoreSymlink "/home/dev/work/dotfiles/tmux/tmux-session-picker";
 }

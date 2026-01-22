@@ -42,9 +42,5 @@
 
     # Development
     vscode
-
-    # Playwright (browsers are pre-patched for NixOS)
-    playwright-driver
-    playwright-driver.browsers
   ];
 }
