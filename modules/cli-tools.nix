@@ -175,6 +175,9 @@ in
       # Notification support (for Claude Code hooks, etc.)
       libnotify  # notify-send command
 
+      # JSON/data processing
+      jq         # Command-line JSON processor
+
       # Modern CLI tools
     ] ++ (if cfg.modern then with pkgs; [
       fzf       # Fuzzy finder
