@@ -72,6 +72,8 @@ with lib;
       ExecStart = mkForce "/etc/sunshine-start.sh";
       Restart = mkForce "always";
       RestartSec = mkForce "10s";
+      # Protect from OOM killer (-900 to 1000, lower = less likely to be killed)
+      OOMScoreAdjust = mkForce "-500";
     };
   };
 
