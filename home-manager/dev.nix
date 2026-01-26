@@ -14,6 +14,7 @@
     ./repos.nix         # Repository management
     ./claude.nix        # Claude Code configuration
     ./hyprland.nix      # Hyprland window manager
+    ./plasma.nix        # KDE Plasma dark theme
   ];
 
   # Home Manager needs a bit of information about you and the paths it should manage

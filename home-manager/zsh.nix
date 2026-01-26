@@ -63,8 +63,8 @@
     };
 
     initContent = ''
-      # Add Bun to PATH
-      export PATH="/home/dev/.bun/bin:$PATH"
+      # Add local bin and Bun to PATH
+      export PATH="$HOME/.local/bin:/home/dev/.bun/bin:$PATH"
 
       # Initialize gnome-keyring if not already running
       if [ -z "$GNOME_KEYRING_CONTROL" ] && command -v gnome-keyring-daemon &> /dev/null; then
