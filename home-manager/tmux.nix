@@ -24,6 +24,9 @@
     '';
   };
 
+  # Force-overwrite tmux.conf to avoid conflicts with stale non-HM-managed files
+  xdg.configFile."tmux/tmux.conf".force = true;
+
   # Symlink dotfiles tmux configs
   home.file.".config/tmux/dotfiles/tmux.conf".source =
     config.lib.file.mkOutOfStoreSymlink "/home/dev/work/dotfiles/tmux/tmux.conf";
