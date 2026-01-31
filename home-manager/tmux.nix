@@ -14,6 +14,8 @@
       yank
       prefix-highlight
       cpu
+      resurrect
+      continuum
     ];
 
     # Source the shared dotfiles config
@@ -22,6 +24,23 @@
       # Source main config from dotfiles (shared with macOS)
       source-file ~/.config/tmux/dotfiles/tmux.conf
     '';
+  };
+
+  # Auto-start tmux server on boot so continuum can restore sessions
+  systemd.user.services.tmux-server = {
+    Unit = {
+      Description = "tmux server";
+      After = [ "default.target" ];
+    };
+    Service = {
+      Type = "forking";
+      ExecStart = "${pkgs.tmux}/bin/tmux new-session -d";
+      ExecStop = "${pkgs.tmux}/bin/tmux kill-server";
+      Restart = "on-failure";
+    };
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
   };
 
   # Force-overwrite tmux.conf to avoid conflicts with stale non-HM-managed files
