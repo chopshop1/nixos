@@ -54,7 +54,9 @@
   home.file.".config/tmux/platform-macos.conf".source =
     config.lib.file.mkOutOfStoreSymlink "/home/dev/work/dotfiles/tmux/platform-macos.conf";
 
-  # Symlink tmux session picker script from dotfiles
+  # Symlink tmux scripts from dotfiles
   home.file.".local/bin/tmux-session-picker".source =
     config.lib.file.mkOutOfStoreSymlink "/home/dev/work/dotfiles/tmux/tmux-session-picker";
+  home.file.".local/bin/tmux-continuum-save".source =
+    config.lib.file.mkOutOfStoreSymlink "/home/dev/work/dotfiles/tmux/tmux-continuum-save";
 }
