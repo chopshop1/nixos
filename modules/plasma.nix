@@ -60,6 +60,8 @@ in
       QT_QPA_PLATFORMTHEME = "kde";
       # GTK dark theme preference
       GTK_THEME = "Breeze-Dark";
+      # KWin triple buffering reduces compositor stalls with fullscreen games
+      KWIN_TRIPLE_BUFFER = "1";
     };
 
     # Qt styling

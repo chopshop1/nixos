@@ -59,34 +59,6 @@ in
       systemd.services."systemd-hibernate".enable = false;
       systemd.services."systemd-hybrid-sleep".enable = false;
 
-      # Create a systemd service that prevents suspend when SSH sessions are active
-      systemd.services.ssh-nosuspend = {
-        description = "Prevent suspend while SSH sessions are active";
-        wantedBy = [ "multi-user.target" ];
-        after = [ "network.target" "sshd.service" ];
-
-        serviceConfig = {
-          Type = "simple";
-          Restart = "always";
-          RestartSec = "30";
-          ExecStart = "${pkgs.bash}/bin/bash -c 'while true; do if ss -tn state established \"( sport = :22 or dport = :22 )\" | grep -q \":22\"; then systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target; else systemctl unmask sleep.target suspend.target hibernate.target hybrid-sleep.target; fi; sleep 30; done'";
-        };
-      };
-
-      # Create a permanent systemd inhibitor lock
-      systemd.services.suspend-inhibitor = {
-        description = "Inhibit system suspension permanently";
-        wantedBy = [ "multi-user.target" ];
-        after = [ "multi-user.target" ];
-
-        serviceConfig = {
-          Type = "simple";
-          Restart = "always";
-          RestartSec = "10";
-          ExecStart = "${pkgs.systemd}/bin/systemd-inhibit --what=sleep:idle:handle-lid-switch --who=nixos --why=\"System configured to never suspend for SSH availability\" --mode=block sleep infinity";
-        };
-      };
-
       # Completely disable power management
       powerManagement.enable = false;
     })

@@ -9,13 +9,27 @@
     shell = "${pkgs.zsh}/bin/zsh";
 
     # Plugins managed by Nix (faster than TPM, declarative)
+    # Plugin extraConfig is placed BEFORE run-shell, so options are
+    # available when the plugin initializes (critical for restore on boot)
     plugins = with pkgs.tmuxPlugins; [
       sensible
       yank
       prefix-highlight
       cpu
-      resurrect
-      continuum
+      {
+        plugin = resurrect;
+        extraConfig = ''
+          set -g @resurrect-capture-pane-contents 'on'
+          set -g @resurrect-strategy-nvim 'session'
+        '';
+      }
+      {
+        plugin = continuum;
+        extraConfig = ''
+          set -g @continuum-restore 'on'
+          set -g @continuum-save-interval '15'
+        '';
+      }
     ];
 
     # Source the shared dotfiles config

@@ -118,6 +118,19 @@
     (writeShellScriptBin "steam-gamescope" ''
       exec ${pkgs.gamescope}/bin/gamescope -W 2560 -H 1440 -r 120 --expose-wayland -- steam -tenfoot "$@"
     '')
+    # Run any game/command inside gamescope to isolate it from KWin.
+    # Prevents Wine/Proton game crashes from taking down the compositor.
+    # Usage: game-gamescope <command> [args...]
+    # Example: game-gamescope lutris lutris:rungameid/1
+    (writeShellScriptBin "game-gamescope" ''
+      exec ${pkgs.gamescope}/bin/gamescope \
+        -W 1920 -H 1080 \
+        -w 1920 -h 1080 \
+        -r 120 \
+        -f \
+        --force-grab-cursor \
+        -- "$@"
+    '')
     # Wine packages
     wineWowPackages.stagingFull  # 64-bit and 32-bit Wine with staging patches
     winetricks
