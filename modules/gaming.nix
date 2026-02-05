@@ -83,12 +83,18 @@
     ];
   };
 
-  # Environment variables for Steam
+  # Environment variables for Steam and Wine/Proton gaming
   environment.sessionVariables = {
     # Force Steam to use X11/XWayland (no scaling since display is at native 2K)
     STEAM_FORCE_DESKTOPUI_SCALING = "1";
     # Disable GPU compositor in CEF to fix blank Store/Library
     STEAM_DISABLE_BROWSER_SANDBOX = "1";
+    # DXVK async shader compilation - eliminates shader stutter in Proton-GE/dwproton
+    DXVK_ASYNC = "1";
+    # RADV graphics pipeline library - faster shader compilation on AMD
+    RADV_PERFTEST = "gpl";
+    # Mesa OpenGL threading - better CPU utilization for GL games
+    mesa_glthread = "true";
   };
 
   # Enable Gamescope compositor (useful for game streaming)
@@ -130,6 +136,42 @@
         -f \
         --force-grab-cursor \
         -- "$@"
+    '')
+    # Kill all Wine/Proton game processes after a crash.
+    # Finds zombie game processes, crash handlers, and orphaned children,
+    # then kills the entire process tree rooted at the Lutris/umu wrapper.
+    # Usage: kill-game
+    (writeShellScriptBin "kill-game" ''
+      echo "Looking for Wine/Proton game processes..."
+      # Find top-level wrapper PIDs (lutris-wrapper, umu-run, pressure-vessel)
+      wrapper_pids=$(${pkgs.procps}/bin/ps -eo pid,args \
+        | ${pkgs.gnugrep}/bin/grep -E '(lutris-wrapper|umu-run|umu-shim|pressure-vessel|proton waitforexitandrun)' \
+        | ${pkgs.gnugrep}/bin/grep -v grep \
+        | ${pkgs.gawk}/bin/awk '{print $1}')
+      # Also find any wine/proton processes directly
+      wine_pids=$(${pkgs.procps}/bin/ps -eo pid,args \
+        | ${pkgs.gnugrep}/bin/grep -iE '(\.exe|wineserver|winedevice|wine64-preloader|wine-preloader)' \
+        | ${pkgs.gnugrep}/bin/grep -v grep \
+        | ${pkgs.gawk}/bin/awk '{print $1}')
+      all_pids=$(echo "$wrapper_pids $wine_pids" | tr ' ' '\n' | sort -u | ${pkgs.gnugrep}/bin/grep -v '^$')
+      if [ -z "$all_pids" ]; then
+        echo "No game processes found."
+        exit 0
+      fi
+      count=$(echo "$all_pids" | wc -l)
+      echo "Found $count process(es). Killing..."
+      echo "$all_pids" | xargs kill -9 2>/dev/null
+      sleep 0.5
+      # Verify
+      remaining=$(${pkgs.procps}/bin/ps -eo pid,args \
+        | ${pkgs.gnugrep}/bin/grep -iE '(\.exe|wineserver|winedevice|lutris-wrapper|umu-run|proton waitforexitandrun)' \
+        | ${pkgs.gnugrep}/bin/grep -v grep \
+        | wc -l)
+      if [ "$remaining" -eq 0 ]; then
+        echo "All game processes killed."
+      else
+        echo "$remaining process(es) still running. Try: kill-game"
+      fi
     '')
     # Wine packages
     wineWowPackages.stagingFull  # 64-bit and 32-bit Wine with staging patches

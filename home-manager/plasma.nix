@@ -35,4 +35,15 @@
       fi
     fi
   '';
+
+  # KWin compositor settings for gaming performance
+  # Suspend compositing when fullscreen windows are detected (e.g. Wine/Proton games).
+  # Without this, KWin composites game frames through the desktop compositor,
+  # adding latency and causing irregular frame pacing.
+  home.activation.setKwinCompositorSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    if command -v ${pkgs.kdePackages.kconfig}/bin/kwriteconfig6 &> /dev/null; then
+      ${pkgs.kdePackages.kconfig}/bin/kwriteconfig6 --file kwinrc --group Compositing --key WindowsBlockCompositing true
+      ${pkgs.kdePackages.kconfig}/bin/kwriteconfig6 --file kwinrc --group Compositing --key AllowTearing true
+    fi
+  '';
 }
