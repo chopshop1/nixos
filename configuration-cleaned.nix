@@ -18,6 +18,7 @@
     ./modules/xfce.nix      # XFCE desktop environment
     ./modules/plasma.nix    # KDE Plasma desktop environment
     ./modules/ollama.nix    # Local LLM server
+    ./modules/opensnitch.nix # Application firewall
   ];
 
   # Bootloader
@@ -129,6 +130,9 @@
 
   # Enable KDE Plasma
   my.plasma.enable = true;
+
+  # Enable OpenSnitch application firewall
+  my.opensnitch.enable = true;
 
   # Enable Ollama local LLM server
   my.ollama.enable = true;
