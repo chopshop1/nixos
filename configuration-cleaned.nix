@@ -12,7 +12,7 @@
     ./modules/gaming.nix
     ./modules/sunshine.nix
     ./modules/streaming-optimization.nix
-    ./modules/vibe-kanban.nix
+
     ./modules/yubikey.nix
     ./modules/hyprland.nix  # Hyprland window manager
     ./modules/xfce.nix      # XFCE desktop environment
