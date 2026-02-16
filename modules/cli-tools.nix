@@ -175,6 +175,9 @@ in
       # Notification support (for Claude Code hooks, etc.)
       libnotify  # notify-send command
 
+      # AI coding agents
+      opencode   # Terminal-based AI coding agent
+
       # JSON/data processing
       jq         # Command-line JSON processor
 

@@ -1,0 +1,5 @@
+.git
+result
+*.lock
+!flake.lock
+.env

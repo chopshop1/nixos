@@ -12,15 +12,24 @@
       url = "github:chopshop1/.nvim";
       flake = false;
     };
+    # Latest dev version of opencode (uses its own nixpkgs for build deps)
+    opencode.url = "github:anomalyco/opencode";
   };
 
-  outputs = { self, nixpkgs, home-manager, chopshop-nvim, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, chopshop-nvim, opencode, ... }@inputs:
   let
     system = "x86_64-linux";
 
     # Shared modules used by all hosts
     sharedModules = [
+      # Make opencode dev package available via overlay
+      { nixpkgs.overlays = [
+        (final: prev: {
+          opencode = opencode.packages.${system}.default;
+        })
+      ]; }
       ./configuration-cleaned.nix
+      ./devContainer/container.nix
 
       # Import Home Manager module
       home-manager.nixosModules.home-manager
@@ -43,6 +52,7 @@
         my.docker.enable = true;
         my.neovim.enable = true;
         my.yubikey.enable = true;
+        my.devContainer.enable = true;
         my.powerManagement = {
           preventSuspend = true;
           enableWakeOnLan = true;

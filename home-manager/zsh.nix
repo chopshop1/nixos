@@ -64,7 +64,7 @@
 
     initContent = ''
       # Add local bin and Bun to PATH
-      export PATH="$HOME/.local/bin:/home/dev/.bun/bin:$PATH"
+      export PATH="$HOME/.local/bin:$HOME/.opencode/bin:/home/dev/.bun/bin:$PATH"
 
       # Initialize gnome-keyring if not already running
       if [ -z "$GNOME_KEYRING_CONTROL" ] && command -v gnome-keyring-daemon &> /dev/null; then
