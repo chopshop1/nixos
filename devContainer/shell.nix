@@ -280,9 +280,6 @@ pkgs.mkShell {
     rpm
     flatpak-builder
 
-    # ── Playwright pre-patched browsers (cli-tools.nix) ──
-    playwright-driver.browsers
-
     # ── Notification support (cli-tools.nix) ──
     libnotify
 
@@ -326,9 +323,18 @@ pkgs.mkShell {
     # PATH additions
     export PATH="$HOME/.local/bin:$HOME/.bun/bin:$PATH"
 
-    # Playwright configuration
+    # Playwright configuration — nix-ld patches downloaded browser binaries automatically
     export PLAYWRIGHT_BROWSERS_PATH="$HOME/.cache/ms-playwright"
     export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS="true"
+
+    # Auto-install Playwright browsers if the project needs them
+    if [ -f "node_modules/playwright-core/browsers.json" ]; then
+      EXPECTED_REV=$(${pkgs.jq}/bin/jq -r '.browsers[] | select(.name == "chromium") | .revision' node_modules/playwright-core/browsers.json 2>/dev/null)
+      if [ -n "$EXPECTED_REV" ] && [ ! -f "$PLAYWRIGHT_BROWSERS_PATH/chromium-$EXPECTED_REV/INSTALLATION_COMPLETE" ]; then
+        echo "Playwright chromium-$EXPECTED_REV missing — installing browsers..."
+        npx playwright install
+      fi
+    fi
 
     # Docker BuildKit
     export DOCKER_BUILDKIT="1"

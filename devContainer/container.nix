@@ -111,9 +111,6 @@ let
     # ── Tauri build tools ──
     file patchelf squashfsTools dpkg rpm flatpak-builder
 
-    # ── Playwright browsers ──
-    playwright-driver.browsers
-
     # ── Misc ──
     libnotify
 

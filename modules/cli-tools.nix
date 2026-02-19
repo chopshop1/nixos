@@ -169,9 +169,6 @@ in
       nodejs
       python312
 
-      # Playwright with pre-patched browsers for NixOS
-      playwright-driver.browsers
-
       # Notification support (for Claude Code hooks, etc.)
       libnotify  # notify-send command
 
