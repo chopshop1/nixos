@@ -124,7 +124,19 @@ in {
     # ===========================================
     # CPU GOVERNOR FOR CONSISTENT PERFORMANCE
     # ===========================================
-    powerManagement.cpuFreqGovernor = mkDefault "performance";
+    # powerManagement.cpuFreqGovernor doesn't work because power-management.nix
+    # sets powerManagement.enable = false, which disables the service that applies it.
+    # Use an explicit oneshot service instead.
+    systemd.services.set-cpu-governor = {
+      description = "Set CPU governor to performance";
+      after = [ "sysinit.target" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = "${pkgs.linuxPackages.cpupower}/bin/cpupower frequency-set -g performance";
+      };
+    };
 
     # ===========================================
     # QOS - PRIORITIZE STREAMING TRAFFIC

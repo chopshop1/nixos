@@ -11,7 +11,7 @@ with lib;
     openFirewall = true;
 
     settings = {
-      # X11 capture for X11 session
+      # X11 capture for Plasma X11 session
       capture = "x11";
       encoder = "vaapi";
       # Input settings
@@ -28,39 +28,35 @@ with lib;
     };
   };
 
-  # Sunshine config file
-  environment.etc."sunshine/sunshine.conf" = {
-    mode = "0644";
-    text = ''
-      capture = x11
-      encoder = vaapi
-      keyboard = enabled
-      mouse = enabled
-      gamepad = enabled
-      controller = 1
-      gamepad_type = x360
-      min_log_level = info
-      key_repeat_delay = 500
-      key_repeat_frequency = 24
-    '';
-  };
-
-  # Sunshine startup script that finds XAUTHORITY from running KDE session
+  # Sunshine startup script for Plasma X11 session
   environment.etc."sunshine-start.sh" = {
     mode = "0755";
     text = ''
       #!/bin/sh
       sleep 3
-      # Find XAUTHORITY from kwin_x11 process
-      KWIN_PID=$(${pkgs.procps}/bin/pgrep -f kwin_x11 | head -1)
-      if [ -n "$KWIN_PID" ] && [ -r "/proc/$KWIN_PID/environ" ]; then
-        export XAUTHORITY=$(cat /proc/$KWIN_PID/environ | tr '\0' '\n' | grep ^XAUTHORITY= | cut -d= -f2)
-      fi
-      export DISPLAY=:0
-      # Unset Wayland vars to ensure X11 capture
+
+      # Find the Plasma/SDDM X11 display dynamically
+      # SDDM runs Xorg on a real seat; pick the display owned by root
+      for sock in /tmp/.X11-unix/X*; do
+        num="''${sock##*/tmp/.X11-unix/X}"
+        owner=$(stat -c '%U' "$sock" 2>/dev/null)
+        if [ "$owner" = "root" ]; then
+          DISPLAY=":$num"
+          break
+        fi
+      done
+      export DISPLAY="''${DISPLAY:-:0}"
+
+      export XDG_SESSION_TYPE="x11"
+      # Unset Wayland vars
       unset WAYLAND_DISPLAY
-      unset XDG_SESSION_TYPE
-      exec /run/wrappers/bin/sunshine /etc/sunshine/sunshine.conf
+      # VAAPI/AMD GPU acceleration
+      export LIBVA_DRIVER_NAME="radeonsi"
+      export RADV_PERFTEST="gpl"
+
+      # XAUTHORITY is inherited from the user session (set by SDDM)
+      echo "Sunshine starting on DISPLAY=$DISPLAY"
+      exec /run/wrappers/bin/sunshine
     '';
   };
 
@@ -74,6 +70,7 @@ with lib;
       RestartSec = mkForce "10s";
       # Protect from OOM killer (-900 to 1000, lower = less likely to be killed)
       OOMScoreAdjust = mkForce "-500";
+      Nice = mkForce "-10";
     };
   };
 
@@ -126,12 +123,10 @@ with lib;
   # Load kernel modules for virtual input devices
   boot.kernelModules = [ "uinput" "uhid" ];
 
-  # Input tools for streaming
+  # Input tools for streaming (X11 session)
   environment.systemPackages = with pkgs; [
     xdotool
     xorg.xdpyinfo
-    wl-clipboard  # Wayland clipboard
-    ydotool       # Wayland input automation
   ];
 
   # Enable libinput for input device hotplugging

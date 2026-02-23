@@ -49,6 +49,14 @@ in
   };
 
   config = mkMerge [
+    # ==================== Shared (any GPU) ====================
+    (mkIf (cfg.type != "none") {
+      # Ensure non-Nix binaries (e.g. Node native addons) can find libvulkan.so.1
+      environment.extraInit = ''
+        export LD_LIBRARY_PATH="/run/opengl-driver/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+      '';
+    })
+
     # ==================== NVIDIA GPU ====================
     (mkIf (cfg.type == "nvidia") {
       services.xserver.videoDrivers = [ "nvidia" ];
@@ -60,6 +68,7 @@ in
           nvidia-vaapi-driver
           libva-vdpau-driver
           libvdpau-va-gl
+          vulkan-loader         # libvulkan.so.1 in /run/opengl-driver/lib/
         ];
         extraPackages32 = with pkgs.pkgsi686Linux; [
           nvidia-vaapi-driver
@@ -87,6 +96,7 @@ in
         nvtopPackages.nvidia
         libva-utils
         vdpauinfo
+        vulkan-loader
         vulkan-tools
         mesa-demos
       ];
@@ -109,6 +119,7 @@ in
           rocmPackages.clr.icd  # OpenCL support
           libva                 # VA-API (video acceleration)
           libvdpau-va-gl        # VDPAU via VA-API
+          vulkan-loader         # libvulkan.so.1 in /run/opengl-driver/lib/
         ];
       };
 
@@ -127,6 +138,7 @@ in
         radeontop
         libva-utils
         vdpauinfo
+        vulkan-loader
         vulkan-tools
         mesa-demos
         corectrl
@@ -152,6 +164,7 @@ in
           intel-media-driver
           vaapiIntel
           libvdpau-va-gl
+          vulkan-loader         # libvulkan.so.1 in /run/opengl-driver/lib/
         ];
       };
 
@@ -164,6 +177,7 @@ in
         intel-gpu-tools
         libva-utils
         vdpauinfo
+        vulkan-loader
         vulkan-tools
         mesa-demos
       ];

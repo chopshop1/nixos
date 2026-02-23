@@ -18,7 +18,6 @@
     ./modules/xfce.nix      # XFCE desktop environment
     ./modules/plasma.nix    # KDE Plasma desktop environment
     ./modules/ollama.nix    # Local LLM server
-    ./modules/opensnitch.nix # Application firewall
   ];
 
   # Bootloader
@@ -131,9 +130,6 @@
   # Enable KDE Plasma
   my.plasma.enable = true;
 
-  # Enable OpenSnitch application firewall
-  my.opensnitch.enable = true;
-
   # Enable Ollama local LLM server
   my.ollama.enable = true;
   # Note: "rocm" builds from source (very slow), use "default" for cached binary
@@ -193,7 +189,7 @@
     enable = true;
     settings = {
       PermitUserEnvironment = true;
-      AcceptEnv = "SHELL LANG LC_*";
+      AcceptEnv = [ "SHELL" "LANG" "LC_*" ];
       UsePAM = true;
       PasswordAuthentication = true;
       PermitEmptyPasswords = false;
@@ -272,6 +268,9 @@
       libGL
       libva
       libvdpau
+
+      # Vulkan/GPU compute (WebGPU via onnxruntime, etc.)
+      vulkan-loader
 
       # GStreamer
       gst_all_1.gstreamer

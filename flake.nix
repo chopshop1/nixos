@@ -26,6 +26,17 @@
       { nixpkgs.overlays = [
         (final: prev: {
           opencode = opencode.packages.${system}.default;
+          lutris = prev.lutris.override {
+            lutris-unwrapped = prev.lutris-unwrapped.overrideAttrs (old: rec {
+              version = "0.5.20";
+              src = prev.fetchFromGitHub {
+                owner = "lutris";
+                repo = "lutris";
+                rev = "v${version}";
+                hash = "sha256-ycAlVV5CkLLsk/m17R8k6x40av1wcEVQU2GMbOuc7Bs=";
+              };
+            });
+          };
         })
       ]; }
       ./configuration-cleaned.nix
