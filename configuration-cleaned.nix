@@ -93,13 +93,15 @@
       "${pkgs.gtk3.dev}/include"
       "${pkgs.zlib.dev}/include"
     ];
-    # Runtime library path
-    LD_LIBRARY_PATH = lib.mkForce (lib.concatStringsSep ":" [
-      "${pkgs.libayatana-appindicator}/lib"
+    # Runtime library path (consolidated — all modules contribute here)
+    LD_LIBRARY_PATH = lib.concatStringsSep ":" [
+      "/run/opengl-driver/lib"              # Vulkan/GL from hardware.graphics (gpu.nix)
+      "${pkgs.vulkan-loader}/lib"           # Vulkan loader direct path
+      "${pkgs.libayatana-appindicator}/lib" # Tauri system tray
       "${pkgs.gtk3}/lib"
       "${pkgs.webkitgtk_4_1}/lib"
       "${pkgs.glib.out}/lib"
-    ]);
+    ];
   };
 
   # Time zone and locale

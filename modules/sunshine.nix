@@ -2,6 +2,9 @@
 
 with lib;
 
+let
+  proxyPython = pkgs.python3.withPackages (ps: [ ps.evdev ]);
+in
 {
   # Enable Sunshine - X11 capture for Plasma X11 session
   services.sunshine = {
@@ -14,6 +17,14 @@ with lib;
       # X11 capture for Plasma X11 session
       capture = "x11";
       encoder = "vaapi";
+
+      # Streaming stability — prevents Moonlight frame jumping
+      # Forward error correction: higher = more resilient to packet loss
+      # but uses more bandwidth. 20% is a good balance.
+      fec_percentage = "20";
+      # Number of threads for software encoding fallback (0 = auto)
+      min_threads = "2";
+
       # Input settings
       key_repeat_delay = "500";
       key_repeat_frequency = "24";
@@ -71,6 +82,9 @@ with lib;
       # Protect from OOM killer (-900 to 1000, lower = less likely to be killed)
       OOMScoreAdjust = mkForce "-500";
       Nice = mkForce "-10";
+      # Real-time scheduling priority for encoder threads — prevents frame pacing jitter
+      LimitRTPRIO = mkForce "99";
+      LimitMEMLOCK = mkForce "infinity";
     };
   };
 
@@ -118,6 +132,9 @@ with lib;
     SUBSYSTEM=="input", MODE="0666", TAG+="uaccess"
     # hidraw for DualSense (ds5) gamepad emulation
     KERNEL=="hidraw*", MODE="0666", TAG+="uaccess"
+    # Stable symlink for Sunshine virtual gamepad — triggers proxy service
+    # Match vendor 045e + Sunshine's name to avoid matching the proxy output ("Xbox 360 Controller")
+    SUBSYSTEM=="input", ATTRS{name}=="Sunshine X-Box One (virtual) pad", ATTRS{id/vendor}=="045e", KERNEL=="event*", SYMLINK+="input/sunshine-gamepad", TAG+="systemd", ENV{SYSTEMD_WANTS}="sunshine-gamepad-proxy.service"
   '';
 
   # Load kernel modules for virtual input devices
@@ -127,9 +144,129 @@ with lib;
   environment.systemPackages = with pkgs; [
     xdotool
     xorg.xdpyinfo
+    evsieve
   ];
 
   # Enable libinput for input device hotplugging
   services.libinput.enable = true;
+
+  # Persistent gamepad proxy — survives Moonlight reconnects
+  #
+  # Problem 1 (reconnect): When Moonlight disconnects/reconnects, Sunshine destroys
+  # and recreates its virtual gamepad. Games hold a file handle to the old device and
+  # never pick up the new one — the controller dies while video keeps working.
+  #
+  # Problem 2 (stuck inputs): On brief disconnects, the axis "release" event is lost.
+  # The game sees the last axis value as still held, causing stuck movement.
+  #
+  # Problem 3 (device identity): evsieve's output had vendor=0000/product=0000, which
+  # SDL's game controller database can't map. Games that re-enumerate devices (e.g.
+  # FF15 during combat) fail to recognize it as an Xbox controller.
+  #
+  # Solution: Python uinput proxy that:
+  #   - Creates a persistent output device with correct Xbox 360 IDs (045e:028e)
+  #   - Grabs Sunshine's ephemeral gamepad exclusively
+  #   - Forwards all events to the persistent output
+  #   - On disconnect: injects neutral events (fixes stuck inputs), waits for
+  #     reconnect, re-grabs, and resumes forwarding
+  #
+  # Flow:
+  #   Sunshine (uinput) → "Sunshine X-Box One (virtual) pad" (ephemeral, /dev/input/sunshine-gamepad)
+  #       ↓ grabbed exclusively by proxy
+  #   Python proxy (uinput) → "Xbox 360 Controller" (persistent, vendor=045e, product=028e)
+  #       ↓ recognized by
+  #   SDL / Proton / Steam Input → Game
+  #
+  # Diagnostics:
+  #   systemctl status sunshine-gamepad-proxy
+  #   cat /proc/bus/input/devices | grep -A 6 "Xbox 360"
+  #   journalctl -u sunshine-gamepad-proxy --no-pager -n 30
+  environment.etc."sunshine-gamepad-proxy.py" = {
+    mode = "0755";
+    text = ''
+      #!/usr/bin/env python3
+      """Persistent gamepad proxy for Sunshine streaming with correct Xbox 360 IDs."""
+      import evdev
+      from evdev import UInput, ecodes, InputDevice
+      import os, time
+
+      INPUT_PATH = "/dev/input/sunshine-gamepad"
+      OUTPUT_NAME = "Xbox 360 Controller"
+      VENDOR, PRODUCT, VERSION = 0x045e, 0x028e, 0x0110
+
+      def wait_for_device(path):
+          while not os.path.exists(path):
+              time.sleep(0.5)
+          time.sleep(0.3)
+
+      def create_output(input_dev):
+          """Create persistent uinput device mirroring input capabilities with Xbox 360 IDs."""
+          caps = input_dev.capabilities(absinfo=True)
+          # EV_SYN is added automatically; EV_FF/EV_MSC not needed for gamepad proxy
+          for evtype in (ecodes.EV_SYN, ecodes.EV_FF, ecodes.EV_MSC):
+              caps.pop(evtype, None)
+          ui = UInput(
+              caps, name=OUTPUT_NAME, vendor=VENDOR, product=PRODUCT,
+              version=VERSION, bustype=ecodes.BUS_USB,
+          )
+          print(f"Created output: {OUTPUT_NAME} ({VENDOR:#06x}:{PRODUCT:#06x})", flush=True)
+          return ui, caps
+
+      def inject_neutral(output, caps):
+          """Send neutral values for all axes and release all buttons."""
+          if ecodes.EV_ABS in caps:
+              for item in caps[ecodes.EV_ABS]:
+                  code = item[0] if isinstance(item, tuple) else item
+                  output.write(ecodes.EV_ABS, code, 0)
+          if ecodes.EV_KEY in caps:
+              for code in caps[ecodes.EV_KEY]:
+                  output.write(ecodes.EV_KEY, code, 0)
+          output.syn()
+          print("Injected neutral events", flush=True)
+
+      def main():
+          print("Sunshine gamepad proxy starting", flush=True)
+
+          # Wait for Sunshine's device to appear, then create persistent output
+          wait_for_device(INPUT_PATH)
+          input_dev = InputDevice(INPUT_PATH)
+          output, caps = create_output(input_dev)
+
+          while True:
+              wait_for_device(INPUT_PATH)
+              try:
+                  input_dev = InputDevice(INPUT_PATH)
+                  input_dev.grab()
+                  print(f"Grabbed: {input_dev.path}", flush=True)
+
+                  for event in input_dev.read_loop():
+                      if event.type == ecodes.EV_SYN:
+                          output.syn()
+                      elif event.type in (ecodes.EV_ABS, ecodes.EV_KEY):
+                          output.write(event.type, event.code, event.value)
+              except OSError as e:
+                  print(f"Disconnected: {e}", flush=True)
+                  inject_neutral(output, caps)
+                  time.sleep(1)
+              except Exception as e:
+                  print(f"Error: {e}", flush=True)
+                  inject_neutral(output, caps)
+                  time.sleep(2)
+
+      if __name__ == "__main__":
+          main()
+    '';
+  };
+
+  systemd.services.sunshine-gamepad-proxy = {
+    description = "Persistent gamepad proxy for Sunshine (Python uinput)";
+    after = [ "sunshine.service" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${proxyPython}/bin/python3 /etc/sunshine-gamepad-proxy.py";
+      Restart = "on-failure";
+      RestartSec = "3s";
+    };
+  };
 
 }

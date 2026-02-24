@@ -196,13 +196,7 @@ in
       gh        # GitHub CLI
     ] else []);
 
-    # LD_LIBRARY_PATH for Tauri appindicator (system tray) and Vulkan
-    environment.sessionVariables = {
-      LD_LIBRARY_PATH = lib.makeLibraryPath [
-        pkgs.libayatana-appindicator
-        pkgs.vulkan-loader
-      ];
-    };
+    # LD_LIBRARY_PATH is consolidated in configuration-cleaned.nix
 
     # Nerd Fonts for terminal/coding (must be in fonts.packages, not systemPackages)
     fonts.packages = with pkgs; [

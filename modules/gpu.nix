@@ -50,12 +50,7 @@ in
 
   config = mkMerge [
     # ==================== Shared (any GPU) ====================
-    (mkIf (cfg.type != "none") {
-      # Ensure non-Nix binaries (e.g. Node native addons) can find libvulkan.so.1
-      environment.extraInit = ''
-        export LD_LIBRARY_PATH="/run/opengl-driver/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-      '';
-    })
+    # LD_LIBRARY_PATH for Vulkan/GL is consolidated in configuration-cleaned.nix
 
     # ==================== NVIDIA GPU ====================
     (mkIf (cfg.type == "nvidia") {
