@@ -63,6 +63,10 @@
     };
 
     initContent = ''
+      # Re-source system environment so non-login shells (e.g. terminals in Plasma)
+      # pick up updated vars after nixos-rebuild without requiring re-login
+      source /etc/set-environment
+
       # Add local bin and Bun to PATH
       export PATH="$HOME/.local/bin:$HOME/.opencode/bin:/home/dev/.bun/bin:$PATH"
 
