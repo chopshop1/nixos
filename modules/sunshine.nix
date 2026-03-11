@@ -18,6 +18,9 @@ in
       capture = "x11";
       encoder = "vaapi";
 
+      # Force single client to avoid multiple gamepads
+      channels = "1";
+
       # Streaming stability — prevents Moonlight frame jumping
       # Forward error correction: higher = more resilient to packet loss
       # but uses more bandwidth. 20% is a good balance.
@@ -132,13 +135,15 @@ in
     SUBSYSTEM=="input", MODE="0666", TAG+="uaccess"
     # hidraw for DualSense (ds5) gamepad emulation
     KERNEL=="hidraw*", MODE="0666", TAG+="uaccess"
-    # Stable symlink for Sunshine virtual gamepad — triggers proxy service
-    # Match vendor 045e + Sunshine's name to avoid matching the proxy output ("Xbox 360 Controller")
-    SUBSYSTEM=="input", ATTRS{name}=="Sunshine X-Box One (virtual) pad", ATTRS{id/vendor}=="045e", KERNEL=="event*", SYMLINK+="input/sunshine-gamepad", TAG+="systemd", ENV{SYSTEMD_WANTS}="sunshine-gamepad-proxy.service"
+    # Stable symlink for Sunshine virtual gamepad — always points to latest Sunshine device
+    # Match vendor 045e (Microsoft) + Sunshine's Xbox One pad name
+    SUBSYSTEM=="input", ATTRS{name}=="Sunshine X-Box One (virtual) pad", ATTRS{id/vendor}=="045e", KERNEL=="event*", SYMLINK+="input/sunshine-gamepad", TAG+="systemd", ENV{SYSTEMD_WANTS}="sunshine-gamepad-proxy.service", OPTIONS+="link_priority=100"
+    # Alternative: Match by product ID range used by Sunshine (02ea = Xbox One)
+    SUBSYSTEM=="input", ATTRS{id/vendor}=="045e", ATTRS{id/product}=="02ea", KERNEL=="event*", SYMLINK+="input/sunshine-gamepad-new", TAG+="systemd", ENV{SYSTEMD_WANTS}="sunshine-gamepad-proxy.service", OPTIONS+="link_priority=50"
   '';
 
-  # Load kernel modules for virtual input devices
-  boot.kernelModules = [ "uinput" "uhid" ];
+  # Load kernel modules for virtual input devices and Xbox controller support
+  boot.kernelModules = [ "uinput" "xpad" ];
 
   # Input tools for streaming (X11 session)
   environment.systemPackages = with pkgs; [
@@ -185,73 +190,89 @@ in
     mode = "0755";
     text = ''
       #!/usr/bin/env python3
-      """Persistent gamepad proxy for Sunshine streaming with correct Xbox 360 IDs."""
+      """Persistent gamepad proxy for Sunshine streaming - single device pass-through."""
       import evdev
       from evdev import UInput, ecodes, InputDevice
-      import os, time
+      import os, sys, time, signal
 
-      INPUT_PATH = "/dev/input/sunshine-gamepad"
       OUTPUT_NAME = "Xbox 360 Controller"
       VENDOR, PRODUCT, VERSION = 0x045e, 0x028e, 0x0110
 
-      def wait_for_device(path):
-          while not os.path.exists(path):
-              time.sleep(0.5)
-          time.sleep(0.3)
+      def find_sunshine_device():
+          """Find first Sunshine virtual gamepad."""
+          for path in evdev.list_devices():
+              try:
+                  dev = InputDevice(path)
+                  if "Sunshine X-Box" in dev.name and "py-evdev-uinput" not in (dev.phys or ""):
+                      return dev
+              except Exception:
+                  pass
+          return None
 
-      def create_output(input_dev):
-          """Create persistent uinput device mirroring input capabilities with Xbox 360 IDs."""
-          caps = input_dev.capabilities(absinfo=True)
-          # EV_SYN is added automatically; EV_FF/EV_MSC not needed for gamepad proxy
+      def create_output(caps):
           for evtype in (ecodes.EV_SYN, ecodes.EV_FF, ecodes.EV_MSC):
               caps.pop(evtype, None)
-          ui = UInput(
-              caps, name=OUTPUT_NAME, vendor=VENDOR, product=PRODUCT,
-              version=VERSION, bustype=ecodes.BUS_USB,
-          )
+          ui = UInput(caps, name=OUTPUT_NAME, vendor=VENDOR, product=PRODUCT,
+                      version=VERSION, bustype=ecodes.BUS_USB)
           print(f"Created output: {OUTPUT_NAME} ({VENDOR:#06x}:{PRODUCT:#06x})", flush=True)
-          return ui, caps
-
-      def inject_neutral(output, caps):
-          """Send neutral values for all axes and release all buttons."""
-          if ecodes.EV_ABS in caps:
-              for item in caps[ecodes.EV_ABS]:
-                  code = item[0] if isinstance(item, tuple) else item
-                  output.write(ecodes.EV_ABS, code, 0)
-          if ecodes.EV_KEY in caps:
-              for code in caps[ecodes.EV_KEY]:
-                  output.write(ecodes.EV_KEY, code, 0)
-          output.syn()
-          print("Injected neutral events", flush=True)
+          return ui
 
       def main():
           print("Sunshine gamepad proxy starting", flush=True)
+          sys.stdout.flush()
 
-          # Wait for Sunshine's device to appear, then create persistent output
-          wait_for_device(INPUT_PATH)
-          input_dev = InputDevice(INPUT_PATH)
-          output, caps = create_output(input_dev)
+          dev = None
+          output = None
+          caps = None
+          last_path = None
 
           while True:
-              wait_for_device(INPUT_PATH)
-              try:
-                  input_dev = InputDevice(INPUT_PATH)
-                  input_dev.grab()
-                  print(f"Grabbed: {input_dev.path}", flush=True)
+              if dev is None or last_path is None:
+                  dev = find_sunshine_device()
+                  if dev is None:
+                      time.sleep(0.2)
+                      continue
 
-                  for event in input_dev.read_loop():
+              if dev.path != last_path:
+                  try:
+                      dev.grab()
+                      print(f"Grabbed: {dev.path}", flush=True)
+                  except IOError as e:
+                      if "Device or resource busy" not in str(e):
+                          print(f"Grab failed: {e}", flush=True)
+                      time.sleep(0.2)
+                      continue
+
+                  try:
+                      caps = dev.capabilities(absinfo=True)
+                      output = create_output(caps)
+                      last_path = dev.path
+                  except Exception as e:
+                      print(f"Setup failed: {e}", flush=True)
+                      dev = None
+                      time.sleep(0.2)
+                      continue
+
+              try:
+                  for event in dev.read_loop():
+                      if output is None:
+                          continue
                       if event.type == ecodes.EV_SYN:
                           output.syn()
                       elif event.type in (ecodes.EV_ABS, ecodes.EV_KEY):
                           output.write(event.type, event.code, event.value)
-              except OSError as e:
-                  print(f"Disconnected: {e}", flush=True)
-                  inject_neutral(output, caps)
-                  time.sleep(1)
+              except OSError:
+                  print("Device disconnected", flush=True)
+                  dev = None
+                  last_path = None
+                  if output:
+                      output.close()
+                      output = None
+                  time.sleep(0.2)
               except Exception as e:
                   print(f"Error: {e}", flush=True)
-                  inject_neutral(output, caps)
-                  time.sleep(2)
+                  dev = None
+                  time.sleep(0.2)
 
       if __name__ == "__main__":
           main()
@@ -260,12 +281,17 @@ in
 
   systemd.services.sunshine-gamepad-proxy = {
     description = "Persistent gamepad proxy for Sunshine (Python uinput)";
-    after = [ "sunshine.service" ];
+    after = [ "remote-fs.target" ];
+    wants = [ "remote-fs.target" ];
     serviceConfig = {
       Type = "simple";
       ExecStart = "${proxyPython}/bin/python3 /etc/sunshine-gamepad-proxy.py";
-      Restart = "on-failure";
-      RestartSec = "3s";
+      Restart = "always";
+      RestartSec = "2s";
+      TimeoutStartSec = "30s";
+      TimeoutStopSec = "10s";
+      IgnoreSIGPIPE = "false";
+      KillMode = "mixed";
     };
   };
 

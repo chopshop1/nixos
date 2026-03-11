@@ -73,6 +73,13 @@
           enable = true;  # Network optimizations only, no encoder overrides
           maxBitrate = 100;
         };
+        my.hardwareMonitoring = {
+          enable = true;
+          sensors.enable = true;
+          rgb.enable = true;
+          rgb.disableOnBoot = true;
+          # fanControl.enable = false;  # Enable after running: sudo sensors-detect && sudo pwmconfig
+        };
       }
     ];
 

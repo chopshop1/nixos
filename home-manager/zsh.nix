@@ -96,6 +96,14 @@
       add-zsh-hook chpwd save_last_dir
       add-zsh-hook zshexit save_last_dir
 
+      # Clear Claude Code tmux pane highlight on interaction
+      if [[ -n "''${TMUX:-}" ]]; then
+        _claude_clear_pane_highlight() {
+          tmux select-pane -t "$TMUX_PANE" -P 'default'
+        }
+        add-zsh-hook precmd _claude_clear_pane_highlight
+      fi
+
       # Enhanced completion settings
       zstyle ':completion:*' menu select
       zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'

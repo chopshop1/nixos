@@ -12,6 +12,7 @@
     ./modules/gaming.nix
     ./modules/sunshine.nix
     ./modules/streaming-optimization.nix
+    ./modules/hardware-monitoring.nix
 
     ./modules/yubikey.nix
     ./modules/hyprland.nix  # Hyprland window manager
@@ -101,6 +102,7 @@
       "${pkgs.gtk3}/lib"
       "${pkgs.webkitgtk_4_1}/lib"
       "${pkgs.glib.out}/lib"
+      "${pkgs.stdenv.cc.cc.lib}/lib"        # libstdc++.so.6 for native modules (sharp, etc.)
     ];
   };
 
@@ -154,6 +156,35 @@
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
+
+    # Fix HDMI audio clicking/artifacts by increasing buffer headroom
+    extraConfig.pipewire = {
+      "10-hdmi-audio" = {
+        "context.properties" = {
+          "default.clock.quantum" = 2048;
+          "default.clock.min-quantum" = 1024;
+        };
+      };
+    };
+
+    wireplumber.configPackages = [
+      (pkgs.writeTextDir "share/wireplumber/wireplumber.conf.d/10-hdmi-headroom.conf" ''
+        monitor.alsa.rules = [
+          {
+            matches = [
+              { node.name = "~alsa_output.pci-0000_03_00.1.*" }
+            ]
+            actions = {
+              update-props = {
+                api.alsa.period-size = 2048
+                api.alsa.headroom = 1024
+                session.suspend-timeout-seconds = 0
+              }
+            }
+          }
+        ]
+      '')
+    ];
   };
 
   # Enable polkit for authentication

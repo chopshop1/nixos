@@ -37,6 +37,7 @@ in
     # Development tools
     bun
     nodejs
+    pnpm
     cargo
     rustc
     rust-analyzer
