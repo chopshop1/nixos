@@ -66,9 +66,9 @@ in
     (mkIf cfg.enableWakeOnLan {
       environment.systemPackages = [ pkgs.ethtool ];
 
-      # Enable Wake-on-LAN for ethernet interfaces
+      # Enable Wake-on-LAN and tune ethernet NICs (disable EEE + offloads for r8169 stability)
       systemd.services.wake-on-lan = {
-        description = "Enable Wake-on-LAN for ethernet interfaces";
+        description = "Enable Wake-on-LAN and tune ethernet NICs";
         wantedBy = [ "multi-user.target" ];
         after = [ "network.target" ];
         serviceConfig = {
@@ -77,6 +77,8 @@ in
           ExecStart = pkgs.writeShellScript "enable-wol" ''
             for iface in $(ls /sys/class/net | grep -E "^(en|eth)"); do
               ${pkgs.ethtool}/bin/ethtool -s "$iface" wol g 2>/dev/null || true
+              ${pkgs.ethtool}/bin/ethtool --set-eee "$iface" eee off 2>/dev/null || true
+              ${pkgs.ethtool}/bin/ethtool -K "$iface" tso off gso off gro off 2>/dev/null || true
             done
           '';
         };
@@ -125,20 +127,35 @@ in
     })
 
     (mkIf cfg.preferEthernet {
-      # Prioritize ethernet over WiFi by setting route metrics
-      # Lower metric = higher priority (ethernet: 100, WiFi: 600)
-      networking.networkmanager.settings = {
-        "connection-ethernet" = {
-          "match-device" = "type:ethernet";
-          "ipv4.route-metric" = 100;
-          "ipv6.route-metric" = 100;
-        };
-        "connection-wifi" = {
-          "match-device" = "type:wifi";
-          "ipv4.route-metric" = 600;
-          "ipv6.route-metric" = 600;
-        };
-      };
+      # Disable WiFi when ethernet is connected (and re-enable when unplugged)
+      # Two interfaces on the same subnet + Docker's ip_forward=1 causes
+      # routing confusion and 85-100% packet loss
+      networking.networkmanager.dispatcherScripts = [
+        {
+          type = "basic";
+          source = pkgs.writeShellScript "wifi-toggle-on-ethernet" ''
+            IFACE="$1"
+            ACTION="$2"
+
+            # Only act on ethernet events
+            case "$IFACE" in
+              en*|eth*) ;;
+              *) exit 0 ;;
+            esac
+
+            case "$ACTION" in
+              up)
+                ${pkgs.networkmanager}/bin/nmcli radio wifi off
+                logger "nm-dispatcher: ethernet $IFACE up, WiFi disabled"
+                ;;
+              down)
+                ${pkgs.networkmanager}/bin/nmcli radio wifi on
+                logger "nm-dispatcher: ethernet $IFACE down, WiFi re-enabled"
+                ;;
+            esac
+          '';
+        }
+      ];
     })
   ];
 }
