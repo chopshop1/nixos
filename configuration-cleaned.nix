@@ -19,6 +19,7 @@
     ./modules/xfce.nix      # XFCE desktop environment
     ./modules/plasma.nix    # KDE Plasma desktop environment
     ./modules/ollama.nix    # Local LLM server
+    ./modules/home-assistant.nix  # Home Assistant firewall rules
   ];
 
   # Bootloader

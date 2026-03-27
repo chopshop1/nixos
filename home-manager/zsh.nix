@@ -7,7 +7,11 @@
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
     enableCompletion = true;
-    historySubstringSearch.enable = true;
+    historySubstringSearch = {
+      enable = true;
+      searchUpKey = [ "^[[A" "^[OA" "$terminfo[kcuu1]" ];
+      searchDownKey = [ "^[[B" "^[OB" "$terminfo[kcud1]" ];
+    };
 
     history = {
       size = 10000;
@@ -115,15 +119,6 @@
       zstyle ':completion:*:messages' format ' %F{purple} -- %d --%f'
       zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
       zstyle ':completion:*' group-name ""
-
-      # Enhanced history search with up/down arrows
-      # Multiple bindings to cover different terminal modes (normal, application, tmux)
-      bindkey '^[[A' history-substring-search-up
-      bindkey '^[[B' history-substring-search-down
-      bindkey '^[OA' history-substring-search-up    # Application mode (tmux)
-      bindkey '^[OB' history-substring-search-down  # Application mode (tmux)
-      bindkey "$terminfo[kcuu1]" history-substring-search-up    # Terminfo up
-      bindkey "$terminfo[kcud1]" history-substring-search-down  # Terminfo down
 
       # Tab completion navigation
       bindkey '^[[Z' reverse-menu-complete  # Shift+Tab for reverse

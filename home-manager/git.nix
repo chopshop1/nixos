@@ -22,6 +22,14 @@
     GIT_LOCAL_CONFIG="$HOME/.config/git/local"
     mkdir -p "$(dirname "$GIT_LOCAL_CONFIG")"
 
+    # Source .env if it exists and env vars aren't already set
+    FLAKE_DIR="''${FLAKE_DIR:-/home/dev/work/nixos}"
+    if [ -z "''${GIT_USER_NAME:-}" ] || [ -z "''${GIT_USER_EMAIL:-}" ]; then
+      if [ -f "$FLAKE_DIR/.env" ]; then
+        . "$FLAKE_DIR/.env"
+      fi
+    fi
+
     # Read from environment or existing config
     NAME="''${GIT_USER_NAME:-}"
     EMAIL="''${GIT_USER_EMAIL:-}"

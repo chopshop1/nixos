@@ -74,12 +74,10 @@ in
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;
-          ExecStart = ''
-            ${pkgs.bash}/bin/bash -c '
-              for iface in $(ls /sys/class/net | grep -E "^(en|eth)"); do
-                ${pkgs.ethtool}/bin/ethtool -s $iface wol g 2>/dev/null || true
-              done
-            '
+          ExecStart = pkgs.writeShellScript "enable-wol" ''
+            for iface in $(ls /sys/class/net | grep -E "^(en|eth)"); do
+              ${pkgs.ethtool}/bin/ethtool -s "$iface" wol g 2>/dev/null || true
+            done
           '';
         };
       };
@@ -103,6 +101,25 @@ in
         };
         device = {
           "wifi.scan-rand-mac-address" = "no";
+        };
+      };
+
+      environment.systemPackages = [ pkgs.iw ];
+
+      # Disable WiFi power save at driver level (NM settings alone aren't enough)
+      systemd.services.wifi-power-save-off = {
+        description = "Disable WiFi power save at driver level";
+        wantedBy = [ "multi-user.target" ];
+        after = [ "NetworkManager-wait-online.target" ];
+        wants = [ "NetworkManager-wait-online.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = pkgs.writeShellScript "wifi-power-save-off" ''
+            for iface in $(${pkgs.iw}/bin/iw dev | ${pkgs.gawk}/bin/awk '/Interface/{print $2}'); do
+              ${pkgs.iw}/bin/iw dev "$iface" set power_save off 2>/dev/null || true
+            done
+          '';
         };
       };
     })

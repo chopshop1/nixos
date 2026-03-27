@@ -158,6 +158,9 @@
         hardwareConfig = ./hosts/lenovo-dev/hardware-configuration.nix;
         gpuType = "amd";
         extraModules = [{
+          # Fix ath10k WiFi + AMD IOMMU page faults causing system hangs
+          boot.kernelParams = [ "iommu=soft" ];
+
           # Dev-only: no gaming, streaming, sunshine, or hardware monitoring
           my.gaming.enable = false;
           my.sunshine.enable = false;
@@ -166,6 +169,7 @@
           my.ollama.enable = false;
           my.docker.enable = true;
           my.devContainer.enable = true;
+          my.homeAssistant.enable = true;
           # Always-on: never suspend, keep network alive
           my.powerManagement = {
             preventSuspend = true;
