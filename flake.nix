@@ -148,6 +148,11 @@
             sensors.enable = true;
             rgb.enable = true;
             rgb.disableOnBoot = true;
+            fanControl.enable = true;
+            # Linear ramp: minPwm at 45°C, full speed at 75°C
+            fanControl.minTemp = 45;
+            fanControl.maxTemp = 75;
+            fanControl.minPwm = 80;
           };
         }];
       };
