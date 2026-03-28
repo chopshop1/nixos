@@ -20,6 +20,7 @@
     ./modules/plasma.nix    # KDE Plasma desktop environment
     ./modules/ollama.nix    # Local LLM server
     ./modules/home-assistant.nix  # Home Assistant firewall rules
+    ./modules/audio-recovery.nix  # Auto-recover stuck HDMI audio after GPU crashes
   ];
 
   # Bootloader
@@ -168,6 +169,7 @@
     extraConfig.pipewire = {
       "10-hdmi-audio" = {
         "context.properties" = {
+          "default.clock.rate" = 48000;
           "default.clock.quantum" = 2048;
           "default.clock.min-quantum" = 1024;
         };
@@ -209,6 +211,25 @@
         ]
       '')
     ];
+  };
+
+  # Auto-recover PipeWire audio stack after crashes
+  # - Restart=always ensures recovery even on clean exit with bad state
+  # - BindsTo ensures WirePlumber restarts whenever PipeWire does
+  systemd.user.services.pipewire.serviceConfig = {
+    Restart = lib.mkForce "always";
+    RestartSec = 1;
+  };
+  systemd.user.services.pipewire-pulse.serviceConfig = {
+    Restart = lib.mkForce "always";
+    RestartSec = 1;
+  };
+  systemd.user.services.wireplumber = {
+    bindsTo = [ "pipewire.service" ];
+    serviceConfig = {
+      Restart = lib.mkForce "always";
+      RestartSec = 1;
+    };
   };
 
   # Enable polkit for authentication

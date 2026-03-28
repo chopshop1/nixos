@@ -206,7 +206,6 @@ in
 
     # Dependencies often needed by Windows games
     dxvk  # DirectX to Vulkan translation
-    vkd3d-proton  # DirectX 12 to Vulkan
 
     # Capture and streaming helpers
     obs-studio  # For testing capture

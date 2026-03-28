@@ -49,6 +49,7 @@ in
     ripgrep
     fd
     mprocs
+    typos
 
     # Desktop applications
     firefox

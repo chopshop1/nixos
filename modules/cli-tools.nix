@@ -167,7 +167,7 @@ in
       # Node/Bun/Python
       bun
       nodejs
-      python312
+      python313
 
       # Notification support (for Claude Code hooks, etc.)
       libnotify  # notify-send command
