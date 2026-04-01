@@ -214,7 +214,7 @@ pkgs.mkShell {
     libxinerama
     libxtst
     libxrender
-    xorg.xorgserver
+    xorgserver
 
     # ── Wayland (cli-tools.nix) ──
     wayland

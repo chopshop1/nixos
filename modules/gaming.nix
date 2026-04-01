@@ -21,17 +21,17 @@ in
     # Force Steam to use XWayland (fixes window closing issues on Wayland)
     package = pkgs.steam.override {
       extraPkgs = pkgs: with pkgs; [
-        # X11 libraries
-        xorg.libXcursor
-        xorg.libXi
-        xorg.libXinerama
-        xorg.libXScrnSaver
-        xorg.libXrandr
-        xorg.libXrender
-        xorg.libXfixes
-        xorg.libXcomposite
-        xorg.libXdamage
-        xorg.libXtst
+        # X11 libraries (top-level names; xorg.* is deprecated)
+        libxcursor
+        libxi
+        libxinerama
+        libxscrnsaver
+        libxrandr
+        libxrender
+        libxfixes
+        libxcomposite
+        libxdamage
+        libxtst
 
         # CEF/Chromium dependencies (required for Store/Library)
         nss
@@ -84,6 +84,10 @@ in
         GDK_BACKEND = "x11";
         # Fix Steam CEF browser issues on Wayland
         STEAM_ENABLE_WAYLAND = "0";
+        # Disable GPU compositor in CEF to fix blank Store/Library.
+        # Scoped to Steam only — setting this globally would disable Chromium's
+        # sandbox in every process that reads it.
+        STEAM_DISABLE_BROWSER_SANDBOX = "1";
       };
     };
 
@@ -93,12 +97,10 @@ in
     ];
   };
 
-  # Environment variables for Steam and Wine/Proton gaming
+  # Environment variables for Wine/Proton gaming
   environment.sessionVariables = {
     # Force Steam to use X11/XWayland (no scaling since display is at native 2K)
     STEAM_FORCE_DESKTOPUI_SCALING = "1";
-    # Disable GPU compositor in CEF to fix blank Store/Library
-    STEAM_DISABLE_BROWSER_SANDBOX = "1";
     # DXVK async shader compilation - eliminates shader stutter in Proton-GE/dwproton
     DXVK_ASYNC = "1";
     # RADV graphics pipeline library - faster shader compilation on AMD

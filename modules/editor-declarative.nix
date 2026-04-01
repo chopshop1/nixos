@@ -50,12 +50,9 @@ in
       gopls
 
       # Tools required by kickstart.nvim
-      ripgrep  # Required by telescope
-      fd       # Required by telescope
-      git      # Required by gitsigns
+      # ripgrep, fd, git, nodejs available via cli-tools.nix / system-base.nix
       gcc      # Required for treesitter compilation
       gnumake  # For building some plugins
-      nodejs   # For some LSPs and plugins
 
       # Additional formatters and linters
       nixpkgs-fmt

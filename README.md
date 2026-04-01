@@ -1,176 +1,113 @@
 # NixOS Configuration
 
-A modular NixOS configuration using flakes for reproducible system management.
+A modular, flake-based NixOS configuration managing three machines with shared modules and per-host feature toggles.
 
-## Structure
+## Host Configurations
+
+| Host | Hardware | GPU | Purpose |
+|------|----------|-----|---------|
+| `nixos` | NVIDIA GTX 1080 Ti workstation | NVIDIA (proprietary) | Gaming, Sunshine streaming, Docker |
+| `nixos-amd` | Ryzen 9 7950X3D + RX 7900 XTX | AMD | Gaming, Sunshine streaming, Docker, fan control |
+| `home` | Lenovo Ryzen 5 Pro 2400GE (Vega 11) | AMD (integrated) | Dev machine, Home Assistant, Docker |
+
+## Directory Structure
 
 ```
 .
-├── flake.nix           # Main flake configuration
-├── flake.lock          # Locked flake dependencies
-├── hosts/              # Host-specific configurations
-│   └── devbox/         # Configuration for 'devbox' host
-│       ├── configuration.nix
-│       ├── hardware-configuration.nix
-│       └── user-settings.nix
-├── modules/            # Reusable NixOS modules
-│   ├── base.nix        # Base system configuration
-│   ├── boot.nix        # Boot loader settings
-│   ├── docker.nix      # Docker configuration
-│   ├── editor.nix      # Text editor configurations
-│   ├── hardware-amd.nix    # AMD-specific hardware
-│   ├── hardware-basics.nix # Common hardware settings
-│   ├── networking.nix  # Network configuration
-│   ├── security.nix    # Security settings
-│   ├── ssh.nix         # SSH server configuration
-│   └── users.nix       # User management
-├── legacy/             # Traditional NixOS configuration (non-flake)
-│   ├── configuration.nix
-│   └── hardware-configuration.nix
-└── scripts/            # Utility scripts
-    ├── nvchad-install.sh      # Install NvChad for Neovim
-    ├── provision-ai-cli.sh    # Install AI CLI tools
-    ├── update.sh              # System update script
-    └── verify.sh              # Configuration verification
+├── flake.nix                  # Flake entry point, host definitions, mkHost helper
+├── configuration-cleaned.nix  # Shared NixOS config (imports all modules)
+├── hardware-configuration.nix # Hardware config for the nixos (NVIDIA) host
+├── hosts/
+│   ├── amd-workstation/
+│   │   └── hardware-configuration.nix
+│   └── lenovo-dev/
+│       └── hardware-configuration.nix
+├── modules/                   # NixOS system modules (see below)
+├── home-manager/              # Home Manager user config (see below)
+├── devContainer/              # Declarative dev container (systemd-nspawn)
+│   ├── container.nix          # NixOS module for the devbox container
+│   ├── docker-compose.yml
+│   ├── Dockerfile
+│   ├── flake.nix / flake.lock
+│   ├── setup.sh / shell.nix
+│   └── README.md
+└── tasks/                     # Task tracking
 ```
 
-## Quick Start
+## Usage
 
-### Using Flakes (Recommended)
+Rebuild for a specific host:
 
-1. **Build the system configuration:**
-   ```bash
-   sudo nixos-rebuild switch --flake .#devbox
-   ```
-
-2. **Update flake inputs:**
-   ```bash
-   nix flake update
-   ```
-
-3. **Check configuration:**
-   ```bash
-   nix flake check
-   ```
-
-### Using Traditional Configuration
-
-1. **Copy to system location:**
-   ```bash
-   sudo cp -r legacy/* /etc/nixos/
-   ```
-
-2. **Build and switch:**
-   ```bash
-   sudo nixos-rebuild switch
-   ```
-
-## Scripts
-
-Make scripts executable first:
 ```bash
-chmod +x scripts/*.sh
+sudo nixos-rebuild switch --flake .#<host>
 ```
 
-### Update System
+Where `<host>` is `nixos`, `nixos-amd`, or `home`.
+
+Update flake inputs:
+
 ```bash
-sudo ./scripts/update.sh
+nix flake update
 ```
 
-### Verify Configuration
-```bash
-./scripts/verify.sh
-```
+### Git User Setup
 
-### Install NvChad
-```bash
-./scripts/nvchad-install.sh
-```
+See [CLAUDE.md](./CLAUDE.md) for first-time git user configuration via environment variables.
 
-### Install AI CLI Tools
-```bash
-./scripts/provision-ai-cli.sh
-```
+## Modules (`modules/`)
 
-## Customization
+| Module | Description |
+|--------|-------------|
+| `audio-recovery.nix` | Watchdog that auto-recovers stuck HDMI audio after GPU crashes by reloading snd_hda_intel |
+| `cli-tools.nix` | Modern CLI tool replacements (eza, bat, etc.) and shell utilities |
+| `desktop-apps.nix` | Desktop applications (browsers, media, communication) |
+| `docker.nix` | Docker engine and user group configuration |
+| `editor-declarative.nix` | Neovim with kickstart.nvim configuration |
+| `gaming.nix` | Steam, Wine, Proton, Lutris, Gamescope |
+| `gpu.nix` | GPU driver setup for NVIDIA, AMD, or Intel (auto-configured per host) |
+| `hardware-monitoring.nix` | lm_sensors, RGB control, and fan control (linear temperature ramp) |
+| `home-assistant.nix` | Firewall rules for Home Assistant and HomeKit Bridge |
+| `hyprland.nix` | Hyprland Wayland compositor |
+| `ollama.nix` | Local LLM server (supports ROCm, CUDA, Vulkan backends) |
+| `plasma.nix` | KDE Plasma desktop environment |
+| `power-management.nix` | Suspend prevention, Wake-on-LAN, WiFi keep-alive, ethernet preference |
+| `streaming-optimization.nix` | Network tuning for Moonlight/Sunshine game streaming |
+| `sunshine.nix` | Sunshine game streaming server with gamepad proxy |
+| `system-base.nix` | Core system packages available on all hosts |
+| `xfce.nix` | XFCE desktop environment |
+| `yubikey.nix` | YubiKey hardware key support and optional PAM integration |
 
-### Adding a New Host
+## Home Manager (`home-manager/`)
 
-1. Create a new directory under `hosts/`:
-   ```bash
-   mkdir -p hosts/newhostname
-   ```
-
-2. Copy and modify the configuration files:
-   ```bash
-   cp hosts/devbox/*.nix hosts/newhostname/
-   ```
-
-3. Update `flake.nix` to add the new host:
-   ```nix
-   nixosConfigurations = {
-     newhostname = nixpkgs.lib.nixosSystem {
-       system = "x86_64-linux";
-       modules = [
-         ./hosts/newhostname/configuration.nix
-         ./hosts/newhostname/hardware-configuration.nix
-       ];
-     };
-   };
-   ```
-
-### Creating New Modules
-
-1. Create a new module file in `modules/`:
-   ```bash
-   touch modules/mymodule.nix
-   ```
-
-2. Add the module structure:
-   ```nix
-   { config, lib, pkgs, ... }:
-   {
-     # Your configuration here
-   }
-   ```
-
-3. Import it in your host configuration:
-   ```nix
-   imports = [
-     ../../modules/mymodule.nix
-   ];
-   ```
-
-## Features
-
-- **Modular Configuration**: Organized into reusable modules
-- **Flake Support**: Reproducible builds with pinned dependencies
-- **AMD Hardware Support**: Optimized for AMD CPUs and GPUs
-- **Development Tools**: Docker, editors, and programming languages
-- **Security Hardening**: AppArmor, Fail2ban, ClamAV
-- **Modern Desktop**: GNOME with Wayland support
+| File | Description |
+|------|-------------|
+| `dev.nix` | Main entry point, imports all other Home Manager modules |
+| `claude.nix` | Claude Code config symlinks to agents and dotfiles repos |
+| `environment.nix` | Session environment variables (Wayland, Playwright) |
+| `git.nix` | Git configuration with environment-variable-based user identity |
+| `hyprland.nix` | Hyprland window manager keybindings, monitors, and theme |
+| `mprocs.nix` | mprocs process manager with vim keybindings |
+| `neovim.nix` | Neovim with language servers, formatters, and treesitter grammars |
+| `packages.nix` | User-level packages and helper scripts (e.g., Playwright browser installer) |
+| `plasma.nix` | KDE Plasma Breeze Dark theme activation |
+| `repos.nix` | Activation scripts to clone/update external config repos |
+| `starship.nix` | Starship prompt with Tokyo Night theme |
+| `terminals.nix` | Kitty and Konsole terminal configuration |
+| `tmux.nix` | Tmux with plugin management via Nix |
+| `zsh.nix` | Zsh shell with autosuggestions, syntax highlighting, and history |
 
 ## Maintenance
 
-### Garbage Collection
-Remove old generations:
 ```bash
+# Garbage collect old generations
 sudo nix-collect-garbage -d
-```
 
-### List Generations
-```bash
+# List generations
 sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
-```
 
-### Rollback
-```bash
+# Rollback to previous generation
 sudo nixos-rebuild switch --rollback
 ```
-
-## License
-
-This configuration is provided as-is for personal use.
 
 ---
 

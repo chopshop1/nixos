@@ -4,11 +4,33 @@ with lib;
 
 let
   cfg = config.my.sunshine;
+  gpuCfg = config.my.gpu;
   proxyPython = pkgs.python3.withPackages (ps: [ ps.evdev ]);
+
+  # Map GPU type to VAAPI driver name
+  defaultVaapiDriver = {
+    nvidia = "nvidia";
+    amd = "radeonsi";
+    intel = "iHD";
+    none = null;
+  }.${gpuCfg.type} or null;
 in
 {
   options.my.sunshine = {
     enable = mkEnableOption "Sunshine game streaming server";
+
+    audioSink = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      example = "alsa_output.pci-0000_03_00.1.hdmi-stereo-extra3";
+      description = "PulseAudio/PipeWire sink name for Sunshine audio capture. If null, Sunshine uses its default behavior (virtual sink).";
+    };
+
+    vaapiDriverName = mkOption {
+      type = types.nullOr types.str;
+      default = defaultVaapiDriver;
+      description = "LIBVA_DRIVER_NAME for hardware encoding in the Sunshine startup script. Defaults based on my.gpu.type. Systemd services don't inherit environment.sessionVariables, so this must be set explicitly.";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -34,10 +56,6 @@ in
       # Number of threads for software encoding fallback (0 = auto)
       min_threads = "2";
 
-      # Audio: capture from the HDMI sink directly, don't create a virtual sink
-      # This prevents Sunshine from switching the default audio device on connect
-      audio_sink = "alsa_output.pci-0000_03_00.1.hdmi-stereo-extra3";
-
       # Input settings
       key_repeat_delay = "500";
       key_repeat_frequency = "24";
@@ -49,6 +67,10 @@ in
       # Use x360 emulation (most compatible)
       gamepad_type = "x360";
       min_log_level = "info";
+    } // optionalAttrs (cfg.audioSink != null) {
+      # Audio: capture from a specific sink directly instead of creating a virtual one
+      # This prevents Sunshine from switching the default audio device on connect
+      audio_sink = cfg.audioSink;
     };
   };
 
@@ -74,9 +96,10 @@ in
       export XDG_SESSION_TYPE="x11"
       # Unset Wayland vars
       unset WAYLAND_DISPLAY
-      # VAAPI/AMD GPU acceleration
-      export LIBVA_DRIVER_NAME="radeonsi"
-      export RADV_PERFTEST="gpl"
+      # VAAPI hardware encoding — must be set explicitly since systemd services
+      # don't inherit environment.sessionVariables from gpu.nix
+      ${optionalString (cfg.vaapiDriverName != null) ''export LIBVA_DRIVER_NAME="${cfg.vaapiDriverName}"''}
+      ${optionalString (gpuCfg.type == "amd") ''export RADV_PERFTEST="gpl"''}
 
       # XAUTHORITY is inherited from the user session (set by SDDM)
       echo "Sunshine starting on DISPLAY=$DISPLAY"
@@ -138,13 +161,13 @@ in
   # Udev rules for Sunshine to access input devices
   services.udev.extraRules = ''
     # uinput for virtual input devices (mouse, keyboard, gamepad)
-    KERNEL=="uinput", SUBSYSTEM=="misc", MODE="0666", OPTIONS+="static_node=uinput", TAG+="uaccess"
+    KERNEL=="uinput", SUBSYSTEM=="misc", MODE="0660", GROUP="input", OPTIONS+="static_node=uinput", TAG+="uaccess"
     # uhid for DualSense (ds5) gamepad emulation
-    KERNEL=="uhid", MODE="0666", OPTIONS+="static_node=uhid", TAG+="uaccess"
+    KERNEL=="uhid", MODE="0660", GROUP="input", OPTIONS+="static_node=uhid", TAG+="uaccess"
     # Allow access to event devices for input
-    SUBSYSTEM=="input", MODE="0666", TAG+="uaccess"
+    SUBSYSTEM=="input", MODE="0660", GROUP="input", TAG+="uaccess"
     # hidraw for DualSense (ds5) gamepad emulation
-    KERNEL=="hidraw*", MODE="0666", TAG+="uaccess"
+    KERNEL=="hidraw*", MODE="0660", GROUP="input", TAG+="uaccess"
     # Stable symlink for Sunshine virtual gamepad — always points to latest Sunshine device
     # Match vendor 045e (Microsoft) + Sunshine's Xbox One pad name
     SUBSYSTEM=="input", ATTRS{name}=="Sunshine X-Box One (virtual) pad", ATTRS{id/vendor}=="045e", KERNEL=="event*", SYMLINK+="input/sunshine-gamepad", TAG+="systemd", ENV{SYSTEMD_WANTS}="sunshine-gamepad-proxy.service", OPTIONS+="link_priority=100"
@@ -158,7 +181,7 @@ in
   # Input tools for streaming (X11 session)
   environment.systemPackages = with pkgs; [
     xdotool
-    xorg.xdpyinfo
+    xdpyinfo
     evsieve
   ];
 
@@ -296,6 +319,8 @@ in
     serviceConfig = {
       Type = "simple";
       ExecStart = "${proxyPython}/bin/python3 /etc/sunshine-gamepad-proxy.py";
+      User = "dev";
+      Group = "input";
       Restart = "always";
       RestartSec = "2s";
       TimeoutStartSec = "30s";
