@@ -170,7 +170,9 @@
         hostName = "home";
         hardwareConfig = ./hosts/lenovo-dev/hardware-configuration.nix;
         gpuType = "amd";
-        extraModules = [{
+        extraModules = [
+          ./modules/crash-monitor.nix
+          {
           # Fix ath10k WiFi + AMD IOMMU page faults causing system hangs
           # Disable PCIe ASPM and deep CPU C-states to prevent silent hard lockups
           boot.kernelParams = [ "iommu=soft" "pcie_aspm=off" "processor.max_cstate=1" ];
@@ -186,16 +188,20 @@
             algorithm = "zstd";
           };
 
-          # Crash recovery: reboot on kernel panic instead of hanging silently
+          # Crash recovery: convert lockups into panics so pstore captures them,
+          # then auto-reboot. Check /sys/fs/pstore/ after reboot for crash dumps.
           boot.kernel.sysctl = {
             "kernel.panic" = 10;
             "kernel.panic_on_oops" = 1;
+            "kernel.softlockup_panic" = 1;
+            "kernel.hardlockup_panic" = 1;
+            "kernel.hung_task_panic" = 1;
           };
 
           # Hardware watchdog: auto-reboot on hard lockup (SP5100 TCO timer)
           # Without this, silent freezes require physical reboot
-          systemd.watchdog.runtimeTime = "30s";
-          systemd.watchdog.rebootTime = "10min";
+          systemd.settings.Manager.RuntimeWatchdogSec = "30s";
+          systemd.settings.Manager.RebootWatchdogSec = "10min";
 
           # Userspace OOM killer -- acts before kernel OOM can deadlock
           systemd.oomd = {
