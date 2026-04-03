@@ -263,13 +263,14 @@
   # XDG Desktop Portal configuration (KDE portal is auto-enabled with Plasma)
 
   # Enable the OpenSSH daemon
+  # Key-based auth only; password auth disabled for security
   services.openssh = {
     enable = true;
     settings = {
-      PermitUserEnvironment = true;
+      PermitUserEnvironment = false;
       AcceptEnv = [ "SHELL" "LANG" "LC_*" ];
       UsePAM = true;
-      PasswordAuthentication = true;
+      PasswordAuthentication = false;
       PermitEmptyPasswords = false;
     };
   };
@@ -316,16 +317,16 @@
       at-spi2-core
 
       # X11
-      xorg.libX11
-      xorg.libXcursor
-      xorg.libXrandr
-      xorg.libXi
-      xorg.libxcb
-      xorg.libXext
-      xorg.libXfixes
-      xorg.libXcomposite
-      xorg.libXdamage
-      xorg.libXrender
+      libx11
+      libxcursor
+      libxrandr
+      libxi
+      libxcb
+      libxext
+      libxfixes
+      libxcomposite
+      libxdamage
+      libxrender
 
       # Wayland
       wayland

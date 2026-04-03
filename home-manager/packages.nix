@@ -31,42 +31,29 @@ in
   # User-specific packages
   home.packages = with pkgs; [
     playwright-ensure-browsers
+
     # Browsers
     google-chrome  # Required for Claude Code browser integration
 
     # Development tools
-    bun
-    nodejs
+    # bun, nodejs available via cli-tools.nix
     pnpm
     cargo
     rustc
-    rust-analyzer
+    # rust-analyzer available via editor-declarative.nix
 
     # CLI tools
-    fzf
-    bat
-    eza
-    ripgrep
-    fd
+    # fzf, bat, eza, ripgrep, fd available via cli-tools.nix
     mprocs
     typos
 
     # Desktop applications
-    firefox
+    # firefox available via desktop-apps.nix (programs.firefox.enable)
+    # kitty available via terminals.nix (programs.kitty)
     thunderbird
-    kitty
     obsidian
 
-    # 1Password
-    _1password-cli
-    _1password-gui
-
-    # Proton applications
-    protonmail-desktop
-    protonmail-bridge
-    protonmail-bridge-gui
-    proton-pass
-    protonvpn-gui
+    # Keyring / secrets (needed by Proton apps, etc.)
     libsecret
     gnome-keyring
 

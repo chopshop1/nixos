@@ -7,16 +7,11 @@
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Add chopshop nvim config as a flake input
-    chopshop-nvim = {
-      url = "github:chopshop1/.nvim";
-      flake = false;
-    };
     # Latest dev version of opencode (uses its own nixpkgs for build deps)
     opencode.url = "github:anomalyco/opencode";
   };
 
-  outputs = { self, nixpkgs, home-manager, chopshop-nvim, opencode, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, opencode, ... }@inputs:
   let
     system = "x86_64-linux";
 
@@ -96,7 +91,13 @@
         };
         extraModules = [{
           my.gaming.enable = true;
-          my.sunshine.enable = true;
+          my.sunshine = {
+            enable = true;
+            # Set to a PulseAudio/PipeWire sink name to capture audio directly,
+            # or null to let Sunshine create a virtual sink.
+            # Find sinks with: pactl list short sinks
+            audioSink = null;
+          };
           my.docker.enable = true;
           my.yubikey.enable = true;
           my.devContainer.enable = true;
@@ -108,6 +109,7 @@
           };
           my.streaming = {
             enable = true;
+            interface = "enp4s0";
             maxBitrate = 100;
           };
           my.hardwareMonitoring = {
@@ -131,7 +133,10 @@
         };
         extraModules = [{
           my.gaming.enable = true;
-          my.sunshine.enable = true;
+          my.sunshine = {
+            enable = true;
+            audioSink = null;
+          };
           my.docker.enable = true;
           my.yubikey.enable = true;
           my.devContainer.enable = true;
@@ -143,6 +148,7 @@
           };
           my.streaming = {
             enable = true;
+            interface = "enp6s0";
             maxBitrate = 100;
           };
           my.hardwareMonitoring = {

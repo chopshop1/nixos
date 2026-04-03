@@ -74,19 +74,19 @@ in
       libayatana-appindicator.dev
 
       # X11 dependencies
-      xorg.libX11
-      xorg.libXcursor
-      xorg.libXrandr
-      xorg.libXi
-      xorg.libxcb
-      xorg.libXext
-      xorg.libXfixes
-      xorg.libXcomposite
-      xorg.libXdamage
-      xorg.libXinerama
-      xorg.libXtst
-      xorg.libXrender
-      xorg.xorgserver  # for xvfb
+      libX11
+      libXcursor
+      libXrandr
+      libXi
+      libxcb
+      libXext
+      libXfixes
+      libXcomposite
+      libXdamage
+      libXinerama
+      libXtst
+      libXrender
+      xorgserver  # for xvfb
 
       # Wayland
       wayland

@@ -33,13 +33,12 @@ in
         "cpu" = pkgs.ollama-cpu;
       }.${cfg.package};
 
-      # Listen on all interfaces (useful for remote access)
-      host = "0.0.0.0";
+      # Bind to localhost only -- previously 0.0.0.0 with an open firewall port,
+      # which exposed the unauthenticated API to the entire LAN.
+      # For remote access, use Tailscale: `tailscale funnel 11434` or SSH tunnel.
+      host = "127.0.0.1";
       port = 11434;
     };
-
-    # Open firewall for Ollama API
-    networking.firewall.allowedTCPPorts = [ 11434 ];
 
     # CLI tool
     environment.systemPackages = [ config.services.ollama.package ];

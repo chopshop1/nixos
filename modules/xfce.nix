@@ -37,8 +37,8 @@ in
     # XFCE packages
     environment.systemPackages = with pkgs; [
       # X11 session management
-      xorg.xinit
-      xorg.xauth
+      xinit
+      xauth
 
       # XFCE extras
       xfce.xfce4-whiskermenu-plugin

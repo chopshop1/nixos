@@ -81,6 +81,9 @@ in
 
       environment.sessionVariables = {
         LIBVA_DRIVER_NAME = "nvidia";
+        # Hardware video acceleration (VA-API) in Firefox requires disabling the
+        # RDD (Remote Data Decoder) sandbox on Linux.  Removing this breaks
+        # GPU-accelerated video decode in Firefox.
         MOZ_DISABLE_RDD_SANDBOX = "1";
         VDPAU_DRIVER = "nvidia";
         __GL_GSYNC_ALLOWED = "1";
@@ -98,7 +101,7 @@ in
 
       # Set display resolution if configured
       services.xserver.displayManager.setupCommands = mkIf (cfg.primaryMonitor != null && cfg.defaultResolution != null) ''
-        ${pkgs.xorg.xrandr}/bin/xrandr --output ${cfg.primaryMonitor} --mode ${cfg.defaultResolution} ${optionalString (cfg.defaultRefreshRate != null) "--rate ${toString cfg.defaultRefreshRate}"} --primary || true
+        ${pkgs.xrandr}/bin/xrandr --output ${cfg.primaryMonitor} --mode ${cfg.defaultResolution} ${optionalString (cfg.defaultRefreshRate != null) "--rate ${toString cfg.defaultRefreshRate}"} --primary || true
       '';
     })
 
@@ -122,6 +125,9 @@ in
         LIBVA_DRIVER_NAME = "radeonsi";
         VDPAU_DRIVER = "radeonsi";
         # RADV is used by default (part of Mesa)
+        # Hardware video acceleration (VA-API) in Firefox requires disabling the
+        # RDD (Remote Data Decoder) sandbox on Linux.  Removing this breaks
+        # GPU-accelerated video decode in Firefox.
         MOZ_DISABLE_RDD_SANDBOX = "1";
         __GL_VRR_ALLOWED = "1";
         # Wayland-specific AMD settings
@@ -144,7 +150,7 @@ in
 
       # Set display resolution if configured (for X11/Plasma sessions)
       services.xserver.displayManager.setupCommands = mkIf (cfg.primaryMonitor != null && cfg.defaultResolution != null) ''
-        ${pkgs.xorg.xrandr}/bin/xrandr --output ${cfg.primaryMonitor} --mode ${cfg.defaultResolution} ${optionalString (cfg.defaultRefreshRate != null) "--rate ${toString cfg.defaultRefreshRate}"} --primary || true
+        ${pkgs.xrandr}/bin/xrandr --output ${cfg.primaryMonitor} --mode ${cfg.defaultResolution} ${optionalString (cfg.defaultRefreshRate != null) "--rate ${toString cfg.defaultRefreshRate}"} --primary || true
       '';
     })
 

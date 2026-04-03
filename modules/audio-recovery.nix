@@ -5,6 +5,10 @@
 #
 # Detection: any ALSA PCM in RUNNING state with hw_ptr=0 and appl_ptr>0 means
 # the hardware stopped consuming audio data while PipeWire is still writing.
+let
+  # The user whose PipeWire session to restart on audio recovery.
+  audioUser = "dev";
+in
 {
   systemd.services.audio-recovery = {
     description = "HDMI audio codec crash recovery watchdog";
@@ -15,6 +19,11 @@
       ExecStart = let
         script = pkgs.writeShellScript "audio-recovery" ''
           set -euo pipefail
+
+          AUDIO_USER="${audioUser}"
+          AUDIO_UID=$(${pkgs.coreutils}/bin/id -u "$AUDIO_USER")
+          RUNTIME_DIR="/run/user/$AUDIO_UID"
+
           STUCK=0
           for status in /proc/asound/card0/pcm*/sub0/status; do
             [ -f "$status" ] || continue
@@ -33,8 +42,7 @@
           echo "audio-recovery: stuck HDA codec detected (hw_ptr=0), recovering..."
 
           # Stop user PipeWire to release the ALSA device
-          RUNTIME_DIR="/run/user/1001"
-          ${pkgs.sudo}/bin/sudo -u dev XDG_RUNTIME_DIR=$RUNTIME_DIR \
+          ${pkgs.sudo}/bin/sudo -u "$AUDIO_USER" XDG_RUNTIME_DIR="$RUNTIME_DIR" \
             ${pkgs.systemd}/bin/systemctl --user stop \
               pipewire.socket pipewire-pulse.socket pipewire pipewire-pulse wireplumber \
             || true
@@ -49,7 +57,7 @@
           sleep 2
 
           # Restart PipeWire
-          ${pkgs.sudo}/bin/sudo -u dev XDG_RUNTIME_DIR=$RUNTIME_DIR \
+          ${pkgs.sudo}/bin/sudo -u "$AUDIO_USER" XDG_RUNTIME_DIR="$RUNTIME_DIR" \
             ${pkgs.systemd}/bin/systemctl --user start \
               pipewire.socket pipewire-pulse.socket wireplumber
 
