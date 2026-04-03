@@ -172,7 +172,38 @@
         gpuType = "amd";
         extraModules = [{
           # Fix ath10k WiFi + AMD IOMMU page faults causing system hangs
-          boot.kernelParams = [ "iommu=soft" ];
+          # Disable PCIe ASPM and deep CPU C-states to prevent silent hard lockups
+          boot.kernelParams = [ "iommu=soft" "pcie_aspm=off" "processor.max_cstate=1" ];
+
+          # Blacklist WiFi driver entirely -- ethernet-only machine, prevents
+          # ath10k DMA/IOMMU issues even with iommu=soft
+          boot.blacklistedKernelModules = [ "ath10k_pci" "ath10k_core" ];
+
+          # Compressed in-memory swap -- prevents OOM deadlocks on 16GB system
+          zramSwap = {
+            enable = true;
+            memoryPercent = 50;
+            algorithm = "zstd";
+          };
+
+          # Crash recovery: reboot on kernel panic instead of hanging silently
+          boot.kernel.sysctl = {
+            "kernel.panic" = 10;
+            "kernel.panic_on_oops" = 1;
+          };
+
+          # Hardware watchdog: auto-reboot on hard lockup (SP5100 TCO timer)
+          # Without this, silent freezes require physical reboot
+          systemd.watchdog.runtimeTime = "30s";
+          systemd.watchdog.rebootTime = "10min";
+
+          # Userspace OOM killer -- acts before kernel OOM can deadlock
+          systemd.oomd = {
+            enable = true;
+            enableRootSlice = true;
+            enableUserSlices = true;
+            enableSystemSlice = true;
+          };
 
           # Dev-only: no gaming, streaming, sunshine, or hardware monitoring
           my.gaming.enable = false;
@@ -187,7 +218,7 @@
           my.powerManagement = {
             preventSuspend = true;
             enableWakeOnLan = true;
-            keepWifiAlive = true;
+            keepWifiAlive = false;  # WiFi driver blacklisted, no interface to manage
             preferEthernet = true;
           };
         }];
