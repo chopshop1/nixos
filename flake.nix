@@ -104,6 +104,7 @@
             preventSuspend = true;
             enableWakeOnLan = true;
             keepWifiAlive = true;
+            preferEthernet = true;
           };
           my.streaming = {
             enable = true;
@@ -138,6 +139,7 @@
             preventSuspend = true;
             enableWakeOnLan = true;
             keepWifiAlive = true;
+            preferEthernet = true;
           };
           my.streaming = {
             enable = true;
