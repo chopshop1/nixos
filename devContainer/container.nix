@@ -56,11 +56,11 @@ let
     bun nodejs python312 cargo rustc
 
     # ── Language servers ──
-    lua-language-server nil nodePackages.typescript-language-server
+    lua-language-server nil typescript-language-server
     pyright rust-analyzer gopls
 
     # ── Formatters & linters ──
-    nixpkgs-fmt black nodePackages.prettier rustfmt gofumpt
+    nixpkgs-fmt black prettier rustfmt gofumpt
 
     # ── Build tools ──
     pkg-config cmake gnumake gcc

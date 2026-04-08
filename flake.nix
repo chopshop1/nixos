@@ -19,7 +19,20 @@
     sharedModules = [
       # Make opencode dev package available via overlay
       { nixpkgs.overlays = [
-        (final: prev: {
+        (final: prev: let
+          ollamaVersion = "0.20.2";
+          ollamaSrc = prev.fetchFromGitHub {
+            owner = "ollama";
+            repo = "ollama";
+            tag = "v${ollamaVersion}";
+            hash = "sha256-Ic3eLOohLR7MQGkLvDJBNOCiBBKxh6l8X9MgK0b4w+Y=";
+          };
+          ollamaOverride = {
+            version = ollamaVersion;
+            src = ollamaSrc;
+            vendorHash = "sha256-Lc1Ktdqtv2VhJQssk8K1UOimeEjVNvDWePE9WkamCos=";
+          };
+        in {
           opencode = opencode.packages.${system}.default;
           lutris = prev.lutris.override {
             lutris-unwrapped = prev.lutris-unwrapped.overrideAttrs (old: rec {
@@ -32,6 +45,11 @@
               };
             });
           };
+          ollama = prev.ollama.overrideAttrs ollamaOverride;
+          ollama-rocm = prev.ollama-rocm.overrideAttrs ollamaOverride;
+          ollama-cuda = prev.ollama-cuda.overrideAttrs ollamaOverride;
+          ollama-vulkan = prev.ollama-vulkan.overrideAttrs ollamaOverride;
+          ollama-cpu = prev.ollama-cpu.overrideAttrs ollamaOverride;
         })
       ]; }
       ./configuration-cleaned.nix
@@ -132,6 +150,10 @@
           defaultRefreshRate = 120;
         };
         extraModules = [{
+          my.ollama.package = "rocm";
+          # Only use discrete GPU (gfx1100) for Ollama — the Ryzen iGPU (gfx1036)
+          # lacks rocBLAS Tensile kernels and crashes inference
+          services.ollama.environmentVariables.HIP_VISIBLE_DEVICES = "0";
           my.gaming.enable = true;
           my.sunshine = {
             enable = true;
