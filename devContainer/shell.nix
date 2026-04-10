@@ -138,7 +138,7 @@ pkgs.mkShell {
     # ── Language servers (editor-declarative.nix) ──
     lua-language-server
     nil
-    nodePackages.typescript-language-server
+    typescript-language-server
     pyright
     rust-analyzer
     gopls
@@ -146,7 +146,7 @@ pkgs.mkShell {
     # ── Formatters & linters (editor-declarative.nix) ──
     nixpkgs-fmt
     black
-    nodePackages.prettier
+    prettier
     rustfmt
     gofumpt
 

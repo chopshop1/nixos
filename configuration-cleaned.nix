@@ -143,8 +143,8 @@
 
   # Enable Ollama local LLM server (overridable per-host)
   my.ollama.enable = lib.mkDefault true;
-  # Note: "rocm" builds from source (very slow), use "default" for cached binary
-  my.ollama.package = "default";
+  # Overridden per-host in flake.nix (e.g. "rocm" for AMD, "cuda" for NVIDIA)
+  my.ollama.package = lib.mkDefault "default";
 
   # Configure keymap
   services.xserver.xkb = {
@@ -263,14 +263,13 @@
   # XDG Desktop Portal configuration (KDE portal is auto-enabled with Plasma)
 
   # Enable the OpenSSH daemon
-  # Key-based auth only; password auth disabled for security
   services.openssh = {
     enable = true;
     settings = {
       PermitUserEnvironment = false;
       AcceptEnv = [ "SHELL" "LANG" "LC_*" ];
       UsePAM = true;
-      PasswordAuthentication = false;
+      PasswordAuthentication = true;
       PermitEmptyPasswords = false;
     };
   };

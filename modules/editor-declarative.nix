@@ -44,7 +44,7 @@ in
       # Language servers
       lua-language-server
       nil                                    # Nix LSP
-      nodePackages.typescript-language-server
+      typescript-language-server
       pyright
       rust-analyzer
       gopls
@@ -57,7 +57,7 @@ in
       # Additional formatters and linters
       nixpkgs-fmt
       black
-      nodePackages.prettier
+      prettier
       rustfmt
       gofumpt
     ] ++ cfg.additionalLSPs;
