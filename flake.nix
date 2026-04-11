@@ -207,22 +207,9 @@
         extraModules = [
           ./modules/crash-monitor.nix
           {
-          # Silent-hard-lockup mitigations for Raven Ridge (Ryzen 5 Pro 2400GE).
-          # Verified insufficient when used alone even with amdgpu.overdrive gone:
-          # the box still silently locked up after ~6 minutes on a clean cmdline.
-          # This is the second tier of mitigations, targeting the amdgpu SMU/DPM
-          # transitions and the Ryzen MWAIT idle path that are the most likely
-          # remaining trigger classes. If this still isn't enough, the only
-          # remaining fix is to flash Lenovo BIOS M1XKT63A+ (see host header above).
-          boot.kernelParams = [
-            "iommu=soft"                 # ath10k DMA / IOMMU page-fault workaround
-            "pcie_aspm=off"              # PCIe ASPM hang workaround
-            "processor.max_cstate=1"     # cap ACPI C-states at C1 (verified effective)
-            "idle=nomwait"               # avoid the Raven Ridge MWAIT idle path entirely
-            "amdgpu.dpm=0"               # disable amdgpu dynamic power management (SMU wedges)
-            "amdgpu.runpm=0"             # disable GPU PCIe runtime PM
-            "rcu_nocbs=0-7"              # canonical Ryzen lockup workaround (Launchpad #1690085)
-          ];
+          # Fix ath10k WiFi + AMD IOMMU page faults causing system hangs
+          # Disable PCIe ASPM and deep CPU C-states to prevent silent hard lockups
+          boot.kernelParams = [ "iommu=soft" "pcie_aspm=off" "processor.max_cstate=1" ];
 
           # Blacklist WiFi driver entirely -- ethernet-only machine, prevents
           # ath10k DMA/IOMMU issues even with iommu=soft
