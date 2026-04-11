@@ -148,6 +148,8 @@
           primaryMonitor = "HDMI-A-1";
           defaultResolution = "1920x1080";
           defaultRefreshRate = 120;
+          # Discrete RX 7900 XTX — overdrive is safe and useful here.
+          overdrive = true;
         };
         extraModules = [{
           my.ollama.package = "rocm";
@@ -187,11 +189,21 @@
         }];
       };
 
-      # Lenovo dev machine: Ryzen 5 Pro 2400GE (Vega 11), 16GB RAM
+      # Lenovo ThinkCentre M715q Tiny (10VG000SUS): Ryzen 5 Pro 2400GE
+      # (Raven Ridge / Zen1 / Vega 11), 16 GB RAM. Headless Home Assistant host.
+      #
+      # KNOWN HARDWARE ISSUE: silent hard lockups on this exact M715q + 2400GE
+      # combo are documented at the Lenovo BIOS level. The fix per upstream is
+      # to flash BIOS M1XKT63A (2024-04-11) or newer. Check current version
+      # with: cat /sys/class/dmi/id/bios_version
+      # Update via fwupdmgr (`fwupdmgr refresh && fwupdmgr update`) or by
+      # booting Lenovo's BIOS update ISO. NixOS cannot do this for you.
       home = mkHost {
         hostName = "home";
         hardwareConfig = ./hosts/lenovo-dev/hardware-configuration.nix;
         gpuType = "amd";
+        # Headless server — do NOT enable my.gpu.overdrive: the ppfeaturemask
+        # it injects is the primary trigger for the silent lockups on this box.
         extraModules = [
           ./modules/crash-monitor.nix
           {

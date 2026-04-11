@@ -20,7 +20,10 @@
     ./modules/plasma.nix    # KDE Plasma desktop environment
     ./modules/ollama.nix    # Local LLM server
     ./modules/home-assistant.nix  # Home Assistant firewall rules
-    ./modules/audio-recovery.nix  # Auto-recover stuck HDMI audio after GPU crashes
+    # audio-recovery.nix removed: detected zero stuck-codec events across
+    # 10,000+ runs on the home host but flooded the journal at ~2 lines/sec,
+    # masking the last userspace events before silent lockups. Re-import
+    # explicitly on a host if HDMI audio actually wedges there.
   ];
 
   # Bootloader

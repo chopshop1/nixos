@@ -46,6 +46,20 @@ in
       example = 120;
       description = "Default refresh rate in Hz";
     };
+
+    overdrive = mkOption {
+      type = types.bool;
+      default = false;
+      description = ''
+        Enable AMD GPU overdrive (overclocking) support. This sets
+        amdgpu.ppfeaturemask=0xfffd7fff on the kernel cmdline, which is
+        intended for discrete Polaris GPUs. On Raven Ridge / Vega iGPU APUs
+        this mask clears PP_GFXOFF_MASK and PP_STUTTER_MODE, which the
+        Raven Ridge SMU firmware mishandles and is a well-documented cause
+        of silent hard lockups. Only enable on hosts with a discrete AMD
+        GPU that you actually want to overclock.
+      '';
+    };
   };
 
   config = mkMerge [
@@ -146,7 +160,9 @@ in
       ];
 
       programs.corectrl.enable = true;
-      hardware.amdgpu.overdrive.enable = true;  # Allow GPU overclocking
+      # Overdrive must be opt-in: it injects amdgpu.ppfeaturemask=0xfffd7fff
+      # which silently hard-locks Raven Ridge iGPUs. See option doc above.
+      hardware.amdgpu.overdrive.enable = cfg.overdrive;
 
       # Set display resolution if configured (for X11/Plasma sessions)
       services.xserver.displayManager.setupCommands = mkIf (cfg.primaryMonitor != null && cfg.defaultResolution != null) ''
