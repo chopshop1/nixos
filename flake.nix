@@ -230,6 +230,10 @@
             "kernel.softlockup_panic" = 1;
             "kernel.hardlockup_panic" = 1;
             "kernel.hung_task_panic" = 1;
+            # Reserve 512MB so kernel allocs never hit direct reclaim (stall source)
+            "vm.min_free_kbytes" = 524288;
+            # Wake kswapd earlier so reclaim stays ahead of allocations
+            "vm.watermark_scale_factor" = 200;
           };
 
           # Hardware watchdog: auto-reboot on hard lockup (SP5100 TCO timer)
@@ -243,6 +247,11 @@
             enableRootSlice = true;
             enableUserSlices = true;
             enableSystemSlice = true;
+            # Kill on sustained memory pressure before the desktop feels it
+            extraConfig = {
+              DefaultMemoryPressureLimit = "40%";
+              DefaultMemoryPressureDurationSec = "20s";
+            };
           };
 
           # Dev-only: no gaming, streaming, sunshine, or hardware monitoring
