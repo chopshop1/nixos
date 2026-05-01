@@ -73,4 +73,17 @@
     config.lib.file.mkOutOfStoreSymlink "/home/dev/work/dotfiles/tmux/tmux-session-picker";
   home.file.".local/bin/tmux-continuum-save".source =
     config.lib.file.mkOutOfStoreSymlink "/home/dev/work/dotfiles/tmux/tmux-continuum-save";
+  home.file.".local/bin/tmux-dev-layout".source =
+    config.lib.file.mkOutOfStoreSymlink "/home/dev/work/dotfiles/tmux/tmux-dev-layout";
+  home.file.".local/bin/tmux-sesh-list".source =
+    config.lib.file.mkOutOfStoreSymlink "/home/dev/work/dotfiles/tmux/tmux-sesh-list";
+  home.file.".local/bin/tmux-sesh-picker".source =
+    config.lib.file.mkOutOfStoreSymlink "/home/dev/work/dotfiles/tmux/tmux-sesh-picker";
+
+  # Sesh config — auto-apply the dev layout (claude / nvim / claude) to any
+  # new session sesh creates. Existing tmux sessions are untouched.
+  home.file.".config/sesh/sesh.toml".text = ''
+    [default_session]
+    startup_command = "$HOME/.local/bin/tmux-dev-layout"
+  '';
 }

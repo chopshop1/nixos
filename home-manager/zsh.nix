@@ -1,6 +1,12 @@
 { config, pkgs, lib, ... }:
 
 {
+  # Zoxide - smarter `cd` (z <dir>, zi for interactive)
+  programs.zoxide = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   # Zsh configuration
   programs.zsh = {
     enable = true;
@@ -107,6 +113,10 @@
         }
         add-zsh-hook precmd _claude_clear_pane_highlight
       fi
+
+      # ls is aliased to eza; use plain file/dir completion instead of _ls
+      # (which probes `ls --help` to detect GNU and can misbehave with the alias)
+      compdef _files ls
 
       # Enhanced completion settings
       zstyle ':completion:*' menu select

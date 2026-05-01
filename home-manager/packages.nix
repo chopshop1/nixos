@@ -46,6 +46,7 @@ in
     # fzf, bat, eza, ripgrep, fd available via cli-tools.nix
     mprocs
     typos
+    sesh        # tmux session manager (fuzzy picker)
 
     # Desktop applications
     # firefox available via desktop-apps.nix (programs.firefox.enable)
